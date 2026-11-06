@@ -108,23 +108,34 @@ const markets = ['Europe', 'Russia', 'Middle East', 'Asia', 'Japan', 'Far East']
           <h1 id="g-hero" class="cond text-[clamp(3.4rem,2rem+6.5vw,7.25rem)] font-medium uppercase leading-[0.9] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>
             Premium citrus.<br />Ready for<br /><span class="text-sage">the world.</span>
           </h1>
-          <div class="mt-9 flex flex-wrap gap-3" data-reveal>
+          <div class="mt-9 flex flex-wrap gap-3">
             <a href="/contact-us" class="btn-forest inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em]">Start an export conversation <Icon name="arrow" class="size-4" /></a>
             <a href="/produce" class="glass inline-flex items-center rounded-full px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em]">Our produce</a>
           </div>
         </div>
-        <ul class="glass grid grid-cols-3 divide-x divide-ivory/15 rounded-[22px] py-4 lg:col-span-4 lg:justify-self-end lg:px-2" aria-label="Certifications" data-reveal>
+        <ul class="glass grid grid-cols-3 divide-x divide-ivory/15 rounded-[22px] py-4 md:hidden" aria-label="Certifications">
           {
             badges.map((b) => (
-              <li class="flex flex-col items-center px-3 text-center lg:w-28">
-                <span class="flex size-11 items-center justify-center rounded-full border border-ivory/35 bg-ivory/5"><Icon name={b.icon} class="size-5" /></span>
-                <span class="cond mt-2 text-sm font-semibold uppercase tracking-[0.08em]">{b.label}</span>
+              <li class="flex flex-col items-center px-2 text-center">
+                <Icon name={b.icon} class="size-5" />
+                <span class="cond mt-1.5 text-sm font-semibold uppercase tracking-[0.08em]">{b.label}</span>
                 <span class="text-[0.65rem] uppercase tracking-[0.12em] text-ivory/65">{b.sub}</span>
               </li>
             ))
           }
         </ul>
       </div>
+      <ul class="glass absolute right-4 top-1/2 hidden -translate-y-1/2 flex-col rounded-[22px] px-3 py-4 md:right-6 md:flex xl:right-[max(1.5rem,calc((100vw-84rem)/2+1.5rem))]" aria-label="Certifications">
+        {
+          badges.map((b, i) => (
+            <li class:list={['flex w-24 flex-col items-center py-3 text-center', i > 0 && 'border-t border-ivory/15']}>
+              <span class="flex size-12 items-center justify-center rounded-full border border-ivory/35 bg-ivory/5"><Icon name={b.icon} class="size-5" /></span>
+              <span class="cond mt-2 text-sm font-semibold uppercase tracking-[0.08em]">{b.label}</span>
+              <span class="text-[0.7rem] uppercase tracking-[0.12em] text-ivory/65">{b.sub}</span>
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
     <!-- Intro: who we are, with the orange -->
