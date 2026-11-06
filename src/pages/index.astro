@@ -1,31 +1,332 @@
 ---
+/**
+ * Design concept B: frosted-glass panels over a fixed Lowveld landscape.
+ * Core palette: ivory, grey, Mahela blue, forest green.
+ */
+import '@fontsource-variable/roboto-condensed';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
-import IntroMetrics from '../components/IntroMetrics.astro';
-import ProduceShowcase from '../components/ProduceShowcase.astro';
-import Process from '../components/Process.astro';
-import Compliance from '../components/Compliance.astro';
-import Markets from '../components/Markets.astro';
-import Heritage from '../components/Heritage.astro';
-import PeopleNewsCta from '../components/PeopleNewsCta.astro';
-import { site } from '../data/site';
+import Icon from '../components/glass/Icon.astro';
+import { site, hero, nav } from '../data/site';
+import heroImage from '../assets/media/farms/dsc-1739.jpg';
+import introImage from '../assets/media/farms/dsc-7988.jpg';
+import panelsImage from '../assets/media/farms/dsc-1779.jpg';
+import emblem from '../assets/media/brand/mahela-emblem-hires.png';
+import orange from '../assets/media/produce/cutouts/orange-with-leaves-a.webp';
+
+/** Drop the client's hero film into public/video/ and set this path, e.g. '/video/hero.mp4'. */
+const heroVideo: string | undefined = undefined;
+const heroPoster = heroImage;
 
 const website = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: site.name,
+  '@id': `${site.url}/#website`,
   url: site.url,
+  name: site.name,
   publisher: { '@id': `${site.url}/#organization` },
 };
+
+const cutouts = import.meta.glob<{ default: ImageMetadata }>('../assets/media/produce/cutouts/*.webp', { eager: true });
+const cut = (n: string) => cutouts[`../assets/media/produce/cutouts/${n}.webp`]!.default;
+
+const fruits = [
+  { name: 'Citrus', img: 'naartjie', text: 'Core export category, five citrus groups' },
+  { name: 'Avocados', img: 'avocado-halved', text: 'GlobalGAP and Tesco standard' },
+  { name: 'Bananas', img: 'banana-peeled', text: 'Cavendish, packed on-farm' },
+  { name: 'Macadamias', img: 'macadamia-nuts-leaves', text: 'Beaumont, for export' },
+  { name: 'Litchis', img: 'lychee', text: 'Mauritius, since 1947' },
+  { name: 'Golden kiwis', img: 'kiwi-halved', text: 'Sorelli, Magoebaskloof' },
+];
+
+const badges = [
+  { icon: 'leaf', label: 'GlobalGAP', sub: 'since 2003' },
+  { icon: 'people', label: 'SIZA', sub: 'accredited' },
+  { icon: 'shield', label: 'PPECB', sub: 'inspected' },
+] as const;
+
+const pillars = [
+  { icon: 'sprout', title: 'Certified nursery', text: 'High-quality, disease-free trees establish the foundation for long-term orchard performance.', href: '/produce' },
+  { icon: 'box', title: 'Packhouse precision', text: 'Two packhouses, optical grading and on-site testing, with PPECB inspectors present full-time in season.', href: '/packhouses' },
+  { icon: 'people', title: 'Ethically grown', text: 'SIZA-aligned labour practices, training and community investment behind every carton.', href: '/mahela-cares' },
+] as const;
+
+const figures = [
+  { value: 1942, label: 'Founded', note: 'The Junction, Letsitele', format: 'year' },
+  { value: 700, label: 'Full-time jobs', note: '+ 1 100 seasonal' },
+  { value: 20000, label: 'm² packhouse', note: 'Junction + Ohrigstad', short: '20K' },
+  { value: 1200, label: 'Tons a day', note: 'In season, double shifts', short: '1.2K' },
+];
+
+const values = [
+  { icon: 'leaf', label: 'GlobalGAP certified since 2003' },
+  { icon: 'drop', label: 'Water-wise drip irrigation' },
+  { icon: 'globe', label: 'Exported to Europe, Asia and beyond' },
+  { icon: 'heart', label: 'Investing in our community' },
+] as const;
+
+const markets = ['Europe', 'Russia', 'Middle East', 'Asia', 'Japan', 'Far East'];
 ---
 
-<Base jsonLd={[website]}>
-  <Hero />
-  <IntroMetrics />
-  <ProduceShowcase />
-  <Process />
-  <Compliance />
-  <Markets />
-  <Heritage />
-  <PeopleNewsCta />
+<Base chrome={false} jsonLd={[website]}>
+  <div class="glass-page relative isolate bg-[#10201a] text-ivory">
+    <!-- Floating glass nav -->
+    <header class="fixed inset-x-0 top-3 z-50 px-3 md:top-5 md:px-6">
+      <div class="glass mx-auto flex max-w-[84rem] items-center justify-between rounded-[22px] px-4 py-2.5 md:px-6">
+        <a href="/" class="flex items-center gap-3" aria-label="Mahela Group home">
+          <Image src={emblem} alt="" width={88} height={82} class="h-9 w-auto" loading="eager" />
+          <span class="leading-none">
+            <span class="cond block text-lg font-semibold tracking-[0.14em]">MAHELA</span>
+            <span class="block pt-0.5 text-[0.55rem] font-medium uppercase tracking-[0.42em] text-ivory/70">Group</span>
+          </span>
+        </a>
+        <nav aria-label="Main" class="hidden lg:block">
+          <ul class="flex gap-7 text-[0.9rem] text-ivory/85">
+            {nav.slice(0, 6).map((n) => <li><a href={n.href} class="transition-colors hover:text-white">{n.label}</a></li>)}
+          </ul>
+        </nav>
+        <a href="/contact-us" class="btn-forest rounded-full px-5 py-2 text-sm font-semibold">Contact</a>
+      </div>
+    </header>
+
+    <!-- Hero: full-screen video (poster image until the film is supplied) -->
+    <section class="relative isolate flex min-h-[100svh] items-end overflow-hidden" aria-labelledby="g-hero">
+      <div class="absolute inset-0 -z-10" aria-hidden="true">
+        <Image src={heroImage} alt="" widths={[768, 1280, 1920, 2400]} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover object-[50%_40%]" />
+        {
+          heroVideo && (
+            <video class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline preload="metadata" poster={heroPoster.src} data-hero-video>
+              <source src={heroVideo} type="video/mp4" />
+            </video>
+          )
+        }
+        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.45)_0%,rgb(12_26_22/0.15)_35%,rgb(12_26_22/0.7)_100%)]"></div>
+      </div>
+      <div class="mx-auto grid w-full max-w-[84rem] items-end gap-10 px-4 pb-14 pt-32 md:px-6 md:pb-20 lg:grid-cols-12">
+        <div class="lg:col-span-8">
+          <h1 id="g-hero" class="cond text-[clamp(3.4rem,2rem+6.5vw,7.25rem)] font-medium uppercase leading-[0.9] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>
+            Premium citrus.<br />Ready for<br /><span class="text-sage">the world.</span>
+          </h1>
+          <div class="mt-9 flex flex-wrap gap-3" data-reveal>
+            <a href="/contact-us" class="btn-forest inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em]">Start an export conversation <Icon name="arrow" class="size-4" /></a>
+            <a href="/produce" class="glass inline-flex items-center rounded-full px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em]">Our produce</a>
+          </div>
+        </div>
+        <ul class="glass grid grid-cols-3 divide-x divide-ivory/15 rounded-[22px] py-4 lg:col-span-4 lg:justify-self-end lg:px-2" aria-label="Certifications" data-reveal>
+          {
+            badges.map((b) => (
+              <li class="flex flex-col items-center px-3 text-center lg:w-28">
+                <span class="flex size-11 items-center justify-center rounded-full border border-ivory/35 bg-ivory/5"><Icon name={b.icon} class="size-5" /></span>
+                <span class="cond mt-2 text-sm font-semibold uppercase tracking-[0.08em]">{b.label}</span>
+                <span class="text-[0.65rem] uppercase tracking-[0.12em] text-ivory/65">{b.sub}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Intro: who we are, with the orange -->
+    <section class="relative isolate overflow-hidden" aria-labelledby="g-intro">
+      <div class="absolute inset-0 -z-10" aria-hidden="true">
+        <Image src={introImage} alt="" widths={[768, 1280, 1920, 2400]} sizes="100vw" class="h-full w-full object-cover object-[50%_60%]" />
+        <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(12_26_22/0.82)_0%,rgb(12_26_22/0.45)_60%,rgb(12_26_22/0.3)_100%)]"></div>
+      </div>
+      <div class="mx-auto grid min-h-[90svh] max-w-[84rem] items-center gap-10 px-4 py-24 md:px-6 lg:grid-cols-12">
+        <div class="glass rounded-[28px] p-7 md:p-10 lg:col-span-6" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">Letsitele, Limpopo • Since 1942</p>
+          <h2 id="g-intro" class="cond mt-4 text-[clamp(2rem,1.4rem+2vw,3rem)] font-medium uppercase leading-[1] tracking-[0.02em]">Grown, packed and shipped by one family</h2>
+          <div class="my-6 flex max-w-[12rem] items-center gap-3 text-sage"><span class="h-px flex-1 bg-ivory/30"></span><Icon name="leaf" class="size-4" /><span class="h-px flex-1 bg-ivory/30"></span></div>
+          <p class="text-lg leading-relaxed text-ivory/85">{hero.lead}</p>
+          <a href="/about-us" class="glass-soft mt-8 inline-flex rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">About Mahela</a>
+        </div>
+        <div class="relative flex justify-center lg:col-span-6">
+          <div class="relative w-[min(72vw,480px)]" data-parallax="-0.2">
+            <div class="absolute inset-x-[12%] bottom-[2%] h-[14%] rounded-[50%] bg-black/45 blur-2xl"></div>
+            <Image src={orange} alt="Mahela orange with leaves" widths={[360, 540, 660]} sizes="(min-width: 1024px) 480px, 72vw" class="relative h-auto w-full drop-shadow-[0_30px_50px_rgba(0,0,0,0.45)]" data-reveal />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Remaining panels float over one orchard photo that stays put while they scroll -->
+    <div class="relative">
+      <div class="sticky top-0 -z-10 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden="true">
+        <Image src={panelsImage} alt="" widths={[768, 1280, 1920, 2400]} sizes="100vw" class="h-full w-full object-cover" />
+        <div class="absolute inset-0 bg-[rgb(12_26_22/0.6)]"></div>
+      </div>
+    <div class="relative mx-auto max-w-[84rem] px-4 pt-24 md:px-6">
+
+      <!-- Fruit icon row -->
+      <section class="glass rounded-[28px] px-5 py-8 md:px-10" aria-labelledby="g-fruit" data-reveal>
+        <div class="flex items-center gap-4">
+          <span class="h-px flex-1 bg-ivory/25"></span>
+          <h2 id="g-fruit" class="cond text-xl uppercase tracking-[0.14em] md:text-2xl">Grown in the Lowveld</h2>
+          <span class="h-px flex-1 bg-ivory/25"></span>
+        </div>
+        <ul class="mt-8 grid grid-cols-2 gap-y-8 sm:grid-cols-3 lg:grid-cols-6 lg:divide-x lg:divide-ivory/15">
+          {
+            fruits.map((f) => (
+              <li class="group px-3 text-center">
+                <a href={`/produce/${f.name === 'Golden kiwis' ? 'kiwis' : f.name.toLowerCase()}`} class="block">
+                  <span class="relative mx-auto block size-24 md:size-28">
+                    <span class="absolute inset-[18%] rounded-full bg-ivory/10 blur-xl transition-opacity group-hover:opacity-100" />
+                    <Image src={cut(f.img)} alt="" widths={[160, 240]} sizes="112px" class="relative h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105" />
+                  </span>
+                  <span class="cond mt-3 block text-lg font-semibold uppercase tracking-[0.08em]">{f.name}</span>
+                  <span class="mt-1 block text-[0.8rem] leading-snug text-ivory/70">{f.text}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- Pillars -->
+      <section class="mt-6 grid gap-6 md:grid-cols-3" aria-label="How we work">
+        {
+          pillars.map((p) => (
+            <article class="glass flex flex-col rounded-[28px] p-7" data-reveal data-tilt>
+              <div class="flex items-start gap-4">
+                <span class="flex size-14 shrink-0 items-center justify-center rounded-full border border-ivory/35 bg-forest/40"><Icon name={p.icon} class="size-6" /></span>
+                <h2 class="cond pt-1 text-2xl font-medium uppercase leading-tight tracking-[0.06em]">{p.title}</h2>
+              </div>
+              <p class="mt-5 flex-1 leading-relaxed text-ivory/80">{p.text}</p>
+              <a href={p.href} class="glass-soft mt-7 self-start rounded-full px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.16em]">Learn more</a>
+            </article>
+          ))
+        }
+      </section>
+
+      <!-- Figures -->
+      <section class="glass mt-6 grid gap-10 rounded-[28px] p-7 md:p-10 lg:grid-cols-12 lg:items-center" aria-labelledby="g-figures" data-reveal>
+        <div class="lg:col-span-4">
+          <h2 id="g-figures" class="cond text-3xl font-medium uppercase leading-tight tracking-[0.04em]">Four generations.<br />One standard.</h2>
+          <div class="my-5 flex max-w-[10rem] items-center gap-3 text-sage"><span class="h-px flex-1 bg-ivory/30"></span><Icon name="leaf" class="size-4" /><span class="h-px flex-1 bg-ivory/30"></span></div>
+          <p class="leading-relaxed text-ivory/80">From the first rented land at The Junction in 1942 to two state-of-the-art packhouses, Mahela is one of South Africa’s biggest privately-owned citrus exporters.</p>
+          <a href="/packhouses" class="btn-blue mt-7 inline-flex rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">Packhouse capability</a>
+        </div>
+        <ul class="glass-soft grid grid-cols-2 gap-y-8 rounded-[22px] p-6 md:grid-cols-4 lg:col-span-8">
+          {
+            figures.map((f) => (
+              <li class="text-center">
+                <span class="cond mx-auto flex size-[5.5rem] items-center justify-center rounded-full border-2 border-ivory/50 bg-forest/50 text-2xl font-semibold tabular md:size-24 md:text-[1.7rem]">
+                  {f.short ? <span>{f.short}</span> : <span data-count={f.value} data-format={f.format ?? 'number'}>{f.value}</span>}
+                </span>
+                <span class="cond mt-3 block text-lg font-semibold uppercase tracking-[0.08em]">{f.label}</span>
+                <span class="block text-[0.8rem] text-ivory/65">{f.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- Markets + CTA -->
+      <section class="mt-6 grid gap-6 lg:grid-cols-12" aria-labelledby="g-markets">
+        <div class="glass rounded-[28px] p-7 md:p-10 lg:col-span-7" data-reveal>
+          <h2 id="g-markets" class="cond text-3xl font-medium uppercase tracking-[0.04em]">From Limpopo to the world</h2>
+          <p class="mt-4 max-w-lg leading-relaxed text-ivory/80">Exported under the Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brands, with Europe as the primary focus.</p>
+          <ul class="mt-7 flex flex-wrap gap-2">
+            {markets.map((m, i) => <li class:list={['rounded-full px-4 py-2 text-sm', i === 0 ? 'btn-forest font-semibold' : 'glass-soft']}>{m}</li>)}
+          </ul>
+        </div>
+        <div class="glass-blue flex flex-col justify-between rounded-[28px] p-7 md:p-10 lg:col-span-5" data-reveal>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ivory/70">Importers • Retailers • Programme buyers</p>
+            <h2 class="cond mt-3 text-3xl font-medium uppercase leading-tight tracking-[0.04em]">Build your next citrus programme with Mahela.</h2>
+          </div>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="/contact-us" class="btn-forest rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">Contact the export team</a>
+            <a href={site.phoneHref} class="glass-soft rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">{site.phone}</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Values row -->
+      <ul class="grid grid-cols-2 gap-6 py-14 md:grid-cols-4" data-reveal>
+        {
+          values.map((v) => (
+            <li class="flex items-center gap-3">
+              <Icon name={v.icon} class="size-8 shrink-0 text-ivory/90" />
+              <span class="cond text-sm uppercase leading-tight tracking-[0.1em] text-ivory/90">{v.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <footer class="glass mb-6 flex flex-wrap items-center justify-between gap-4 rounded-[22px] px-6 py-5 text-sm text-ivory/70">
+        <span>© 2026 Mahela Group · {site.address.street}, {site.address.locality}</span>
+        <span class="flex gap-5"><a href={`mailto:${site.email}`} class="hover:text-white">{site.email}</a><a href="/legal" class="hover:text-white">POPIA</a></span>
+      </footer>
+    </div>
+    </div>
+  </div>
 </Base>
+
+<script>
+  // Respect reduced motion: hold the hero film on its poster frame.
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+  if (video && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    video.removeAttribute('autoplay');
+    video.pause();
+  }
+</script>
+
+<style is:global>
+  .glass-page {
+    font-family: 'Inter Variable', system-ui, sans-serif;
+  }
+  .cond {
+    font-family: 'Roboto Condensed Variable', 'Arial Narrow', sans-serif;
+  }
+  .glass,
+  .glass-soft,
+  .glass-blue {
+    border: 1px solid rgb(245 242 234 / 0.22);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+  .glass {
+    background: linear-gradient(135deg, rgb(245 242 234 / 0.16), rgb(142 149 155 / 0.08));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.22),
+      0 24px 60px -20px rgb(0 0 0 / 0.45);
+  }
+  .glass-soft {
+    background: rgb(245 242 234 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.15);
+  }
+  .glass-blue {
+    background: linear-gradient(140deg, rgb(29 79 148 / 0.72), rgb(29 79 148 / 0.42));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.22),
+      0 24px 60px -20px rgb(0 0 0 / 0.45);
+  }
+  .btn-forest {
+    color: var(--color-ivory);
+    background: linear-gradient(180deg, #2c6b44, #1e4a30);
+    border: 1px solid rgb(185 209 166 / 0.45);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 10px 24px -10px rgb(0 0 0 / 0.5);
+    transition: transform 0.3s, filter 0.3s;
+  }
+  .btn-blue {
+    color: #f5f2ea;
+    background: linear-gradient(180deg, #2a62b0, #1d4f94);
+    border: 1px solid rgb(245 242 234 / 0.3);
+    transition: transform 0.3s, filter 0.3s;
+  }
+  .btn-forest:hover,
+  .btn-blue:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+  .glass-soft { transition: background-color 0.3s; }
+  a.glass-soft:hover { background: rgb(245 242 234 / 0.16); }
+  @media (max-width: 767px) {
+    .glass, .glass-soft, .glass-blue {
+      -webkit-backdrop-filter: blur(12px) saturate(130%);
+      backdrop-filter: blur(12px) saturate(130%);
+    }
+  }
+</style>

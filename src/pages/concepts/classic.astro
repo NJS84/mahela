@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import IntroMetrics from '../../components/IntroMetrics.astro';
+import ProduceShowcase from '../../components/ProduceShowcase.astro';
+import Process from '../../components/Process.astro';
+import Compliance from '../../components/Compliance.astro';
+import Markets from '../../components/Markets.astro';
+import Heritage from '../../components/Heritage.astro';
+import PeopleNewsCta from '../../components/PeopleNewsCta.astro';
+import { site } from '../../data/site';
+
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.name,
+  url: site.url,
+  publisher: { '@id': `${site.url}/#organization` },
+};
+---
+
+<Base jsonLd={[website]} noindex title="Concept A: Classic">
+  <Hero />
+  <IntroMetrics />
+  <ProduceShowcase />
+  <Process />
+  <Compliance />
+  <Markets />
+  <Heritage />
+  <PeopleNewsCta />
+</Base>
