@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/inter';
+
+/*
+  Mahela design tokens (Phase 2 draft).
+  Logo blue is the brand mark colour; orchard green is the main accent;
+  lemon-lime is the secondary accent, used sparingly for emphasis.
+*/
+@theme {
+  --color-brand: #274486; /* logo blue */
+  --color-brand-deep: #1a2f61;
+
+  --color-green-950: #0c2418;
+  --color-green-900: #123222;
+  --color-green-800: #17432c;
+  --color-green-700: #1f5a3a; /* main accent */
+  --color-green-500: #3e7c4f;
+  --color-green-200: #c9dccd;
+
+  --color-lime: #d4e157; /* secondary accent */
+  --color-lime-soft: #eef4bf;
+
+  --color-bone: #f4f1ea;
+  --color-bone-deep: #e9e4d8;
+  --color-clay: #8a5a3b;
+  --color-ink: #1c1f1d;
+  --color-ink-soft: #4a4f4b;
+  --color-line: rgb(28 31 29 / 0.12);
+
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: clamp(2.75rem, 1.6rem + 5.2vw, 6.5rem);
+  --text-display--line-height: 0.98;
+  --text-h2: clamp(2rem, 1.4rem + 2.6vw, 3.75rem);
+  --text-h2--line-height: 1.04;
+  --text-h3: clamp(1.375rem, 1.15rem + 0.9vw, 1.875rem);
+  --text-h3--line-height: 1.15;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-bone);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-bone);
+  }
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-green-950);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .font-display {
+    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  }
+}
+
+@utility container-x {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 0.5rem + 2.5vw, 3rem);
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Elements that animate in start hidden only when JS + motion are allowed. */
+.js-motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .js-motion [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* With motion on, the heritage track is driven by a pinned scroll instead. */
+.js-motion [data-heritage-scroll] {
+  overflow: visible;
+}
+
+/* Placeholder imagery until Mahela's photography is supplied. */
+@layer components {
+.ph {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 20% 10%, rgb(255 255 255 / 0.18), transparent 60%),
+    linear-gradient(160deg, var(--ph-a, var(--color-green-700)), var(--ph-b, var(--color-green-950)));
+}
+.ph::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 1rem;
+  bottom: 0.875rem;
+  font: 500 0.6875rem/1 var(--font-sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.55);
+}
+}

@@ -1,0 +1,24 @@
+---
+/**
+ * Placeholder wordmark. Replace with Mahela's supplied vector logo (blue).
+ * `tone="light"` renders it for dark backgrounds.
+ */
+interface Props {
+  tone?: 'brand' | 'light';
+  class?: string;
+}
+const { tone = 'brand', class: className = '' } = Astro.props;
+const fill = tone === 'light' ? '#ffffff' : 'var(--color-brand)';
+---
+
+<span class:list={['inline-flex items-center gap-2.5', className]} aria-label="Mahela Group">
+  <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+    <circle cx="17" cy="17" r="16" fill="none" stroke={fill} stroke-width="1.5"></circle>
+    <path d="M9 22V12l8 7 8-7v10" fill="none" stroke={fill} stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    ></path>
+  </svg>
+  <span class="leading-none" style={`color:${fill}`}>
+    <span class="block font-display text-[1.35rem] font-semibold tracking-[0.06em]">MAHELA</span>
+    <span class="eyebrow block pt-0.5 text-[0.55rem] tracking-[0.42em] opacity-80">Group</span>
+  </span>
+</span>
