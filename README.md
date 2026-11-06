@@ -25,4 +25,4 @@ npm run build    # type-checks, then builds to dist/
 
 ## Status
 
-Phase 2: home page look and feel. Photography and the logo are placeholders (`.ph` blocks and `Logo.astro`) until Mahela supplies final assets. Figures marked `confirm` in `src/data/site.ts` need a fact check with the client.
+Phase 2: home page look and feel. Photography, logo and certification marks come from the client WordPress media library (`src/assets/media`, see its README). No vector logo exists yet. Figures marked `confirm` in `src/data/site.ts` need a fact check with the client.

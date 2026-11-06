@@ -69,11 +69,13 @@ export type Produce = {
   summary: string;
   facts: string[];
   tone: [string, string];
+  image: string;
 };
 
 export const produce: Produce[] = [
   {
     slug: 'citrus',
+    image: 'orange-with-leaves-b',
     name: 'Citrus',
     tag: 'Core export category',
     summary:
@@ -83,6 +85,7 @@ export const produce: Produce[] = [
   },
   {
     slug: 'avocados',
+    image: 'avocado-halved',
     name: 'Avocados',
     tag: 'Harvest March – July',
     summary:
@@ -92,6 +95,7 @@ export const produce: Produce[] = [
   },
   {
     slug: 'bananas',
+    image: 'banana-peeled',
     name: 'Bananas',
     tag: 'Mala-Mala brand',
     summary:
@@ -101,6 +105,7 @@ export const produce: Produce[] = [
   },
   {
     slug: 'macadamias',
+    image: 'macadamia-nuts-leaves',
     name: 'Macadamias',
     tag: 'Harvest May – July',
     summary:
@@ -110,6 +115,7 @@ export const produce: Produce[] = [
   },
   {
     slug: 'litchis',
+    image: 'lychee',
     name: 'Litchis',
     tag: 'Harvest December – January',
     summary:
@@ -119,6 +125,7 @@ export const produce: Produce[] = [
   },
   {
     slug: 'kiwis',
+    image: 'kiwi-halved',
     name: 'Golden kiwis',
     tag: 'Harvest February',
     summary:

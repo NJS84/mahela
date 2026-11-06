@@ -1,11 +1,15 @@
 ---
+import { Image } from 'astro:assets';
 import { people, news, cta, site } from '../data/site';
+import team from '../assets/media/people/dhk-9884.jpg';
 ---
 
 <section class="bg-bone py-24 md:py-36" aria-labelledby="people-title">
   <div class="container-x grid gap-12 md:grid-cols-12 md:items-center">
     <div class="relative aspect-[4/5] overflow-hidden rounded-3xl md:col-span-6" data-reveal>
-      <div class="ph absolute inset-[-8%]" style="--ph-a:#3e7c4f;--ph-b:#0c2418" data-label="Photo: Mahela team in the orchard" data-parallax="0.12"></div>
+      <div class="absolute inset-[-8%]" data-parallax="0.12">
+        <Image src={team} alt="Mahela Group directors walking through an orchard" widths={[600, 900, 1200]} sizes="(min-width: 768px) 50vw, 100vw" class="h-full w-full object-cover object-[45%_50%]" />
+      </div>
     </div>
     <div class="md:col-span-5 md:col-start-8">
       <p class="eyebrow text-green-700" data-reveal>{people.eyebrow}</p>

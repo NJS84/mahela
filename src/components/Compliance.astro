@@ -1,5 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import { compliance } from '../data/site';
+import globalgap from '../assets/media/certifications/globalgap-colour.png';
+import siza from '../assets/media/certifications/siza-colour.png';
+import nsf from '../assets/media/certifications/nsf-registered-colour.png';
+
+const logos: Record<string, ImageMetadata> = { GlobalGAP: globalgap, SIZA: siza, 'NSF Registered': nsf };
 ---
 
 <section class="relative overflow-hidden bg-brand text-white" aria-labelledby="compliance-title">
@@ -32,8 +38,8 @@ import { compliance } from '../data/site';
         <ul class="marquee-track flex w-max gap-4">
           {
             [...compliance.memberships, ...compliance.memberships].map((m, i) => (
-              <li class="flex h-20 w-52 items-center justify-center rounded-2xl border border-white/15 text-sm font-semibold tracking-wide text-white/80" aria-hidden={i >= compliance.memberships.length ? 'true' : undefined}>
-                {m}
+              <li class:list={['flex h-20 w-52 items-center justify-center rounded-2xl px-6 text-sm font-semibold tracking-wide', logos[m] ? 'bg-white text-ink' : 'border border-white/15 text-white/80']} aria-hidden={i >= compliance.memberships.length ? 'true' : undefined}>
+                {logos[m] ? <Image src={logos[m]} alt={m} height={48} class="max-h-10 w-auto object-contain" /> : m}
               </li>
             ))
           }

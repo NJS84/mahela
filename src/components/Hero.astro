@@ -1,15 +1,27 @@
 ---
+import { Image } from 'astro:assets';
 import { hero } from '../data/site';
+import landscape from '../assets/media/farms/dsc-1739.jpg';
+import orange from '../assets/media/produce/cutouts/orange-with-leaves-a.webp';
 ---
 
 <section class="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-green-950 text-white" aria-labelledby="hero-title">
-  <!-- Layer 1: landscape (placeholder until orchard photography is supplied) -->
+  <!-- Layer 1: sunrise aerial over Mahela orchards -->
   <div class="absolute inset-0 -z-30" data-parallax="0.15">
-    <div class="ph absolute inset-[-10%]" style="--ph-a:#1f5a3a;--ph-b:#07170f" data-label="Hero photo: orchard / Lowveld landscape"></div>
+    <Image
+      src={landscape}
+      alt=""
+      widths={[768, 1280, 1920, 2400]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="absolute inset-0 h-[115%] w-full object-cover object-[50%_40%]"
+    />
+    <div class="absolute inset-0 bg-green-950/45"></div>
   </div>
 
-  <!-- Layer 2: orchard rows, drawn -->
-  <svg class="absolute inset-x-0 bottom-0 -z-20 h-[58%] w-full opacity-40" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true" data-parallax="0.3">
+  <!-- Layer 2: drawn orchard rows for depth -->
+  <svg class="absolute inset-x-0 bottom-0 -z-20 h-[58%] w-full opacity-25" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true" data-parallax="0.3">
     <defs>
       <linearGradient id="row" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#3e7c4f" stop-opacity="0"></stop>
@@ -25,27 +37,8 @@ import { hero } from '../data/site';
   </svg>
 
   <!-- Layer 3: citrus slice, foreground depth -->
-  <div class="pointer-events-none absolute -right-[16vw] top-[8%] -z-10 w-[40vw] md:-right-[6vw] md:top-[12%] md:w-[min(56vw,760px)]" data-parallax="-0.25" aria-hidden="true">
-    <svg viewBox="0 0 400 400" class="h-auto w-full drop-shadow-[0_40px_80px_rgba(0,0,0,0.45)]" data-hero-slice>
-      <circle cx="200" cy="200" r="196" fill="#e8742a"></circle>
-      <circle cx="200" cy="200" r="178" fill="#fbe7c4"></circle>
-      <circle cx="200" cy="200" r="168" fill="#f39a3d"></circle>
-      {
-        Array.from({ length: 11 }).map((_, i) => {
-          const a = (i / 11) * Math.PI * 2;
-          const b = ((i + 1) / 11) * Math.PI * 2;
-          const r = 158;
-          const x1 = 200 + Math.cos(a + 0.04) * r;
-          const y1 = 200 + Math.sin(a + 0.04) * r;
-          const x2 = 200 + Math.cos(b - 0.04) * r;
-          const y2 = 200 + Math.sin(b - 0.04) * r;
-          return (
-            <path d={`M${200 + Math.cos((a + b) / 2) * 14} ${200 + Math.sin((a + b) / 2) * 14} L${x1} ${y1} A${r} ${r} 0 0 1 ${x2} ${y2} Z`} fill="#f7b04f" opacity="0.92" />
-          );
-        })
-      }
-      <circle cx="200" cy="200" r="16" fill="#fbe7c4"></circle>
-    </svg>
+  <div class="pointer-events-none absolute -right-[16vw] top-[8%] -z-10 w-[40vw] md:right-[2vw] md:top-[14%] md:w-[min(38vw,560px)]" data-parallax="-0.25" aria-hidden="true">
+    <Image src={orange} alt="" widths={[320, 480, 640]} sizes="(min-width: 768px) 40vw, 40vw" loading="eager" class="h-auto w-full drop-shadow-[0_40px_60px_rgba(0,0,0,0.5)]" data-hero-slice />
   </div>
 
   <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-green-950 via-green-950/40 to-transparent"></div>
