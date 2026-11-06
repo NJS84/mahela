@@ -1,0 +1,25 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/site/Icon.astro';
+import { media } from '../lib/media';
+---
+
+<Base title="Page not found" noindex>
+  <section class="relative flex min-h-[100svh] items-center overflow-hidden">
+    <Image src={media('farms/citrus-trees.jpg')} alt="" widths={[1280, 1920]} sizes="100vw" class="absolute inset-0 -z-10 h-full w-full object-cover" loading="eager" />
+    <div class="absolute inset-0 -z-10 bg-[rgb(12_26_22/0.7)]"></div>
+    <div class="mx-auto grid max-w-[84rem] items-center gap-10 px-4 md:px-6 lg:grid-cols-2">
+      <div class="glass rounded-[32px] p-8 md:p-12">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sage">404</p>
+        <h1 class="cond mt-3 text-[clamp(2.6rem,1.6rem+4vw,5rem)] font-medium uppercase leading-[0.95]">This one fell off the tree</h1>
+        <p class="mt-5 text-lg text-ivory/80">The page you are looking for has moved or no longer exists.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/" class="btn-forest inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">Home <Icon name="arrow" class="size-4" /></a>
+          <a href="/produce" class="glass-soft inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">Our produce</a>
+        </div>
+      </div>
+      <Image src={media('produce/renders/orange.webp')} alt="" width={520} class="mx-auto w-[60%] rotate-12 drop-shadow-[0_40px_50px_rgba(0,0,0,0.5)] lg:w-[70%]" data-float-big />
+    </div>
+  </section>
+</Base>

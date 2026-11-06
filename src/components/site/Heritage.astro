@@ -1,0 +1,29 @@
+---
+import { heritage } from '../../data/site';
+import SectionTitle from './SectionTitle.astro';
+---
+
+<section class="relative overflow-hidden py-24 md:py-0" aria-labelledby="heritage-title" data-heritage>
+  <div class="flex min-h-[100svh] flex-col justify-center">
+    <div class="mx-auto w-full max-w-[84rem] px-4 md:px-6">
+      <SectionTitle eyebrow={heritage.eyebrow} title={heritage.title} id="heritage-title" />
+    </div>
+    <div class="mt-12 overflow-x-auto pb-4 md:overflow-visible" data-heritage-scroll>
+      <ol class="flex w-max gap-5 px-4 md:px-[max(1.5rem,calc((100vw-84rem)/2+1.5rem))]" data-heritage-track>
+        {
+          heritage.milestones.map((m, i) => (
+            <li class="glass relative w-[78vw] max-w-[24rem] shrink-0 rounded-[28px] p-7 md:w-[24rem]" data-glare>
+              <span class="cond block text-[4.5rem] font-semibold leading-none text-sage/80 tabular">{m.year}</span>
+              <span class="my-5 block h-px w-full bg-ivory/20" />
+              <p class="leading-relaxed text-ivory/85">{m.text}</p>
+              <span class="absolute right-6 top-6 text-xs tabular text-ivory/40">{String(i + 1).padStart(2, '0')} / {String(heritage.milestones.length).padStart(2, '0')}</span>
+            </li>
+          ))
+        }
+        <li class="flex w-[60vw] max-w-[20rem] shrink-0 items-center md:w-[20rem]">
+          <a href="/about-us" class="btn-forest rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">The full story</a>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>

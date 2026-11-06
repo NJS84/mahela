@@ -1,0 +1,24 @@
+---
+/** A few loose citrus leaves that drift at different depths as the page scrolls. */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+interface Props {
+  spots?: { x: string; y: string; size: number; r: number; blur?: boolean }[];
+}
+const { spots = [
+  { x: '6%', y: '12%', size: 90, r: -30 },
+  { x: '88%', y: '30%', size: 130, r: 40, blur: true },
+  { x: '78%', y: '82%', size: 70, r: 110 },
+] } = Astro.props;
+const leaf = media('produce/renders/leaf.webp');
+---
+
+<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+  {
+    spots.map((s) => (
+      <div class="absolute" style={`left:${s.x};top:${s.y};width:${s.size}px;transform:rotate(${s.r}deg)`} data-float>
+        <Image src={leaf} alt="" width={s.size * 2} class:list={['h-auto w-full drop-shadow-[0_16px_20px_rgba(0,0,0,0.35)]', s.blur && 'blur-[3px] opacity-80']} />
+      </div>
+    ))
+  }
+</div>

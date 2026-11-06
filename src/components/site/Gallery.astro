@@ -1,0 +1,21 @@
+---
+/** Photo strip: tilting glass-framed photos that reveal on scroll. */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+interface Props {
+  images: { src: string; alt: string }[];
+}
+const { images } = Astro.props;
+---
+
+<ul class:list={['grid gap-4 sm:grid-cols-2', images.length >= 3 && 'lg:grid-cols-3', images.length === 4 && 'lg:grid-cols-4']}>
+  {
+    images.map((img, i) => (
+      <li class:list={[i % 2 === 1 && 'lg:translate-y-10']}>
+        <div class="glass-soft overflow-hidden rounded-[24px] p-1.5" data-reveal data-tilt>
+        <Image src={media(img.src)} alt={img.alt} widths={[480, 720, 960]} sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" class="aspect-[4/5] w-full rounded-[18px] object-cover" />
+        </div>
+      </li>
+    ))
+  }
+</ul>

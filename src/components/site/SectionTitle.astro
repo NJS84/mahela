@@ -1,0 +1,17 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  id?: string;
+  align?: 'left' | 'center';
+  as?: 'h2' | 'h3';
+}
+const { eyebrow, title, lead, id, align = 'left', as: Tag = 'h2' } = Astro.props;
+---
+
+<header class:list={['max-w-3xl', align === 'center' && 'mx-auto text-center']}>
+  {eyebrow && <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sage" data-reveal>{eyebrow}</p>}
+  <Tag id={id} class="cond mt-3 text-[clamp(2rem,1.3rem+2.6vw,3.75rem)] font-medium uppercase leading-[0.98] tracking-[0.01em]" data-split>{title}</Tag>
+  {lead && <p class="mt-6 text-lg leading-relaxed text-ivory/80" data-reveal>{lead}</p>}
+</header>

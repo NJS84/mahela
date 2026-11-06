@@ -1,0 +1,63 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import CtaBand from '../../components/site/CtaBand.astro';
+import Icon from '../../components/site/Icon.astro';
+import { media, hasMedia } from '../../lib/media';
+import { posts } from '../../data/pages';
+
+const sorted = [...posts].sort((a, b) => b.date.localeCompare(a.date));
+const [first, ...rest] = sorted;
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+const img = (p: (typeof posts)[number]) => (p.image && hasMedia(p.image) ? media(p.image) : media('farms/dsc-1739.jpg'));
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Mahela Group news',
+    hasPart: sorted.map((p) => ({ '@type': 'NewsArticle', headline: p.title, datePublished: p.date, url: `https://www.mahela.co.za/news/${p.slug}` })),
+  },
+];
+---
+
+<Base title="News" description="News and press coverage of Mahela Group, the Letsitele citrus producer and exporter: farming, community, conservation and awards." breadcrumbs={[{ name: 'News', href: '/news' }]} jsonLd={jsonLd}>
+  <PageHero image={media('farms/sitrusboorde2.jpg')} eyebrow="News" title="Mahela in the news" lead="Press coverage and stories from our farms, packhouses and community." crumbs={[{ name: 'News', href: '/news' }]} />
+
+  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-label="Articles">
+    {
+      first && (
+        <a href={`/news/${first.slug}`} class="glass group grid overflow-hidden rounded-[32px] p-1.5 lg:grid-cols-2" data-reveal data-glare>
+          <div class="overflow-hidden rounded-[26px]">
+            <Image src={img(first)} alt="" widths={[640, 960, 1280]} sizes="(min-width: 1024px) 45vw, 100vw" class="aspect-[16/10] h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          </div>
+          <div class="flex flex-col justify-center p-7 md:p-12">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sage"><time datetime={first.date}>{fmt(first.date)}</time>{first.source && ` · ${first.source}`}</p>
+            <h2 class="cond mt-4 text-[clamp(2rem,1.4rem+2vw,3.25rem)] font-medium uppercase leading-[0.98]">{first.title}</h2>
+            <p class="mt-4 leading-relaxed text-ivory/80">{first.excerpt}</p>
+            <span class="mt-8 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-sage">Read more <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+          </div>
+        </a>
+      )
+    }
+    <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        rest.map((p) => (
+          <li data-reveal>
+            <a href={`/news/${p.slug}`} class="glass group flex h-full flex-col overflow-hidden rounded-[26px] p-1.5" data-glare data-tilt>
+              <div class="overflow-hidden rounded-[20px]">
+                <Image src={img(p)} alt="" widths={[480, 720]} sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" class="aspect-[16/10] w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+              </div>
+              <div class="flex flex-1 flex-col p-5">
+                <p class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-sage"><time datetime={p.date}>{fmt(p.date)}</time>{p.source && ` · ${p.source}`}{p.lang === 'af' && ' · Afrikaans'}</p>
+                <h2 class="cond mt-3 text-2xl font-medium uppercase leading-tight" lang={p.lang === 'af' ? 'af' : undefined}>{p.title}</h2>
+                <span class="mt-auto inline-flex items-center gap-2 pt-5 text-xs font-semibold uppercase tracking-[0.16em] text-ivory/70">Read <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mt-24"><CtaBand /></div>
+  </section>
+</Base>

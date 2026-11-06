@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import Backdrop from '../../components/site/Backdrop.astro';
+import SectionTitle from '../../components/site/SectionTitle.astro';
+import ProduceCard from '../../components/site/ProduceCard.astro';
+import CtaBand from '../../components/site/CtaBand.astro';
+import Leaves from '../../components/site/Leaves.astro';
+import Icon from '../../components/site/Icon.astro';
+import { media } from '../../lib/media';
+import { produce } from '../../data/site';
+import { produceDetail } from '../../data/pages';
+import { produceArt, produceIcon } from '../../data/produce-art';
+
+const title = 'Fruit, nuts and nursery trees from Limpopo';
+const description = 'Mahela Group produces citrus, avocados, bananas, macadamias, litchis and golden kiwis in the Letsitele valley and Ohrigstad, Limpopo, from certified, disease-free nursery trees.';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Mahela Group produce',
+    itemListElement: produce.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: produceDetail[p.slug]?.title ?? p.name, url: `https://www.mahela.co.za/produce/${p.slug}` })),
+  },
+];
+---
+
+<Base title="Produce" description={description} breadcrumbs={[{ name: 'Produce', href: '/produce' }]} jsonLd={jsonLd} ogImage={media('farms/citrus-trees.jpg')}>
+  <PageHero image={media('farms/citrus-trees.jpg')} eyebrow="Mahela produce" title={title} lead="The biggest percentage of fruit produced on Mahela farms is citrus, alongside avocados, bananas, macadamias, litchis and golden kiwis, all grown from certified nursery trees." crumbs={[{ name: 'Produce', href: '/produce' }]} />
+
+  <section class="relative overflow-hidden bg-[#1e4a30] py-24 md:py-32" aria-labelledby="all-produce">
+    <div class="absolute inset-0 bg-[radial-gradient(80%_60%_at_70%_30%,rgb(255_255_255/0.12),transparent_70%)]"></div>
+    <Leaves spots={[{ x: '88%', y: '6%', size: 120, r: 30, blur: true }, { x: '6%', y: '70%', size: 80, r: -50 }]} />
+    <div class="relative mx-auto max-w-[84rem] px-4 md:px-6">
+      <SectionTitle eyebrow="Our portfolio" title="Citrus at the core. Subtropicals alongside." lead="The warm days and cold nights of our region are beneficial for producing fruit with well-balanced levels of sugar and acidity as well as good fibre and moisture content." id="all-produce" />
+      <ul class="mt-16 grid gap-x-10 gap-y-14 md:grid-cols-2 xl:grid-cols-3">
+        {
+          produce.map((p) => (
+            <li id={p.slug} data-reveal>
+              <ProduceCard tag={p.tag} title={p.name} href={`/produce/${p.slug}`} image={media(produceArt[p.slug]!)} icon={produceIcon[p.slug]} points={p.facts.slice(0, 3)} accent={p.tone[0]} headingLevel="h2" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Backdrop image={media('farms/dhk-9895.jpg')} dim={0.55}>
+    <section id="nursery" class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="nursery-title">
+      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
+        <span class="flex size-14 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8"><Icon name="sprout" class="size-7" /></span>
+        <SectionTitle eyebrow="Nursery" title="Certified nursery trees" id="nursery-title" />
+        <p class="mt-6 text-lg leading-relaxed text-ivory/85">Certified, disease-free trees ensure quality and food safety. Every Mahela orchard starts in our own nursery, and high-quality, disease-free trees establish the foundation for long-term orchard performance.</p>
+        <a href="/contact-us" class="btn-forest mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Enquire about trees <Icon name="arrow" class="size-4" /></a>
+      </div>
+      <div class="lg:col-span-5" data-reveal>
+        <div class="glass-soft overflow-hidden rounded-[28px] p-1.5" data-tilt>
+          <Image src={media('farms/mahela-ohrigstad-tango-boompies.jpg')} alt="Young Tango citrus trees in a Mahela orchard at Ohrigstad" widths={[480, 720, 960]} sizes="(min-width: 1024px) 34vw, 100vw" class="aspect-[4/5] w-full rounded-[22px] object-cover" />
+        </div>
+      </div>
+    </section>
+    <div class="mt-24"><CtaBand /></div>
+  </Backdrop>
+</Base>

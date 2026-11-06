@@ -1,0 +1,22 @@
+---
+/** Answer-first fact list (a <dl>) that search and AI engines can lift directly. */
+interface Props {
+  facts: { label: string; value: string }[];
+  title?: string;
+}
+const { facts, title = 'At a glance' } = Astro.props;
+---
+
+<div class="glass rounded-[28px] p-7 md:p-8" data-reveal data-glare>
+  <h2 class="cond text-sm font-semibold uppercase tracking-[0.18em] text-sage">{title}</h2>
+  <dl class="mt-5 divide-y divide-ivory/12">
+    {
+      facts.map((f) => (
+        <div class="grid grid-cols-[8.5rem_1fr] gap-4 py-3 text-sm md:text-[0.95rem]">
+          <dt class="text-ivory/60">{f.label}</dt>
+          <dd class="text-ivory">{f.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</div>

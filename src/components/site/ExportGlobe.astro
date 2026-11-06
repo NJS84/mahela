@@ -1,0 +1,54 @@
+---
+/** Market section: interactive 3D globe + market list. Falls back to the list alone. */
+import Icon from './Icon.astro';
+import SectionTitle from './SectionTitle.astro';
+import { exportPage } from '../../data/pages';
+
+interface Props {
+  headingLevel?: 'h2' | 'h3';
+  title?: string;
+  lead?: string;
+}
+const { title = 'From Limpopo to international markets.', lead = 'Mahela fruit is exported to Europe, Asia, Japan, the Middle East, the Far East and Russia under the Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brands.' } = Astro.props;
+const markets = exportPage.markets;
+---
+
+<section class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="markets-title">
+  <div class="lg:col-span-5">
+    <SectionTitle eyebrow="Global market access" title={title} lead={lead} id="markets-title" />
+    <ul class="mt-8 space-y-2" aria-label="Export markets">
+      {
+        markets.map((m) => (
+          <li data-market={m.name} tabindex="0" class="glass-soft group flex cursor-default items-start gap-4 rounded-2xl px-5 py-4 outline-none transition-colors hover:bg-ivory/15 focus-visible:bg-ivory/15">
+            <span class:list={['mt-1.5 size-2.5 shrink-0 rounded-full', m.primary ? 'bg-[#f5a524] shadow-[0_0_12px_#f5a524]' : 'bg-sage']} />
+            <span>
+              <span class="cond block text-lg font-semibold uppercase tracking-[0.08em]">
+                {m.name}
+                {m.primary && <span class="ml-2 rounded-md bg-[#f5a524]/20 px-2 py-0.5 align-middle text-[0.65rem] tracking-[0.14em] text-[#ffd48a]">Primary focus</span>}
+              </span>
+              <span class="text-sm text-ivory/70">{m.text}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div class="relative lg:col-span-7">
+    <div
+      class="relative mx-auto aspect-square w-full max-w-[640px]"
+      data-globe
+      data-origin={JSON.stringify(exportPage.origin)}
+      data-markets={JSON.stringify(markets.map(({ name, lat, lon, primary }) => ({ name, lat, lon, primary })))}
+    >
+      <div class="globe-fallback absolute inset-[12%] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgb(185_209_166/0.35),rgb(15_42_31/0.9)_60%)] shadow-[0_0_80px_rgb(185_209_166/0.25)]"></div>
+    </div>
+    <p class="mt-2 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.18em] text-ivory/55"><Icon name="globe" class="size-4" />Drag to spin · origin Letsitele, Limpopo</p>
+  </div>
+</section>
+
+<style>
+  [data-globe]:global(.is-3d) .globe-fallback {
+    opacity: 0;
+    transition: opacity 1s;
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import Backdrop from '../../components/site/Backdrop.astro';
+import SectionTitle from '../../components/site/SectionTitle.astro';
+import Figures from '../../components/site/Figures.astro';
+import CtaBand from '../../components/site/CtaBand.astro';
+import Icon from '../../components/site/Icon.astro';
+import type { IconName } from '../../lib/icons';
+import { media } from '../../lib/media';
+import { about } from '../../data/pages';
+import { metrics } from '../../data/site';
+
+const chapters = [
+  { year: '1942', label: 'The Junction', text: about.history[0]!, img: 'farms/dsc-1739.jpg' },
+  { year: '1950', label: 'The first citrus tree', text: about.history[1]!, img: 'farms/blossoms.jpg' },
+  { year: '1960s', label: 'A family business', text: about.history[2]!, img: 'farms/sirusboorde.jpg' },
+  { year: 'Today', label: 'Four sons, a fourth generation', text: about.history[3]!, img: 'people/byqoe6630.jpg' },
+];
+const description = 'Mahela Group was founded in 1942 at The Junction outside Letsitele, Limpopo. Today the Vorster family farms citrus, subtropical fruit and nuts, runs a nursery, two packhouses and a game breeding programme.';
+---
+
+<Base title="About us" description={description} breadcrumbs={[{ name: 'About us', href: '/about-us' }]} ogImage={media('people/about-us-photo1.jpg')}>
+  <PageHero image={media('people/about-us-photo1.jpg')} eyebrow="About Mahela Group" title="Rooted in the Letsitele valley since 1942" lead={about.lead} crumbs={[{ name: 'About us', href: '/about-us' }]} position="50% 35%" />
+
+  <section class="relative py-24 md:py-32" aria-labelledby="history-title">
+    <div class="mx-auto max-w-[84rem] px-4 md:px-6">
+      <SectionTitle eyebrow="Our history" title="From one rented field to one of South Africa’s biggest privately-owned citrus exporters" id="history-title" />
+    </div>
+    <ol class="mx-auto mt-16 max-w-[84rem] space-y-24 px-4 md:space-y-40 md:px-6">
+      {
+        chapters.map((c, i) => (
+          <li class="grid items-center gap-8 lg:grid-cols-12">
+            <div class:list={['relative lg:col-span-6', i % 2 === 1 && 'lg:order-2 lg:col-start-7']}>
+              <span class="cond pointer-events-none absolute -top-14 left-0 select-none text-[clamp(5rem,3rem+9vw,11rem)] font-semibold leading-none text-ivory/[0.07]" aria-hidden="true" data-parallax="-0.4">{c.year}</span>
+              <div class="glass-soft relative overflow-hidden rounded-[28px] p-1.5" data-reveal data-tilt>
+                <Image src={media(c.img)} alt="" widths={[640, 960, 1280]} sizes="(min-width: 1024px) 45vw, 100vw" class="aspect-[16/11] w-full rounded-[22px] object-cover" />
+              </div>
+            </div>
+            <div class:list={['lg:col-span-5', i % 2 === 1 ? 'lg:order-1 lg:col-start-1' : 'lg:col-start-8']}>
+              <p class="cond text-6xl font-semibold text-sage md:text-7xl" data-reveal>{c.year}</p>
+              <h3 class="cond mt-2 text-2xl font-medium uppercase tracking-[0.05em]" data-reveal>{c.label}</h3>
+              <p class="mt-5 text-lg leading-relaxed text-ivory/80" data-reveal>{c.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <Backdrop image={media('farms/dsc-1779.jpg')} dim={0.6}>
+    <section class="glass-dark rounded-[32px] p-8 md:p-12" aria-label="Mahela in numbers" data-reveal data-glare>
+      <Figures items={metrics as any} />
+    </section>
+  </Backdrop>
+
+  <section id="today" class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="today-title">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <SectionTitle eyebrow="Mahela Group today" title="A diversified farming group" id="today-title" />
+        {about.today.map((t) => <p class="mt-5 leading-relaxed text-ivory/80" data-reveal>{t}</p>)}
+      </div>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:col-span-7">
+        {
+          about.divisions.map((d) => (
+            <li data-reveal>
+              <a href={d.href} class="glass group flex h-full flex-col rounded-[24px] p-6 transition-transform duration-500 hover:-translate-y-1" data-glare>
+                <span class="flex size-12 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8"><Icon name={d.icon as IconName} class="size-6" /></span>
+                <h3 class="cond mt-5 text-xl font-semibold uppercase tracking-[0.06em]">{d.title}</h3>
+                <p class="mt-2 text-[0.95rem] leading-relaxed text-ivory/75">{d.text}</p>
+                <Icon name="arrow" class="mt-auto size-4 self-end pt-0 text-sage transition-transform group-hover:translate-x-1" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Backdrop image={media('farms/dhk-8485.jpg')} dim={0.6}>
+    <SectionTitle eyebrow="Our values" title="What we stand for" align="center" id="values-title" />
+    <ul class="mt-14 grid gap-5 md:grid-cols-2">
+      {
+        about.values.map((v, i) => (
+          <li class="glass rounded-[28px] p-8" data-reveal data-glare>
+            <div class="flex items-center gap-4">
+              <span class="cond text-4xl font-semibold text-sage/70">{String(i + 1).padStart(2, '0')}</span>
+              <span class="flex size-12 items-center justify-center rounded-full border border-ivory/30 bg-forest/50"><Icon name={v.icon as IconName} class="size-6" /></span>
+            </div>
+            <h3 class="cond mt-5 text-2xl font-medium uppercase tracking-[0.05em]">{v.title}</h3>
+            <p class="mt-3 leading-relaxed text-ivory/80">{v.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <a href="/about-us/leadership" class="glass-blue group mt-16 flex flex-col gap-6 overflow-hidden rounded-[32px] p-8 md:flex-row md:items-center md:justify-between md:p-12" data-glare>
+      <span>
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-ivory/70">Leadership</span>
+        <span class="cond mt-2 block text-3xl font-medium uppercase md:text-5xl">Meet the board of directors</span>
+      </span>
+      <span class="btn-forest inline-flex items-center gap-2 self-start rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] md:self-auto">View the board <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+    </a>
+    <div class="mt-10"><CtaBand /></div>
+  </Backdrop>
+</Base>

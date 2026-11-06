@@ -1,6 +1,6 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/fraunces';
 @import '@fontsource-variable/inter';
+@import '@fontsource-variable/roboto-condensed';
 
 /*
   Mahela design tokens (Phase 2 draft).
@@ -39,7 +39,7 @@
   --color-ink-soft: #4a4f4b;
   --color-line: rgb(28 31 29 / 0.12);
 
-  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-display: 'Roboto Condensed Variable', 'Arial Narrow', sans-serif;
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
   --text-display: clamp(2.75rem, 1.6rem + 5.2vw, 6.5rem);
@@ -54,14 +54,14 @@
 
 @layer base {
   html {
-    background: var(--color-bone);
-    color: var(--color-ink);
+    background: #10201a;
+    color: var(--color-ivory);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
   body {
-    background: var(--color-bone);
+    background: #10201a;
   }
   ::selection {
     background: var(--color-lime);
@@ -71,9 +71,6 @@
     outline: 2px solid var(--color-lime);
     outline-offset: 3px;
     border-radius: 2px;
-  }
-  .font-display {
-    font-variation-settings: 'opsz' 144, 'SOFT' 30;
   }
 }
 
@@ -132,4 +129,74 @@
   text-transform: uppercase;
   color: rgb(255 255 255 / 0.55);
 }
+}
+
+/* ---------- Glass design system (locked Phase 2) ---------- */
+.cond { font-family: 'Roboto Condensed Variable', 'Arial Narrow', sans-serif; }
+
+@layer components {
+  .glass,
+  .glass-soft,
+  .glass-blue,
+  .glass-dark {
+    border: 1px solid rgb(245 242 234 / 0.22);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+  .glass {
+    background: linear-gradient(135deg, rgb(245 242 234 / 0.16), rgb(142 149 155 / 0.08));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 24px 60px -20px rgb(0 0 0 / 0.45);
+  }
+  .glass-soft {
+    background: rgb(245 242 234 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.15);
+    transition: background-color 0.3s;
+  }
+  a.glass-soft:hover, button.glass-soft:hover { background: rgb(245 242 234 / 0.16); }
+  .glass-dark {
+    background: linear-gradient(135deg, rgb(16 32 26 / 0.62), rgb(16 32 26 / 0.42));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 24px 60px -20px rgb(0 0 0 / 0.5);
+  }
+  .glass-blue {
+    background: linear-gradient(140deg, rgb(29 79 148 / 0.72), rgb(29 79 148 / 0.42));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 24px 60px -20px rgb(0 0 0 / 0.45);
+  }
+  .btn-forest {
+    color: var(--color-ivory);
+    background: linear-gradient(180deg, #2c6b44, #1e4a30);
+    border: 1px solid rgb(185 209 166 / 0.45);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 10px 24px -10px rgb(0 0 0 / 0.5);
+    transition: transform 0.3s, filter 0.3s;
+  }
+  .btn-blue {
+    color: #f5f2ea;
+    background: linear-gradient(180deg, #2a62b0, #1d4f94);
+    border: 1px solid rgb(245 242 234 / 0.3);
+    transition: transform 0.3s, filter 0.3s;
+  }
+  .btn-forest:hover, .btn-blue:hover { filter: brightness(1.08); }
+  .leaf-rule { display: flex; align-items: center; gap: 0.75rem; color: var(--color-sage); }
+  .leaf-rule::before, .leaf-rule::after { content: ''; height: 1px; flex: 1; background: rgb(245 242 234 / 0.3); }
+  .prose-glass p { line-height: 1.75; color: rgb(245 242 234 / 0.82); }
+  .prose-glass p + p { margin-top: 1.1em; }
+}
+
+/* Light that follows the cursor across glass panels (set by motion.ts). */
+[data-glare] { position: relative; overflow: hidden; }
+[data-glare]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--glare-o, 0);
+  background: radial-gradient(420px circle at var(--glare-x, 50%) var(--glare-y, 50%), rgb(255 255 255 / 0.14), transparent 45%);
+  transition: opacity 0.4s;
+}
+
+@media (max-width: 767px) {
+  .glass, .glass-soft, .glass-blue, .glass-dark {
+    -webkit-backdrop-filter: blur(12px) saturate(130%);
+    backdrop-filter: blur(12px) saturate(130%);
+  }
 }

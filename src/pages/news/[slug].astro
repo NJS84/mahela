@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/site/Icon.astro';
+import CtaBand from '../../components/site/CtaBand.astro';
+import { media, hasMedia } from '../../lib/media';
+import { posts } from '../../data/pages';
+
+export function getStaticPaths() {
+  return posts.map((p) => ({ params: { slug: p.slug } }));
+}
+const { slug } = Astro.params as { slug: string };
+const p = posts.find((x) => x.slug === slug)!;
+const image = p.image && hasMedia(p.image) ? media(p.image) : media('farms/dsc-1739.jpg');
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+const others = posts.filter((x) => x.slug !== slug).slice(0, 3);
+const url = `https://www.mahela.co.za/news/${slug}`;
+const crumbs = [{ name: 'News', href: '/news' }, { name: p.title, href: `/news/${slug}` }];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: p.title,
+    description: p.excerpt,
+    datePublished: p.date,
+    inLanguage: p.lang === 'af' ? 'af' : 'en-ZA',
+    mainEntityOfPage: url,
+    publisher: { '@id': 'https://www.mahela.co.za/#organization' },
+    about: { '@id': 'https://www.mahela.co.za/#organization' },
+    ...(p.url ? { isBasedOn: p.url } : {}),
+    ...(p.source ? { sourceOrganization: { '@type': 'Organization', name: p.source } } : {}),
+  },
+];
+---
+
+<Base title={p.title} description={p.excerpt} breadcrumbs={crumbs} jsonLd={jsonLd} ogImage={image} type="article">
+  <article class="mx-auto max-w-[60rem] px-4 pb-24 pt-36 md:px-6 md:pt-44">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs uppercase tracking-[0.16em] text-ivory/70">
+      <a href="/news" class="inline-flex items-center gap-2 hover:text-white"><Icon name="arrow" class="size-4 rotate-180" />All news</a>
+    </nav>
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sage"><time datetime={p.date}>{fmt(p.date)}</time>{p.source && ` · ${p.source}`}</p>
+    <h1 class="cond mt-4 text-[clamp(2.4rem,1.6rem+3.4vw,4.75rem)] font-medium uppercase leading-[0.95]" lang={p.lang === 'af' ? 'af' : undefined} data-split>{p.title}</h1>
+    <div class="glass-soft mt-10 overflow-hidden rounded-[28px] p-1.5" data-reveal>
+      <Image src={image} alt="" widths={[640, 960, 1280]} sizes="(min-width: 960px) 60rem, 100vw" class="max-h-[70svh] w-full rounded-[22px] object-cover" loading="eager" />
+    </div>
+    <div class="prose-glass mt-10 text-lg leading-relaxed text-ivory/85">
+      <p>{p.excerpt}</p>
+    </div>
+    {
+      p.url && (
+        <a href={p.url} rel="noopener" target="_blank" class="btn-forest mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>
+          Read the full article{p.source && ` on ${p.source}`} <Icon name="external" class="size-4" />
+        </a>
+      )
+    }
+    <h2 class="cond mt-24 text-sm font-semibold uppercase tracking-[0.18em] text-sage">More news</h2>
+    <ul class="mt-5 grid gap-4 sm:grid-cols-3">
+      {others.map((o) => <li><a href={`/news/${o.slug}`} class="glass block h-full rounded-[22px] p-5 text-[0.95rem] font-medium leading-snug transition-transform hover:-translate-y-1" data-glare>{o.title}</a></li>)}
+    </ul>
+    <div class="mt-20"><CtaBand /></div>
+  </article>
+</Base>

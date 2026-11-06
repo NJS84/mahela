@@ -7,9 +7,27 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import Lenis from 'lenis';
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
+
+/** Load the WebGL pieces only when their section is about to scroll into view. */
+function lazyMount(selector: string, load: () => Promise<(el: HTMLElement) => void>) {
+  const els = document.querySelectorAll<HTMLElement>(selector);
+  if (!els.length) return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        load().then((mount) => mount(e.target as HTMLElement));
+      });
+    },
+    { rootMargin: '400px' },
+  );
+  els.forEach((el) => io.observe(el));
+}
 
 const formatNumber = (n: number) => Math.round(n).toLocaleString('en-ZA').replace(/,/g, ' ');
 
@@ -49,11 +67,74 @@ export function initMotion() {
     ScrollTrigger.refresh();
   });
 
-  // Hero entrance.
-  const slice = document.querySelector('[data-hero-slice]');
-  if (slice) {
-    gsap.from(slice, { scale: 0.82, rotate: -18, opacity: 0, duration: 2, ease: 'expo.out', delay: 0.2 });
-    gsap.to(slice, { rotate: 25, ease: 'none', scrollTrigger: { trigger: slice, start: 'top top', end: 'bottom top', scrub: true } });
+  // WebGL: 3D orange and export globe.
+  lazyMount('[data-orange3d]', () => import('./orange3d').then((m) => m.mountOrange));
+  lazyMount('[data-globe]', () => import('./globe').then((m) => m.mountGlobe));
+
+  // Hero film: ease in and drift as the page scrolls away.
+  const heroMedia = document.querySelector<HTMLElement>('[data-hero-media]');
+  if (heroMedia) {
+    gsap.fromTo(heroMedia, { scale: 1.12 }, { scale: 1, duration: 2.4, ease: 'expo.out' });
+    gsap.to(heroMedia, { yPercent: 18, scale: 1.08, ease: 'none', scrollTrigger: { trigger: heroMedia.closest('section'), start: 'top top', end: 'bottom top', scrub: true } });
+  }
+  const badges = gsap.utils.toArray<HTMLElement>('[data-badge]');
+  if (badges.length) gsap.from(badges, { x: 40, opacity: 0, duration: 1, stagger: 0.12, ease: 'expo.out', delay: 0.6 });
+
+  // Count rings draw around the figures.
+  gsap.utils.toArray<SVGCircleElement>('[data-ring]').forEach((c) => {
+    gsap.fromTo(c, { strokeDashoffset: 302 }, { strokeDashoffset: 0, duration: 2, ease: 'power3.out', scrollTrigger: { trigger: c, start: 'top 90%', once: true } });
+  });
+
+  // Farm-to-port journey: the line draws and a carton travels along it.
+  document.querySelectorAll<HTMLElement>('[data-journey]').forEach((j) => {
+    const path = j.querySelector<SVGPathElement>('[data-journey-path]');
+    const mover = j.querySelector<HTMLElement>('[data-journey-mover]');
+    if (!path) return;
+    const len = path.getTotalLength();
+    gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: j, start: 'top 65%', end: 'bottom 70%', scrub: 0.6 } });
+    tl.to(path, { strokeDashoffset: 0, ease: 'none' }, 0);
+    if (mover) tl.to(mover, { motionPath: { path, align: path, alignOrigin: [0.5, 0.5] }, ease: 'none' }, 0);
+    j.querySelectorAll<HTMLElement>('[data-stop]').forEach((stop) => {
+      ScrollTrigger.create({ trigger: stop, start: 'top 70%', end: 'bottom 30%', toggleClass: { targets: stop, className: 'is-on' } });
+    });
+  });
+
+  // Floating leaves drift at different depths.
+  gsap.utils.toArray<HTMLElement>('[data-float]').forEach((leaf, i) => {
+    gsap.to(leaf, { y: () => -window.innerHeight * (0.25 + (i % 3) * 0.15), rotate: (i % 2 ? 1 : -1) * 40, ease: 'none', scrollTrigger: { trigger: leaf.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
+
+  // Hero fruit renders bob gently, like they are floating in water.
+  gsap.utils.toArray<HTMLElement>('[data-float-big]').forEach((el, i) => {
+    gsap.to(el, { y: -18, rotate: i % 2 ? -4 : 4, duration: 3.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  });
+
+  // Light on the glass: a highlight follows the pointer.
+  if (window.matchMedia('(hover: hover)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-glare]').forEach((p) => {
+      p.addEventListener('pointermove', (e) => {
+        const r = p.getBoundingClientRect();
+        p.style.setProperty('--glare-x', `${e.clientX - r.left}px`);
+        p.style.setProperty('--glare-y', `${e.clientY - r.top}px`);
+        p.style.setProperty('--glare-o', '1');
+      });
+      p.addEventListener('pointerleave', () => p.style.setProperty('--glare-o', '0'));
+    });
+    // Magnetic buttons
+    document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((b) => {
+      const x = gsap.quickTo(b, 'x', { duration: 0.4, ease: 'power3' });
+      const y = gsap.quickTo(b, 'y', { duration: 0.4, ease: 'power3' });
+      b.addEventListener('pointermove', (e) => {
+        const r = b.getBoundingClientRect();
+        x((e.clientX - r.left - r.width / 2) * 0.25);
+        y((e.clientY - r.top - r.height / 2) * 0.35);
+      });
+      b.addEventListener('pointerleave', () => {
+        x(0);
+        y(0);
+      });
+    });
   }
 
   // Counters.
@@ -89,6 +170,33 @@ export function initMotion() {
   });
 
   const mm = gsap.matchMedia();
+  mm.add('(min-width: 1024px)', () => {
+    // Produce rail: pinned sideways scroll, page tone follows the centred fruit.
+    const rail = document.querySelector<HTMLElement>('[data-rail]');
+    const track = document.querySelector<HTMLElement>('[data-rail-track]');
+    if (rail && track) {
+      const tint = rail.querySelector<HTMLElement>('[data-rail-tint]');
+      const cards = gsap.utils.toArray<HTMLElement>('[data-rail-card]');
+      const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 48);
+      const tween = gsap.to(track, {
+        x: () => -distance(),
+        ease: 'none',
+        scrollTrigger: { trigger: rail, start: 'top top', end: () => `+=${distance()}`, pin: true, scrub: 0.7, invalidateOnRefresh: true },
+      });
+      cards.forEach((card) => {
+        const fruit = card.querySelector('[data-card-fruit]');
+        if (fruit) gsap.fromTo(fruit, { xPercent: -30, scale: 0.8, rotate: -12 }, { xPercent: 0, scale: 1, rotate: 0, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 95%', end: 'center 55%', scrub: true } });
+        ScrollTrigger.create({
+          trigger: card,
+          containerAnimation: tween,
+          start: 'left 60%',
+          end: 'right 40%',
+          onToggle: (self) => self.isActive && tint && gsap.to(tint, { backgroundColor: card.dataset.tone, duration: 0.8 }),
+        });
+      });
+    }
+  });
+
   mm.add('(min-width: 768px)', () => {
     // Layered parallax.
     gsap.utils.toArray<HTMLElement>('[data-parallax]').forEach((el) => {

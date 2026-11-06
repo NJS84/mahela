@@ -1,0 +1,155 @@
+---
+/**
+ * Floating glass navigation. Desktop shows the main links with a produce
+ * mega-menu; mobile opens a full-screen glass panel (focus-trapped, Esc to close).
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+import { site } from '../../data/site';
+
+const produceLinks = [
+  { label: 'Citrus', href: '/produce/citrus', img: 'produce/renders/orange.webp' },
+  { label: 'Avocados', href: '/produce/avocados', img: 'produce/cutouts/avocado-halved.webp' },
+  { label: 'Bananas', href: '/produce/bananas', img: 'produce/renders/banana.webp' },
+  { label: 'Macadamias', href: '/produce/macadamias', img: 'produce/renders/macadamia.webp' },
+  { label: 'Litchis', href: '/produce/litchis', img: 'produce/renders/litchi.webp' },
+  { label: 'Golden kiwis', href: '/produce/kiwis', img: 'produce/renders/kiwi.webp' },
+];
+
+const links = [
+  { label: 'About', href: '/about-us' },
+  { label: 'Produce', href: '/produce', mega: true },
+  { label: 'Packhouses', href: '/packhouses' },
+  { label: 'Export', href: '/export' },
+  { label: 'Mahela Cares', href: '/mahela-cares' },
+  { label: 'Mahela Game', href: '/mahela-game' },
+  { label: 'News', href: '/news' },
+];
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => path === href || path.startsWith(href + '/');
+const emblem = media('brand/mahela-emblem-hires.png');
+---
+
+<header class="fixed inset-x-0 top-3 z-50 px-3 md:top-5 md:px-6" data-header>
+  <div class="glass mx-auto flex max-w-[84rem] items-center justify-between rounded-[22px] px-4 py-2.5 transition-[background-color,transform] duration-500 md:px-6" data-header-bar>
+    <a href="/" class="flex items-center gap-3" aria-label="Mahela Group home">
+      <Image src={emblem} alt="" width={88} height={82} class="h-9 w-auto" loading="eager" />
+      <span class="leading-none">
+        <span class="cond block text-lg font-semibold tracking-[0.14em]">MAHELA</span>
+        <span class="block pt-0.5 text-[0.55rem] font-medium uppercase tracking-[0.42em] text-ivory/70">Group</span>
+      </span>
+    </a>
+
+    <nav aria-label="Main" class="hidden xl:block">
+      <ul class="flex items-center gap-1 text-[0.9rem] text-ivory/85">
+        {
+          links.map((l) => (
+            <li class:list={[l.mega && 'group relative']}>
+              <a
+                href={l.href}
+                class:list={['rounded-full px-3.5 py-2 transition-colors hover:bg-ivory/10 hover:text-white', isActive(l.href) && 'bg-ivory/12 text-white']}
+                aria-current={isActive(l.href) ? 'page' : undefined}
+              >
+                {l.label}
+              </a>
+              {l.mega && (
+                <div class="invisible absolute left-1/2 top-full w-[38rem] -translate-x-1/2 translate-y-2 pt-4 opacity-0 transition-all duration-300 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                  <ul class="glass-dark grid grid-cols-3 gap-2 rounded-[22px] p-3">
+                    {produceLinks.map((p) => (
+                      <li>
+                        <a href={p.href} class="group/item flex flex-col items-center rounded-2xl px-2 py-3 text-center transition-colors hover:bg-ivory/10">
+                          <Image src={media(p.img)} alt="" width={96} height={96} class="size-16 object-contain drop-shadow-[0_8px_10px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover/item:-translate-y-1 group-hover/item:scale-110" />
+                          <span class="cond mt-2 text-sm font-semibold uppercase tracking-[0.1em]">{p.label}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href="/contact-us" class="btn-forest hidden rounded-full px-5 py-2 text-sm font-semibold sm:inline-flex">Contact</a>
+      <button type="button" class="glass-soft inline-flex size-10 items-center justify-center rounded-full xl:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu" data-menu-open>
+        <Icon name="menu" class="size-5" />
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="fixed inset-0 z-[60] hidden bg-[rgb(10_22_17/0.55)] p-3 backdrop-blur-xl" role="dialog" aria-modal="true" aria-label="Menu" data-menu>
+    <div class="glass-dark flex h-full flex-col overflow-y-auto rounded-[28px] p-6">
+      <div class="flex items-center justify-between">
+        <span class="cond text-lg font-semibold tracking-[0.14em]">MAHELA</span>
+        <button type="button" class="glass-soft inline-flex size-10 items-center justify-center rounded-full" aria-label="Close menu" data-menu-close>
+          <Icon name="close" class="size-5" />
+        </button>
+      </div>
+      <ul class="mt-10 space-y-1">
+        <li><a href="/" class="cond block py-2 text-3xl uppercase tracking-[0.04em]" data-menu-link>Home</a></li>
+        {links.map((l) => <li><a href={l.href} class:list={['cond block py-2 text-3xl uppercase tracking-[0.04em]', isActive(l.href) && 'text-sage']} data-menu-link>{l.label}</a></li>)}
+        <li><a href="/contact-us" class="cond block py-2 text-3xl uppercase tracking-[0.04em]" data-menu-link>Contact</a></li>
+      </ul>
+      <ul class="mt-8 grid grid-cols-3 gap-2">
+        {
+          produceLinks.map((p) => (
+            <li>
+              <a href={p.href} class="glass-soft flex flex-col items-center rounded-2xl px-1 py-3 text-center" data-menu-link>
+                <Image src={media(p.img)} alt="" width={80} height={80} class="size-12 object-contain" />
+                <span class="mt-1 text-[0.7rem] uppercase tracking-[0.1em]">{p.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-auto space-y-2 pt-8 text-sm text-ivory/75">
+        <a href={site.phoneHref} class="flex items-center gap-2"><Icon name="phone" class="size-4" />{site.phone}</a>
+        <a href={`mailto:${site.email}`} class="flex items-center gap-2"><Icon name="mail" class="size-4" />{site.email}</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-menu-close]');
+  const bar = document.querySelector<HTMLElement>('[data-header-bar]');
+
+  function setOpen(open: boolean) {
+    if (!menu || !openBtn) return;
+    menu.classList.toggle('hidden', !open);
+    openBtn.setAttribute('aria-expanded', String(open));
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+    (open ? closeBtn : openBtn)?.focus();
+  }
+  openBtn?.addEventListener('click', () => setOpen(true));
+  closeBtn?.addEventListener('click', () => setOpen(false));
+  menu?.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (!menu || menu.classList.contains('hidden')) return;
+    if (e.key === 'Escape') setOpen(false);
+    if (e.key === 'Tab') {
+      const items = [...menu.querySelectorAll<HTMLElement>('a, button')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    }
+  });
+
+  // Darken the bar once the page scrolls past the hero top.
+  const onScroll = () => bar?.classList.toggle('glass-dark', window.scrollY > 40);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>

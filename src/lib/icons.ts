@@ -1,0 +1,1 @@
+export type IconName = 'leaf' | 'sprout' | 'shield' | 'box' | 'people' | 'drop' | 'globe' | 'heart' | 'check' | 'arrow' | 'sun' | 'menu' | 'close' | 'phone' | 'mail' | 'pin' | 'clock' | 'external' | 'chevron' | 'truck' | 'flask';

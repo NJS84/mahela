@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Icon from '../components/site/Icon.astro';
+import { media } from '../lib/media';
+import { site } from '../data/site';
+
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
+const topics = ['Export and programmes', 'Produce', 'Nursery trees', 'Mahela Game', 'Careers', 'Media', 'Other'];
+const mapUrl = 'https://www.google.com/maps/search/?api=1&query=Mahela+Group+The+Junction+Letsitele';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact Mahela Group',
+    mainEntity: {
+      '@id': 'https://www.mahela.co.za/#organization',
+      contactPoint: [{ '@type': 'ContactPoint', contactType: 'sales', telephone: site.phone, email: site.email, areaServed: 'Worldwide', availableLanguage: ['English', 'Afrikaans'] }],
+    },
+  },
+];
+const field = 'mt-2 w-full rounded-2xl border border-ivory/20 bg-ivory/8 px-4 py-3 text-ivory placeholder:text-ivory/40 outline-none transition focus:border-sage focus:bg-ivory/12 focus:ring-2 focus:ring-sage/40';
+const label = 'text-xs font-semibold uppercase tracking-[0.16em] text-ivory/75';
+---
+
+<Base title="Contact us" description={`Contact Mahela Group in Letsitele, Limpopo: ${site.phone}, ${site.email}. Main Road, R71, The Junction. Export, produce, nursery and game enquiries.`} breadcrumbs={[{ name: 'Contact us', href: '/contact-us' }]} jsonLd={jsonLd}>
+  {siteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+  <PageHero image={media('farms/dsc-9156.jpg')} eyebrow="Contact" title="Talk to the Mahela team" lead="Discuss varieties, specifications, market windows, packhouse capability and export requirements, or any other enquiry." crumbs={[{ name: 'Contact us', href: '/contact-us' }]} />
+
+  <section class="mx-auto grid max-w-[84rem] gap-8 px-4 py-24 md:px-6 md:py-32 lg:grid-cols-12" id="form">
+    <div class="glass rounded-[32px] p-7 md:p-12 lg:col-span-7" data-reveal>
+      <h2 class="cond text-4xl font-medium uppercase">Send an enquiry</h2>
+      <p class="mt-2 text-ivory/70">We usually reply within one working day.</p>
+      <form action="/api/contact" method="post" class="mt-8 grid gap-5 sm:grid-cols-2" data-contact novalidate>
+        <label class="sm:col-span-1"><span class={label}>Name *</span><input class={field} name="name" autocomplete="name" required maxlength="120" /></label>
+        <label class="sm:col-span-1"><span class={label}>Company</span><input class={field} name="company" autocomplete="organization" maxlength="160" /></label>
+        <label><span class={label}>Email *</span><input class={field} type="email" name="email" autocomplete="email" required maxlength="200" /></label>
+        <label><span class={label}>Phone</span><input class={field} type="tel" name="phone" autocomplete="tel" maxlength="40" /></label>
+        <label><span class={label}>Country</span><input class={field} name="country" autocomplete="country-name" maxlength="80" /></label>
+        <label><span class={label}>Topic</span><select class={field} name="topic">{topics.map((t) => <option class="bg-[#10201a]">{t}</option>)}</select></label>
+        <label class="sm:col-span-2"><span class={label}>Message *</span><textarea class={field} name="message" rows="6" required maxlength="5000"></textarea></label>
+        <label class="hidden" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+        <label class="flex items-start gap-3 text-sm text-ivory/80 sm:col-span-2">
+          <input type="checkbox" name="consent" value="yes" required class="mt-1 size-4 accent-[#2c6b44]" />
+          <span>I agree that Mahela Group may use these details to respond to my enquiry, in line with the <a href="/legal" class="underline decoration-sage underline-offset-4">privacy notice (POPIA)</a>.</span>
+        </label>
+        {siteKey && <div class="cf-turnstile sm:col-span-2" data-sitekey={siteKey} data-theme="dark"></div>}
+        <div class="flex flex-wrap items-center gap-4 sm:col-span-2">
+          <button type="submit" class="btn-forest inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] disabled:opacity-60" data-magnetic>Send enquiry <Icon name="arrow" class="size-4" /></button>
+          <p class="text-sm" role="status" aria-live="polite" data-contact-status></p>
+        </div>
+      </form>
+    </div>
+
+    <aside class="space-y-5 lg:col-span-5" aria-label="Contact details">
+      <div class="glass rounded-[32px] p-7 md:p-9" data-reveal data-glare>
+        <h2 class="cond text-sm font-semibold uppercase tracking-[0.18em] text-sage">Head office</h2>
+        <address class="mt-5 space-y-4 not-italic">
+          <a href={mapUrl} target="_blank" rel="noopener" class="flex gap-3 hover:text-white"><Icon name="pin" class="mt-0.5 size-5 shrink-0 text-sage" /><span>{site.address.street}<br />{site.address.locality}, {site.address.region}, {site.address.postalCode}<br /><span class="text-ivory/60">{site.address.postal}</span></span></a>
+          <a href={site.phoneHref} class="flex gap-3 hover:text-white"><Icon name="phone" class="size-5 shrink-0 text-sage" />Tel {site.phone}</a>
+          <p class="flex gap-3 text-ivory/75"><Icon name="phone" class="size-5 shrink-0 text-sage/60" />Fax {site.fax}</p>
+          <a href={`mailto:${site.email}`} class="flex gap-3 hover:text-white"><Icon name="mail" class="size-5 shrink-0 text-sage" />{site.email}</a>
+          <p class="flex gap-3 text-ivory/75"><Icon name="clock" class="size-5 shrink-0 text-sage" />{site.hours}</p>
+        </address>
+      </div>
+      <a href={mapUrl} target="_blank" rel="noopener" class="glass-blue group relative block overflow-hidden rounded-[32px] p-7 md:p-9" data-reveal data-glare>
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-ivory/70">Find us</span>
+        <span class="cond mt-2 block text-3xl font-medium uppercase">The Junction, Letsitele</span>
+        <span class="mt-2 block text-sm text-ivory/75">23.88° S, 30.39° E · on the R71 in the Mopani district, Limpopo</span>
+        <span class="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em]">Open in Google Maps <Icon name="external" class="size-4" /></span>
+      </a>
+    </aside>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact]');
+  const status = document.querySelector<HTMLElement>('[data-contact-status]');
+  const messages: Record<string, string> = {
+    validation: 'Please add your name, a valid email address, a message and your consent.',
+    captcha: 'The spam check failed. Please try again.',
+    config: 'The form is not connected yet. Please email info@mahela.co.za.',
+    send: 'We could not send your message. Please email info@mahela.co.za.',
+    error: 'Something went wrong. Please email info@mahela.co.za.',
+  };
+  const say = (text: string, ok = false) => {
+    if (!status) return;
+    status.textContent = text;
+    status.className = ok ? 'text-sm text-sage' : 'text-sm text-[#ffb27a]';
+  };
+  const params = new URLSearchParams(location.search);
+  if (params.get('sent')) say('Thank you. Your enquiry has been sent.', true);
+  else if (params.get('error')) say(messages[params.get('error')!] ?? messages.error!);
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    const btn = form.querySelector('button');
+    btn?.setAttribute('disabled', '');
+    say('Sending…', true);
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { accept: 'application/json' } });
+      const data = (await res.json().catch(() => ({ ok: false, error: 'error' }))) as { ok: boolean; error?: string };
+      if (data.ok) {
+        form.reset();
+        say('Thank you. Your enquiry has been sent.', true);
+      } else say(messages[data.error ?? 'error'] ?? messages.error!);
+    } catch {
+      say(messages.error!);
+    } finally {
+      btn?.removeAttribute('disabled');
+      (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+    }
+  });
+</script>

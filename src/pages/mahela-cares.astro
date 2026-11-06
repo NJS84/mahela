@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Backdrop from '../components/site/Backdrop.astro';
+import SectionTitle from '../components/site/SectionTitle.astro';
+import Gallery from '../components/site/Gallery.astro';
+import CtaBand from '../components/site/CtaBand.astro';
+import Icon from '../components/site/Icon.astro';
+import { media } from '../lib/media';
+import { cares } from '../data/pages';
+
+const description = 'How Mahela Group cares for its employees, community and environment: SIZA accreditation, training, an on-farm crèche and school, the Khomanani Mahela farmer project, integrated pest management and wildlife conservation.';
+const pillars = [
+  { id: 'employees', icon: 'people', title: 'Our employees', paras: cares.employees, img: 'packhouse/dscf0510.jpg' },
+  { id: 'environment', icon: 'drop', title: 'Our environment', paras: cares.environment, img: 'farms/dsc-9156.jpg' },
+  { id: 'community', icon: 'heart', title: 'Our community', paras: cares.community, img: 'community/the-newly-renovated.jpg' },
+] as const;
+---
+
+<Base title="Mahela Cares" description={description} breadcrumbs={[{ name: 'Mahela Cares', href: '/mahela-cares' }]} ogImage={media('people/dsc-1211.jpg')}>
+  <PageHero image={media('people/dsc-1211.jpg')} eyebrow="Mahela Cares" title="People, community and the land we farm" lead={cares.lead} crumbs={[{ name: 'Mahela Cares', href: '/mahela-cares' }]} position="50% 60%">
+    <ul class="mt-8 flex flex-wrap gap-2">
+      {pillars.map((p) => <li><a href={`#${p.id}`} class="glass-soft inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"><Icon name={p.icon} class="size-4" />{p.title}</a></li>)}
+    </ul>
+  </PageHero>
+
+  {
+    pillars.map((p, i) => (
+      <Backdrop image={media(p.img)} dim={0.66}>
+        <section id={p.id} class="grid gap-10 lg:grid-cols-12" aria-labelledby={`${p.id}-title`}>
+          <div class:list={['glass rounded-[32px] p-8 md:p-12 lg:col-span-8', i % 2 === 1 && 'lg:col-start-5']} data-reveal data-glare>
+            <span class="flex size-14 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8"><Icon name={p.icon} class="size-7" /></span>
+            <SectionTitle title={p.title} id={`${p.id}-title`} />
+            {p.paras.map((t) => <p class="mt-5 leading-relaxed text-ivory/85">{t}</p>)}
+            {p.id === 'employees' && (
+              <ul class="mt-8 grid gap-2 sm:grid-cols-2">
+                {cares.programmes.map((x) => <li class="flex items-center gap-2.5 text-sm text-ivory/85"><Icon name="check" class="size-4 text-sage" />{x}</li>)}
+              </ul>
+            )}
+          </div>
+        </section>
+        {p.id === 'employees' && (
+          <aside class="glass-blue mt-16 grid gap-8 rounded-[32px] p-8 md:p-12 lg:grid-cols-12" aria-labelledby="khomanani-title" data-reveal data-glare>
+            <div class="lg:col-span-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ivory/70">Employee empowerment</p>
+              <h3 id="khomanani-title" class="cond mt-3 text-4xl font-medium uppercase leading-none">Khomanani Mahela</h3>
+            </div>
+            <p class="text-lg leading-relaxed text-ivory/85 lg:col-span-8">{cares.khomanani}</p>
+          </aside>
+        )}
+      </Backdrop>
+    ))
+  }
+
+  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="life-title">
+    <SectionTitle eyebrow="Life at Mahela" title="Moments from our farms" id="life-title" />
+    <div class="mt-12 pb-10">
+      <Gallery images={[
+        { src: 'people/dsc-1424.jpg', alt: 'Mahela Group office team' },
+        { src: 'community/mahelacares-people-photo1.jpg', alt: 'Mahela employees together on the farm' },
+        { src: 'people/staff-photo-no-layers.jpg', alt: 'Mahela Group staff photo' },
+      ]} />
+    </div>
+    <div class="mt-16"><CtaBand title="Partner with a grower that cares." text="Ethically grown, SIZA-accredited fruit from a company invested in its people, its community and the land." /></div>
+  </section>
+</Base>

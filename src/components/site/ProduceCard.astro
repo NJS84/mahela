@@ -1,0 +1,39 @@
+---
+/**
+ * The "leaf card": a frosted panel with the fruit sitting half behind the
+ * glass (blurred by the backdrop filter) and half breaking out of its edge.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { IconName } from '../../lib/icons';
+
+interface Props {
+  tag: string;
+  title: string;
+  href: string;
+  image: ImageMetadata;
+  icon?: IconName;
+  points: string[];
+  accent?: string;
+  headingLevel?: 'h2' | 'h3';
+}
+const { tag, title, href, image, icon = 'leaf', points, accent = '#2c6b44', headingLevel: H = 'h3' } = Astro.props;
+---
+
+<article class="produce-card group relative isolate pr-[18%]" style={`--accent:${accent}`} data-produce-card>
+  <div class="absolute right-0 top-1/2 -z-10 w-[62%] -translate-y-1/2 transition-transform duration-700 ease-out group-hover:-translate-y-[54%] group-hover:rotate-3" data-card-fruit>
+    <div class="absolute inset-[18%] rounded-full blur-3xl" style="background: color-mix(in srgb, var(--accent) 55%, transparent)"></div>
+    <Image src={image} alt="" widths={[320, 480, 640].filter((w) => w <= image.width)} sizes="(min-width: 1024px) 320px, 60vw" class="relative h-auto w-full drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" />
+  </div>
+  <a href={href} class="glass relative flex min-h-[26rem] flex-col rounded-[28px] p-7 md:p-8" data-glare>
+    <span class="self-start rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]" style="background: color-mix(in srgb, var(--accent) 70%, #1e4a30); color: #f5f2ea">{tag}</span>
+    <H class="cond mt-5 text-[2.6rem] font-medium leading-none tracking-[0.01em]">{title}</H>
+    <span class="mt-6 flex size-16 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8 shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]"><Icon name={icon} class="size-8 text-ivory" /></span>
+    <span class="mt-7 block border-t border-ivory/15 pt-6 text-sm font-semibold uppercase tracking-[0.14em] text-ivory/90">At a glance</span>
+    <ul class="mt-3 space-y-2 text-[0.95rem] text-ivory/80">
+      {points.map((p) => <li class="flex gap-2.5"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-ivory/70"></span>{p}</li>)}
+    </ul>
+    <span class="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-semibold uppercase tracking-[0.16em] text-sage">Explore <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+  </a>
+</article>

@@ -1,0 +1,47 @@
+---
+/** Full-bleed interior page hero: one photo, eyebrow, H1, lead and breadcrumbs. */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+
+interface Props {
+  image: ImageMetadata;
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  crumbs?: { name: string; href: string }[];
+  position?: string;
+  tall?: boolean;
+}
+const { image, eyebrow, title, lead, crumbs = [], position = '50% 50%', tall = false } = Astro.props;
+---
+
+<section class:list={['relative isolate flex items-end overflow-hidden', tall ? 'min-h-[100svh]' : 'min-h-[78svh]']} aria-labelledby="page-title">
+  <div class="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <div class="absolute inset-[-8%_0]" data-parallax="0.35">
+      <Image src={image} alt="" widths={[768, 1280, 1920, 2400].filter((w) => w <= image.width)} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover" style={`object-position:${position}`} />
+    </div>
+    <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.55)_0%,rgb(12_26_22/0.2)_40%,rgb(12_26_22/0.85)_100%)]"></div>
+  </div>
+  <div class="mx-auto w-full max-w-[84rem] px-4 pb-14 pt-36 md:px-6 md:pb-20">
+    {
+      crumbs.length > 0 && (
+        <nav aria-label="Breadcrumb" class="mb-6">
+          <ol class="flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-ivory/70">
+            <li><a href="/" class="hover:text-white">Home</a></li>
+            {crumbs.map((c, i) => (
+              <li class="flex items-center gap-1.5">
+                <Icon name="chevron" class="size-3" />
+                {i === crumbs.length - 1 ? <span aria-current="page" class="text-ivory">{c.name}</span> : <a href={c.href} class="hover:text-white">{c.name}</a>}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+    {eyebrow && <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-sage">{eyebrow}</p>}
+    <h1 id="page-title" class="cond max-w-5xl text-[clamp(2.8rem,1.6rem+5vw,6.25rem)] font-medium uppercase leading-[0.92] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>{title}</h1>
+    {lead && <p class="mt-7 max-w-2xl text-lg leading-relaxed text-ivory/85 md:text-xl" data-reveal>{lead}</p>}
+    <slot />
+  </div>
+</section>

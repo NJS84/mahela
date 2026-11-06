@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../../data/site';
+interface Props {
+  title?: string;
+  text?: string;
+}
+const {
+  title = 'Build your next citrus programme with Mahela.',
+  text = 'Discuss varieties, specifications, market windows, packhouse capability and export requirements with the Mahela team.',
+} = Astro.props;
+---
+
+<section class="glass-blue relative overflow-hidden rounded-[32px] p-8 md:p-14" aria-labelledby="cta-title" data-reveal data-glare>
+  <div class="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-sage/20 blur-3xl"></div>
+  <div class="relative grid gap-8 lg:grid-cols-12 lg:items-end">
+    <div class="lg:col-span-8">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ivory/70">Importers • Retailers • Programme buyers</p>
+      <h2 id="cta-title" class="cond mt-3 text-[clamp(2rem,1.3rem+2.4vw,3.5rem)] font-medium uppercase leading-[0.98]">{title}</h2>
+      <p class="mt-5 max-w-xl leading-relaxed text-ivory/80">{text}</p>
+    </div>
+    <div class="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
+      <a href="/contact-us" class="btn-forest inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Contact the export team <Icon name="arrow" class="size-4" /></a>
+      <a href={site.phoneHref} class="glass-soft inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]"><Icon name="phone" class="size-4" />{site.phone}</a>
+    </div>
+  </div>
+</section>

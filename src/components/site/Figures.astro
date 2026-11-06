@@ -1,0 +1,30 @@
+---
+/** Key figures with count-up numbers and drawn rings. */
+interface Props {
+  items: { value: number; label: string; note?: string; format?: 'year' | 'number'; prefix?: string; suffix?: string }[];
+}
+const { items } = Astro.props;
+const fmt = (n: number) => n.toLocaleString('en-ZA').replace(/[, ]/g, ' ');
+---
+
+<ul class="grid grid-cols-2 gap-y-10 md:grid-cols-4">
+  {
+    items.map((f) => (
+      <li class="text-center">
+        <span class="relative mx-auto flex size-32 items-center justify-center md:size-36">
+          <svg class="absolute inset-0 -rotate-90" viewBox="0 0 104 104" aria-hidden="true">
+            <circle cx="52" cy="52" r="48" fill="rgb(30 74 48 / 0.45)" stroke="rgb(245 242 234 / 0.15)" stroke-width="1.5" />
+            <circle cx="52" cy="52" r="48" fill="none" stroke="#b9d1a6" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="302" stroke-dashoffset="0" data-ring />
+          </svg>
+          <span class="cond relative text-[1.9rem] font-semibold leading-none tabular md:text-[2.2rem]">
+            {f.prefix && <span class="block text-[0.7rem] font-medium uppercase tracking-[0.14em] text-ivory/70">{f.prefix}</span>}
+            <span data-count={f.value} data-format={f.format ?? 'number'}>{f.format === 'year' ? f.value : fmt(f.value)}</span>
+            {f.suffix && <span class="text-base font-medium"> {f.suffix}</span>}
+          </span>
+        </span>
+        <span class="cond mt-4 block text-lg font-semibold uppercase tracking-[0.08em]">{f.label}</span>
+        {f.note && <span class="mt-0.5 block text-[0.8rem] text-ivory/65">{f.note}</span>}
+      </li>
+    ))
+  }
+</ul>

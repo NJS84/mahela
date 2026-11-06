@@ -1,0 +1,26 @@
+---
+/**
+ * A section group whose own photo stays put (sticky) while glass panels
+ * scroll over it, so every part of a page has its own image.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  image: ImageMetadata;
+  dim?: number;
+  class?: string;
+  position?: string;
+}
+const { image, dim = 0.62, class: className = '', position = '50% 50%' } = Astro.props;
+---
+
+<div class:list={['relative', className]}>
+  <div class="sticky top-0 -z-10 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden="true">
+    <Image src={image} alt="" widths={[768, 1280, 1920].filter((w) => w <= image.width)} sizes="100vw" class="h-full w-full object-cover" style={`object-position:${position}`} />
+    <div class="absolute inset-0" style={`background: rgb(12 26 22 / ${dim})`}></div>
+  </div>
+  <div class="relative mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32">
+    <slot />
+  </div>
+</div>

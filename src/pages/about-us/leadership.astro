@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import SectionTitle from '../../components/site/SectionTitle.astro';
+import CtaBand from '../../components/site/CtaBand.astro';
+import { media } from '../../lib/media';
+import { leadership } from '../../data/pages';
+
+const crumbs = [{ name: 'About us', href: '/about-us' }, { name: 'Leadership', href: '/about-us/leadership' }];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Mahela Group board of directors',
+    itemListElement: [leadership.chair, ...leadership.directors].map((d, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: { '@type': 'Person', name: d.name, jobTitle: d.role, worksFor: { '@id': 'https://www.mahela.co.za/#organization' } },
+    })),
+  },
+];
+---
+
+<Base title="Board of directors" description={leadership.lead} breadcrumbs={crumbs} jsonLd={jsonLd} ogImage={media('people/byqoe6630.jpg')}>
+  <PageHero image={media('people/byqoe6630.jpg')} eyebrow="Leadership" title={leadership.title} lead={leadership.lead} crumbs={crumbs} position="50% 30%" />
+
+  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="board-title">
+    <SectionTitle eyebrow="The Vorster family" title="Edward and his four sons" id="board-title" />
+    <ul class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      {
+        leadership.directors.map((d, i) => (
+          <li class:list={[i % 2 === 1 && 'lg:translate-y-12']}>
+            <figure class="glass group overflow-hidden rounded-[26px] p-1.5" data-reveal data-tilt data-glare>
+              <div class="overflow-hidden rounded-[20px]">
+                <Image src={media(`people/${d.image}.jpg`)} alt={`${d.name}, ${d.role} of Mahela Group`} widths={[320, 480, 640]} sizes="(min-width: 1024px) 18vw, (min-width: 640px) 45vw, 90vw" class="aspect-[3/4] w-full object-cover grayscale-[35%] transition duration-700 group-hover:scale-105 group-hover:grayscale-0" />
+              </div>
+              <figcaption class="px-4 pb-4 pt-4">
+                <span class="cond block text-xl font-semibold uppercase tracking-[0.06em]">{d.name}</span>
+                <span class="text-sm text-ivory/65">{d.role}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="glass mt-28 flex flex-col gap-2 rounded-[28px] p-8 md:flex-row md:items-center md:justify-between" data-reveal>
+      <span>
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">Chairman</span>
+        <span class="cond mt-1 block text-3xl font-medium uppercase">{leadership.chair.name}</span>
+      </span>
+      <span class="text-ivory/70">{leadership.chair.role}</span>
+    </div>
+    <div class="mt-16"><CtaBand /></div>
+  </section>
+</Base>
