@@ -8,9 +8,11 @@ interface Props {
   title?: string;
   description?: string;
   jsonLd?: Record<string, unknown>[];
+  chrome?: boolean;
+  noindex?: boolean;
 }
 
-const { title, description = site.description, jsonLd = [] } = Astro.props;
+const { title, description = site.description, jsonLd = [], chrome = true, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Citrus producers and exporters, Limpopo, South Africa`;
 const canonical = new URL(Astro.url.pathname, site.url).toString();
 
@@ -45,6 +47,7 @@ const schemas = [organization, ...jsonLd];
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#123222" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -66,11 +69,11 @@ const schemas = [organization, ...jsonLd];
       class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-lime focus:px-4 focus:py-2 focus:text-green-950"
       >Skip to content</a
     >
-    <Header />
+    {chrome && <Header />}
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    {chrome && <Footer />}
     <script>
       import { initMotion } from '../scripts/motion';
       initMotion();
