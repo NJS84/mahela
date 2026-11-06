@@ -20,6 +20,6 @@ export const citrusArt: Record<string, string> = {
   Grapefruit: 'produce/cutouts/grapefruit-sticker.webp',
   'Valencia oranges': 'produce/renders/orange.webp',
   Navels: 'produce/cutouts/orange-with-leaves-b.webp',
-  'Soft citrus': 'produce/cutouts/naartjie.webp',
+  'Soft citrus': 'produce/renders/mandarin.webp',
   Lemons: 'produce/renders/lemon.webp',
 };

@@ -25,8 +25,8 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Produce" description={description} breadcrumbs={[{ name: 'Produce', href: '/produce' }]} jsonLd={jsonLd} ogImage={media('farms/citrus-trees.jpg')}>
-  <PageHero image={media('farms/citrus-trees.jpg')} eyebrow="Mahela produce" title={title} lead="The biggest percentage of fruit produced on Mahela farms is citrus, alongside avocados, bananas, macadamias, litchis and golden kiwis, all grown from certified nursery trees." crumbs={[{ name: 'Produce', href: '/produce' }]} />
+<Base title="Produce" description={description} breadcrumbs={[{ name: 'Produce', href: '/produce' }]} jsonLd={jsonLd} ogImage={media('generated/orchard-aerial.jpg')}>
+  <PageHero image={media('generated/orchard-aerial.jpg')} eyebrow="Mahela produce" title={title} lead="The biggest percentage of fruit produced on Mahela farms is citrus, alongside avocados, bananas, macadamias, litchis and golden kiwis, all grown from certified nursery trees." crumbs={[{ name: 'Produce', href: '/produce' }]} />
 
   <section class="relative overflow-hidden bg-[#1e4a30] py-24 md:py-32" aria-labelledby="all-produce">
     <div class="absolute inset-0 bg-[radial-gradient(80%_60%_at_70%_30%,rgb(255_255_255/0.12),transparent_70%)]"></div>
@@ -54,8 +54,11 @@ const jsonLd = [
         <a href="/contact-us" class="btn-forest mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Enquire about trees <Icon name="arrow" class="size-4" /></a>
       </div>
       <div class="lg:col-span-5" data-reveal>
+        <div class="relative">
+        <Image src={media('produce/renders/sapling.webp')} alt="" width={420} class="pointer-events-none absolute -bottom-10 -left-10 z-10 w-[42%] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] md:-left-16" data-float-big />
         <div class="glass-soft overflow-hidden rounded-[28px] p-1.5" data-tilt>
           <Image src={media('farms/mahela-ohrigstad-tango-boompies.jpg')} alt="Young Tango citrus trees in a Mahela orchard at Ohrigstad" widths={[480, 720, 960]} sizes="(min-width: 1024px) 34vw, 100vw" class="aspect-[4/5] w-full rounded-[22px] object-cover" />
+        </div>
         </div>
       </div>
     </section>

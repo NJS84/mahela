@@ -9,6 +9,7 @@ import Gallery from '../../components/site/Gallery.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
 import Leaves from '../../components/site/Leaves.astro';
 import Icon from '../../components/site/Icon.astro';
+import PeelSequence from '../../components/site/PeelSequence.astro';
 import { media } from '../../lib/media';
 import { produceDetail } from '../../data/pages';
 import { produce } from '../../data/site';
@@ -66,6 +67,8 @@ const jsonLd = [
       </div>
     </div>
   </section>
+
+  {slug === 'citrus' && <PeelSequence />}
 
   {
     p.groups && p.groups.length > 0 && (

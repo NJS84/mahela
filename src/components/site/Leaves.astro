@@ -10,14 +10,14 @@ const { spots = [
   { x: '88%', y: '30%', size: 130, r: 40, blur: true },
   { x: '78%', y: '82%', size: 70, r: 110 },
 ] } = Astro.props;
-const leaf = media('produce/renders/leaf.webp');
+const art = [media('produce/renders/leaf.webp'), media('produce/renders/leaf2.webp'), media('produce/renders/citrus-blossom.webp')];
 ---
 
 <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
   {
-    spots.map((s) => (
+    spots.map((s, i) => (
       <div class="absolute" style={`left:${s.x};top:${s.y};width:${s.size}px;transform:rotate(${s.r}deg)`} data-float>
-        <Image src={leaf} alt="" width={s.size * 2} class:list={['h-auto w-full drop-shadow-[0_16px_20px_rgba(0,0,0,0.35)]', s.blur && 'blur-[3px] opacity-80']} />
+        <Image src={art[i % art.length]!} alt="" width={s.size * 2} class:list={['h-auto w-full drop-shadow-[0_16px_20px_rgba(0,0,0,0.35)]', s.blur && 'blur-[3px] opacity-80']} />
       </div>
     ))
   }

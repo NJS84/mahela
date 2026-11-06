@@ -60,6 +60,23 @@ const certs = ['certifications/globalgap.png', 'certifications/siza.png', 'certi
     </div>
   </Backdrop>
 
+  <Backdrop image={media('generated/reefer-interior.jpg')} dim={0.55}>
+    <section class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="cold-title">
+      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
+        <SectionTitle eyebrow="Cold chain" title="Fresh from the packhouse to the port" id="cold-title" />
+        <p class="mt-6 text-lg leading-relaxed text-ivory/85">Strict temperature and handling protocols protect freshness through the supply chain. From the packhouses, the pallets of fruit are transported per truck to local ports, where the fruit is once again inspected before it leaves for its export destination.</p>
+        <ul class="mt-8 grid gap-3 sm:grid-cols-3">
+          {['PPECB inspected', 'Inspected again at port', 'Temperature controlled'].map((t) => <li class="glass-soft flex items-center gap-2 rounded-2xl px-4 py-3 text-sm"><Icon name="check" class="size-4 shrink-0 text-sage" />{t}</li>)}
+        </ul>
+      </div>
+      <div class="lg:col-span-5" data-reveal>
+        <div class="glass-soft mx-auto max-w-sm overflow-hidden rounded-[28px] p-1.5" data-tilt>
+          <Image src={media('generated/reefer-ship.jpg')} alt="A refrigerated container ship at sea carrying fruit to export markets" widths={[480, 720, 896]} sizes="(min-width: 1024px) 24rem, 90vw" class="aspect-[3/4] w-full rounded-[22px] object-cover" />
+        </div>
+      </div>
+    </section>
+  </Backdrop>
+
   <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="brands-title">
     <div class="grid items-center gap-12 lg:grid-cols-12">
       <div class="lg:col-span-6">
