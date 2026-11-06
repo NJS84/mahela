@@ -9,15 +9,14 @@ import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/glass/Icon.astro';
 import { site, hero, nav } from '../data/site';
-import heroImage from '../assets/media/farms/dsc-1739.jpg';
+import heroImage from '../assets/media/video/hero-poster.jpg';
 import introImage from '../assets/media/farms/dsc-7988.jpg';
 import panelsImage from '../assets/media/farms/dsc-1779.jpg';
 import emblem from '../assets/media/brand/mahela-emblem-hires.png';
 import orange from '../assets/media/produce/cutouts/orange-with-leaves-a.webp';
 
-/** Drop the client's hero film into public/video/ and set this path, e.g. '/video/hero.mp4'. */
-const heroVideo: string | undefined = undefined;
-const heroPoster = heroImage;
+/** Hero loop cut from Mahela_MASTER_GRADED_1-001.mp4 (19 s, muted). */
+const heroVideo = { desktop: '/video/hero-1280.mp4', mobile: '/video/hero-960.mp4' };
 
 const website = {
   '@context': 'https://schema.org',
@@ -90,17 +89,14 @@ const markets = ['Europe', 'Russia', 'Middle East', 'Asia', 'Japan', 'Far East']
       </div>
     </header>
 
-    <!-- Hero: full-screen video (poster image until the film is supplied) -->
+    <!-- Hero: full-screen looping film; the poster frame shows until it plays -->
     <section class="relative isolate flex min-h-[100svh] items-end overflow-hidden" aria-labelledby="g-hero">
       <div class="absolute inset-0 -z-10" aria-hidden="true">
-        <Image src={heroImage} alt="" widths={[768, 1280, 1920, 2400]} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover object-[50%_40%]" />
-        {
-          heroVideo && (
-            <video class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline preload="metadata" poster={heroPoster.src} data-hero-video>
-              <source src={heroVideo} type="video/mp4" />
-            </video>
-          )
-        }
+        <Image src={heroImage} alt="" widths={[768, 1280]} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover object-[50%_40%]" />
+        <video class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline preload="auto" aria-hidden="true" data-hero-video>
+          <source src={heroVideo.mobile} type="video/mp4" media="(max-width: 767px)" />
+          <source src={heroVideo.desktop} type="video/mp4" />
+        </video>
         <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.45)_0%,rgb(12_26_22/0.15)_35%,rgb(12_26_22/0.7)_100%)]"></div>
       </div>
       <div class="mx-auto grid w-full max-w-[84rem] items-end gap-10 px-4 pb-14 pt-32 md:px-6 md:pb-20 lg:grid-cols-12">
