@@ -53,8 +53,11 @@ for (let i = 0; i < n; i++) {
 
 <style>
   :global(.js-motion) .journey-stop > div {
-    opacity: 0.35;
-    transform: scale(0.96);
+    opacity: 0.3;
+    transform: translateX(-3rem) scale(0.96);
+  }
+  :global(.js-motion) .journey-stop:nth-child(even) > div {
+    transform: translateX(3rem) scale(0.96);
   }
   :global(.js-motion) .journey-stop:global(.is-on) > div {
     opacity: 1;

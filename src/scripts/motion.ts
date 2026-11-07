@@ -64,6 +64,7 @@ export function initMotion() {
         scrollTrigger: { trigger: el, start: 'top 88%', once: true },
       });
     });
+    ScrollTrigger.sort();
     ScrollTrigger.refresh();
   });
 
@@ -255,4 +256,11 @@ export function initMotion() {
       });
     }
   });
+
+  // Pinned sections (produce rail, heritage) are created after the triggers
+  // further down the page, which would leave those triggers measured without
+  // the pin spacing (the journey line had already finished before it was
+  // reached). Re-order by position and measure again.
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
 }

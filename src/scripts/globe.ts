@@ -72,13 +72,14 @@ export function mountGlobe(el: HTMLElement) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   const canvas = renderer.domElement;
-  canvas.className = 'absolute inset-0 h-full w-full cursor-grab touch-pan-y';
+  canvas.className = 'globe-canvas absolute inset-0 h-full w-full cursor-grab touch-pan-y';
   canvas.setAttribute('aria-hidden', 'true');
   el.appendChild(canvas);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
-  camera.position.set(0, 0, 3.6);
+  // Pulled back so the halo and the arcs always sit inside the canvas.
+  camera.position.set(0, 0, 4.8);
 
   const world = new THREE.Group();
   scene.add(world);
@@ -89,17 +90,28 @@ export function mountGlobe(el: HTMLElement) {
     new THREE.MeshBasicMaterial({ color: '#0f2a1f', transparent: true, opacity: 0.85 }),
   );
   world.add(core);
+  // Atmosphere: a camera-facing disc whose glow fades to nothing well before
+  // the canvas edge, so it reads as a soft halo and is never cut off.
   const glow = new THREE.Mesh(
-    new THREE.SphereGeometry(R * 1.12, 64, 48),
+    new THREE.PlaneGeometry(R * 3.6, R * 3.6),
     new THREE.ShaderMaterial({
       transparent: true,
-      side: THREE.BackSide,
+      depthTest: false,
       depthWrite: false,
-      uniforms: { c: { value: new THREE.Color('#b9d1a6') } },
-      vertexShader: 'varying vec3 vN; void main(){ vN = normalize(normalMatrix*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
-      fragmentShader: 'uniform vec3 c; varying vec3 vN; void main(){ float i = pow(0.75 - dot(vN, vec3(0.,0.,1.)), 3.0); gl_FragColor = vec4(c, i*0.9); }',
+      uniforms: { c: { value: new THREE.Color('#b9d1a6') }, r: { value: R * 1.02 } },
+      vertexShader: 'varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+      fragmentShader: [
+        'uniform vec3 c; uniform float r; varying vec2 vP;',
+        'void main(){',
+        '  float d = length(vP) / r;',
+        '  float outer = 1.0 - smoothstep(0.96, 1.45, d);',
+        '  outer = outer * outer * smoothstep(0.7, 1.0, d);',
+        '  gl_FragColor = vec4(c, outer * 0.42);',
+        '}',
+      ].join('\n'),
     }),
   );
+  glow.renderOrder = -1;
   scene.add(glow);
 
   // Land dots
@@ -133,7 +145,7 @@ export function mountGlobe(el: HTMLElement) {
   const arcs = markets.map((m) => {
     const end = toVec(m.lat, m.lon, R * 1.005);
     const mid = o.clone().add(end).multiplyScalar(0.5);
-    const lift = 1 + o.distanceTo(end) * 0.55;
+    const lift = 1 + o.distanceTo(end) * 0.32;
     mid.normalize().multiplyScalar(R * lift);
     const curve = new THREE.QuadraticBezierCurve3(o, mid, end);
     const geo = new THREE.TubeGeometry(curve, 80, m.primary ? 0.008 : 0.005, 8, false);

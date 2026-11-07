@@ -35,7 +35,7 @@ const markets = exportPage.markets;
   </div>
   <div class="relative lg:col-span-7">
     <div
-      class="relative mx-auto aspect-square w-full max-w-[640px]"
+      class="relative mx-auto aspect-square w-full max-w-[760px]"
       data-globe
       data-origin={JSON.stringify(exportPage.origin)}
       data-markets={JSON.stringify(markets.map(({ name, lat, lon, primary }) => ({ name, lat, lon, primary })))}
@@ -47,6 +47,11 @@ const markets = exportPage.markets;
 </section>
 
 <style>
+  /* Belt and braces: anything near the canvas edge fades out, so there is never a hard line. */
+  [data-globe] :global(.globe-canvas) {
+    -webkit-mask-image: radial-gradient(closest-side, #000 80%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 80%, transparent 100%);
+  }
   [data-globe]:global(.is-3d) .globe-fallback {
     opacity: 0;
     transition: opacity 1s;

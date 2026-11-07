@@ -16,7 +16,6 @@ import Heritage from '../components/site/Heritage.astro';
 import CtaBand from '../components/site/CtaBand.astro';
 import Leaves from '../components/site/Leaves.astro';
 import { site, hero, intro, produce, process, compliance, people } from '../data/site';
-import { posts } from '../data/pages';
 import { produceArt, produceIcon } from '../data/produce-art';
 import { media } from '../lib/media';
 import heroImage from '../assets/media/video/hero-poster.jpg';
@@ -51,8 +50,6 @@ const figures = [
 
 const pillarIcons = ['leaf', 'people', 'flask', 'box'] as const;
 const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colour.png', 'certifications/nsf-registered-colour.png'];
-const latest = posts.slice(0, 3);
-const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: 'numeric', month: 'long' });
 ---
 
 <Base jsonLd={[website]} description="Mahela Group is a 4th generation, GlobalGAP-certified grower and exporter of premium citrus, avocados, bananas, macadamias, litchis and golden kiwis from Letsitele in Limpopo, South Africa.">
@@ -69,6 +66,7 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
       <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.45)_0%,rgb(12_26_22/0.15)_35%,rgb(12_26_22/0.75)_100%)]"></div>
     </div>
     <div class="mx-auto w-full max-w-[84rem] px-4 pb-14 pt-32 md:px-6 md:pb-20">
+      <p class="cond mb-3 text-[clamp(1.5rem,1.1rem+1.4vw,2.4rem)] font-semibold uppercase leading-none tracking-[0.42em] text-ivory drop-shadow-[0_2px_16px_rgba(0,0,0,0.35)]">Mahela</p>
       <p class="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-ivory/80">{hero.eyebrow}</p>
       <h1 id="g-hero" class="cond max-w-4xl text-[clamp(3.4rem,2rem+6.5vw,7.25rem)] font-medium uppercase leading-[0.9] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>
         Premium citrus.<br />Ready for<br /><span class="text-sage">the world.</span>
@@ -197,8 +195,8 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
     <section aria-labelledby="g-compliance">
       <div class="grid gap-10 lg:grid-cols-12 lg:items-end">
         <div class="lg:col-span-7"><SectionTitle eyebrow={compliance.eyebrow} title={compliance.title} lead={compliance.lead} id="g-compliance" /></div>
-        <ul class="flex flex-wrap items-center gap-3 lg:col-span-5 lg:justify-end" aria-label="Certifications" data-reveal>
-          {certs.map((c) => <li class="rounded-2xl bg-ivory/90 px-4 py-3"><Image src={media(c)} alt={c.includes('globalgap') ? 'GlobalGAP' : c.includes('siza') ? 'SIZA' : 'NSF Registered'} height={44} class="h-10 w-auto" /></li>)}
+        <ul class="flex flex-wrap items-center gap-3 lg:col-span-5 lg:flex-nowrap lg:justify-end lg:gap-2.5" aria-label="Certifications" data-reveal>
+          {certs.map((c) => <li class="flex h-16 shrink-0 items-center rounded-2xl bg-ivory/90 px-4 lg:h-[3.75rem] lg:px-3.5"><Image src={media(c)} alt={c.includes('globalgap') ? 'GlobalGAP' : c.includes('siza') ? 'SIZA' : 'NSF Registered'} height={64} class="h-10 w-auto lg:h-9" /></li>)}
         </ul>
       </div>
       <ul class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -242,32 +240,6 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
         <div class="glass-dark flex flex-col justify-center rounded-[28px] p-7" data-reveal><span class="cond text-5xl font-semibold tabular" data-count="700">700</span><span class="mt-2 text-sm uppercase tracking-[0.14em] text-ivory/70">Full-time employees</span></div>
         <div class="glass-dark flex flex-col justify-center rounded-[28px] p-7" data-reveal><span class="cond text-5xl font-semibold tabular" data-count="1100">1 100</span><span class="mt-2 text-sm uppercase tracking-[0.14em] text-ivory/70">Additional non-permanent jobs</span></div>
       </div>
-    </section>
-
-    <section class="mt-24" aria-labelledby="g-news">
-      <div class="flex flex-wrap items-end justify-between gap-6">
-        <SectionTitle eyebrow="In the news" title="Mahela in the press" id="g-news" />
-        <a href="/news" class="glass-soft rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">All news</a>
-      </div>
-      <ul class="mt-10 grid gap-5 md:grid-cols-3">
-        {
-          latest.map((p) => (
-            <li class="glass group overflow-hidden rounded-[26px]" data-reveal data-glare>
-              <a href={`/news/${p.slug}`} class="flex h-full flex-col">
-                {p.image && (
-                  <span class="block aspect-[16/10] overflow-hidden">
-                    <Image src={media(p.image)} alt="" widths={[480, 720]} sizes="(min-width: 768px) 30vw, 90vw" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  </span>
-                )}
-                <span class="flex flex-1 flex-col p-6">
-                  <span class="text-xs uppercase tracking-[0.16em] text-ivory/60">{fmtDate(p.date)}{p.source && ` · ${p.source}`}</span>
-                  <span class="cond mt-3 text-xl font-medium leading-snug">{p.title}</span>
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
     </section>
 
     <div class="mt-24"><CtaBand /></div>
