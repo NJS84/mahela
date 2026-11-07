@@ -1,0 +1,153 @@
+---
+/**
+ * Mahela Cares scroll scene: Khomanani Mahela. As you scroll, a citrus sapling grows from the soil
+ * into a young tree and oranges appear on it, while the five stages of the project (approved copy)
+ * light up on blue glass cards: from promising junior managers to co-owners sharing future profits.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const steps = [
+  { title: 'Promising junior managers', text: 'Mahela Group identified promising junior managers whom Mahela can upskill into commercial citrus farmers.' },
+  { title: 'Land and initial inputs', text: 'Mahela provides the land and all the initial inputs for a start-up citrus farm.' },
+  { title: 'Farmed together', text: 'Mahela farms the orchards with the beneficiaries.' },
+  { title: 'Skills beyond production', text: 'Advanced farming know-how and skills such as financial planning, management and marketing are imparted on top of production skills.' },
+  { title: 'Co-owners of the land', text: 'The beneficiaries became co-owners of the land, and they will share in future profits.' },
+];
+const sapling = media('produce/renders/sapling.webp');
+const leaf = media('produce/renders/leaf.webp');
+const orange = media('produce/renders/orange.webp');
+const fruit = [
+  [34, 26, 0.9], [55, 16, 0.85], [58, 36, 1], [40, 42, 0.8], [47, 28, 0.75], [30, 12, 0.7],
+] as const;
+---
+
+<section class="kg relative isolate" style="height:420svh" aria-labelledby="kg-title" data-kg>
+  <div class="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="absolute inset-0 bg-[radial-gradient(70%_70%_at_30%_40%,#2f6a3a,#0b1d12_75%)]"></div>
+      <div class="absolute inset-0 opacity-0 bg-[radial-gradient(60%_60%_at_30%_40%,#c98a12,transparent_70%)]" data-kg-sun></div>
+    </div>
+    <div class="mx-auto grid w-full max-w-[84rem] items-center gap-6 px-4 md:grid-cols-12 md:gap-10 md:px-6">
+      <div class="md:col-span-5">
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Employee empowerment</span>
+        <h2 id="kg-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Khomanani Mahela</h2>
+        <p class="mt-3 max-w-md text-sm leading-relaxed text-white/80 md:text-base">The pride of our employee empowerment efforts is the Khomanani Mahela project.</p>
+        <!-- The growing tree. -->
+        <div class="relative mx-auto mt-4 aspect-square w-[min(62vw,20rem)] md:mt-8 md:w-[min(34vw,26rem)]" aria-hidden="true">
+          <div class="absolute inset-x-[6%] bottom-[4%] h-[14%] rounded-[50%] bg-[radial-gradient(closest-side,#7a3d1c,#3b1d0d_70%,transparent)]"></div>
+          <div class="absolute inset-x-0 bottom-[8%] top-0 origin-bottom" data-kg-tree>
+            <Image src={sapling} alt="" widths={[480, 720].filter((w) => w <= sapling.width)} sizes="26rem" class="absolute inset-0 h-full w-full object-contain object-bottom drop-shadow-[0_24px_30px_rgba(0,0,0,0.45)]" />
+            {fruit.map(([x, y, s]) => (
+              <Image src={orange} alt="" widths={[120]} sizes="60px" class="absolute w-[9%] opacity-0" style={`left:${x}%;top:${y}%;--s:${s}`} data-kg-fruit />
+            ))}
+          </div>
+          <Image src={leaf} alt="" widths={[120]} sizes="60px" class="absolute right-[6%] top-[10%] w-[14%] opacity-0" data-kg-leaf />
+        </div>
+      </div>
+      <ol class="space-y-2.5 md:col-span-7 md:space-y-3">
+        {steps.map((s, i) => (
+          <li class="kg-step flex gap-4 rounded-[22px] p-4 md:p-5" data-kg-step={i}>
+            <span class="kg-num cond flex size-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold">{i + 1}</span>
+            <span>
+              <span class="cond block text-lg font-medium uppercase leading-tight text-white md:text-2xl">{s.title}</span>
+              <span class="kg-text block text-[0.85rem] leading-snug text-white/85 md:text-[0.95rem]">{s.text}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .kg-step {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.18), rgb(150 182 222 / 0.06));
+    border: 1px solid rgb(225 238 255 / 0.26);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    opacity: 0.45;
+    transition: opacity 0.5s, transform 0.5s, border-color 0.5s;
+  }
+  .kg-text {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s, margin-top 0.5s;
+  }
+  .kg-step.is-on {
+    opacity: 1;
+    transform: translateX(6px);
+    border-color: rgb(235 244 255 / 0.6);
+  }
+  .kg-step.is-on .kg-text {
+    max-height: 7rem;
+    margin-top: 0.35rem;
+  }
+  .kg-step.is-past {
+    opacity: 0.78;
+  }
+  .kg-num {
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    transition: background-color 0.4s, box-shadow 0.4s;
+  }
+  .kg-step.is-on .kg-num,
+  .kg-step.is-past .kg-num {
+    background: #74c365;
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgb(116 195 101 / 0.25);
+  }
+  @media (max-width: 767px) {
+    .kg-step:not(.is-on) {
+      padding-block: 0.55rem;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-kg]').forEach((root) => {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-kg-step]')];
+    const tree = root.querySelector<HTMLElement>('[data-kg-tree]')!;
+    const fruit = [...root.querySelectorAll<HTMLElement>('[data-kg-fruit]')];
+    const leaf = root.querySelector<HTMLElement>('[data-kg-leaf]')!;
+    const sun = root.querySelector<HTMLElement>('[data-kg-sun]')!;
+    const n = steps.length;
+    let at = -1;
+    const show = (i: number) => {
+      if (i === at) return;
+      at = i;
+      steps.forEach((s, k) => {
+        s.classList.toggle('is-on', k === i);
+        s.classList.toggle('is-past', k < i);
+      });
+    };
+    show(0);
+    gsap.set(tree, { scale: 0.32 });
+
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (st) => {
+        const p = st.progress;
+        show(Math.min(n - 1, Math.floor(p * n * 0.999)));
+        // The tree grows through the first four stages, then bears fruit as the beneficiaries become co-owners.
+        const g = Math.min(1, p / 0.78);
+        gsap.set(tree, { scale: 0.32 + 0.68 * gsap.parseEase('power1.out')(g), rotation: Math.sin(p * 12) * 1.5 });
+        fruit.forEach((f, k) => {
+          const t = Math.max(0, Math.min(1, (p - 0.78 - k * 0.025) / 0.08));
+          gsap.set(f, { opacity: t, scale: (Number(f.style.getPropertyValue('--s')) || 1) * gsap.parseEase('back.out(2)')(t) });
+        });
+        const lt = Math.max(0, Math.min(1, (p - 0.3) / 0.5));
+        gsap.set(leaf, { opacity: lt > 0 && lt < 1 ? Math.sin(lt * Math.PI) : 0, x: -lt * 160, y: lt * 220, rotation: lt * 260 });
+        gsap.set(sun, { opacity: Math.max(0, (p - 0.6) * 1.8) });
+      },
+    });
+  });
+</script>
