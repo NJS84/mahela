@@ -146,6 +146,29 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
   .cv-arrow:hover {
     background: rgb(255 255 255 / 0.22);
   }
+  /* The next arrow breathes twice in warm green to draw the eye (on first view and on each group change). */
+  .cv-arrow.is-breathe {
+    animation: cv-breathe 1.3s ease-in-out 2;
+  }
+  @keyframes cv-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 0 0 0 rgb(116 195 101 / 0);
+    }
+    50% {
+      transform: scale(1.14);
+      background: #74c365;
+      border-color: rgb(255 255 255 / 0.7);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 0 0 9px rgb(116 195 101 / 0.25), 0 0 28px 6px rgb(116 195 101 / 0.55);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cv-arrow.is-breathe {
+      animation: none;
+    }
+  }
   .cv-arrow:disabled {
     opacity: 0.35;
     cursor: default;
@@ -322,6 +345,20 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
       }, { threshold: 0.6 }).observe(bar);
     }
 
+    const breathe = (i: number) => {
+      const btn = panels[i]?.querySelector<HTMLElement>('[data-cv-next]');
+      if (!btn) return;
+      btn.classList.remove('is-breathe');
+      void btn.offsetWidth;
+      btn.classList.add('is-breathe');
+      btn.addEventListener('animationend', () => btn.classList.remove('is-breathe'), { once: true });
+    };
+    new IntersectionObserver(([e], o) => {
+      if (!e!.isIntersecting) return;
+      window.setTimeout(() => breathe(current), 600);
+      o.disconnect();
+    }, { threshold: 0.5 }).observe(panels[0]!);
+
     function show(next: number) {
       if (next === current) return;
       const prev = current;
@@ -351,6 +388,7 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
         p.tabIndex = i === next ? 0 : -1;
       });
       current = next;
+      window.setTimeout(() => breathe(next), 900 * d);
     }
 
     picks.forEach((p, i) => {
