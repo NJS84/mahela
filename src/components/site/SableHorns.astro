@@ -1,0 +1,166 @@
+---
+/**
+ * Mahela Game scroll scene: the sable breeding story measured in horn. As you scroll, a pair of
+ * scimitar sable horns draws itself up beside an inch ruler, the counter climbs to 50 inches and
+ * the three milestones of the programme (approved copy) light up: 1998, the Western Zambian
+ * sable, and three bulls over 50 inches at the start of 2018.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const steps = [
+  { year: '1998', title: 'A sable breeding project', text: 'As part of the Gravelotte Study Group, Mahela co-founded a sable breeding project in 1998 to improve the genetic pool of the region’s sable.' },
+  { year: 'Zambia', title: 'Western Zambian sable', text: 'This saw the inclusion of the highly sought-after Western Zambian sable into our breeding programme.' },
+  { year: '2018', title: 'Bulls over 50 inches', text: 'At the start of 2018, BJ Vorster owned three sable bulls with horns measuring more than 50 inches.' },
+];
+const bg = media('conservation/game-and-conservation-photo1.jpg');
+const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
+---
+
+<section class="sh relative isolate bg-[#120d08]" style="height:360svh" aria-labelledby="sh-title" data-sh>
+  <div class="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <Image src={bg} alt="" widths={[960, 1440]} sizes="100vw" class="absolute inset-0 h-full w-full object-cover opacity-30" style="object-position:30% 40%" data-sh-bg />
+      <div class="absolute inset-0 bg-[radial-gradient(70%_80%_at_30%_50%,rgb(120_70_20/0.55),#120d08_80%)]"></div>
+    </div>
+    <div class="mx-auto grid w-full max-w-[84rem] items-center gap-6 px-4 md:grid-cols-12 md:gap-10 md:px-6">
+      <div class="md:col-span-5">
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Sable breeding</span>
+        <h2 id="sh-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Measured in inches of horn</h2>
+        <!-- Horns and ruler. -->
+        <div class="relative mx-auto mt-4 flex h-[min(46svh,24rem)] items-end gap-4 md:mt-8 md:h-[min(56svh,30rem)]" aria-hidden="true">
+          <div class="relative h-full w-12 shrink-0">
+            <div class="absolute inset-y-0 right-0 w-px bg-white/40"></div>
+            {ticks.map((t) => (
+              <div class="absolute right-0 flex translate-y-1/2 items-center gap-1.5" style={`bottom:${(t / 50) * 100}%`}>
+                <span class="text-[0.6rem] font-semibold text-white/60">{t}″</span>
+                <span class:list={['h-px bg-white/60', t % 10 === 0 ? 'w-3' : 'w-2']}></span>
+              </div>
+            ))}
+            <div class="sh-mark absolute right-0 h-px w-[calc(100%+12rem)] translate-x-full bg-[#f2cf3c]/70" style="bottom:0%" data-sh-mark></div>
+          </div>
+          <svg viewBox="0 0 200 300" class="h-full w-auto overflow-visible" fill="none">
+            <defs>
+              <linearGradient id="sh-horn" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#8a6a44" />
+                <stop offset="0.45" stop-color="#4a3420" />
+                <stop offset="1" stop-color="#1a120a" />
+              </linearGradient>
+            </defs>
+            <!-- Two backward-curving scimitar horns rising from the head. -->
+            <path d="M78 296 C 70 220, 60 150, 84 92 C 100 56, 128 26, 166 8" stroke="url(#sh-horn)" stroke-width="16" stroke-linecap="round" pathLength="1" class="sh-horn" data-sh-horn />
+            <path d="M108 296 C 104 224, 100 160, 120 104 C 134 70, 158 44, 192 28" stroke="url(#sh-horn)" stroke-width="14" stroke-linecap="round" pathLength="1" class="sh-horn" data-sh-horn />
+            <!-- Rim light. -->
+            <path d="M74 296 C 66 220, 56 150, 80 92 C 96 56, 124 26, 162 8" stroke="#f2d9a6" stroke-width="2" stroke-linecap="round" pathLength="1" class="sh-horn sh-rim" data-sh-horn />
+            <!-- Rings on the horn base. -->
+            <path d="M78 296 C 70 220, 60 150, 84 92 C 100 56, 128 26, 166 8" stroke="#c9a26a" stroke-width="16" stroke-dasharray="0.012 0.03" pathLength="1" class="sh-ring" data-sh-ring />
+          </svg>
+          <p class="absolute bottom-0 right-0 text-right" >
+            <span class="cond block text-[clamp(3.6rem,2.6rem+4vw,6.5rem)] font-medium leading-[0.8] text-white"><span data-sh-count>0</span>″</span>
+            <span class="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-white/70">sable horn length</span>
+          </p>
+        </div>
+      </div>
+      <ol class="space-y-3 md:col-span-7">
+        {steps.map((s, i) => (
+          <li class="sh-step flex gap-5 rounded-[24px] p-5 md:p-6" data-sh-step={i}>
+            <span class="cond w-24 shrink-0 text-3xl font-medium uppercase leading-none text-white md:w-36 md:text-[2.6rem]">{s.year}</span>
+            <span>
+              <span class="cond block text-lg font-medium uppercase leading-tight text-white md:text-2xl">{s.title}</span>
+              <span class="sh-text block text-[0.85rem] leading-snug text-white/85 md:text-[0.95rem]">{s.text}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sh-horn {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.5));
+  }
+  .sh-rim {
+    opacity: 0.55;
+    filter: none;
+  }
+  .sh-ring {
+    opacity: 0.6;
+    clip-path: inset(70% 0 0 0);
+  }
+  .sh-step {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.18), rgb(150 182 222 / 0.06));
+    border: 1px solid rgb(225 238 255 / 0.26);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    opacity: 0.45;
+    transition: opacity 0.5s, transform 0.5s, border-color 0.5s;
+  }
+  .sh-text {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s, margin-top 0.5s;
+  }
+  .sh-step.is-on {
+    opacity: 1;
+    transform: translateX(6px);
+    border-color: rgb(242 207 60 / 0.7);
+  }
+  .sh-step.is-on .sh-text {
+    max-height: 7rem;
+    margin-top: 0.35rem;
+  }
+  .sh-step.is-past {
+    opacity: 0.78;
+  }
+  .sh-mark {
+    box-shadow: 0 0 10px rgb(242 207 60 / 0.6);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-sh]').forEach((root) => {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-sh-step]')];
+    const horns = [...root.querySelectorAll<SVGPathElement>('[data-sh-horn]')];
+    const ring = root.querySelector<SVGPathElement>('[data-sh-ring]')!;
+    const count = root.querySelector<HTMLElement>('[data-sh-count]')!;
+    const mark = root.querySelector<HTMLElement>('[data-sh-mark]')!;
+    const bg = root.querySelector<HTMLElement>('[data-sh-bg]')!;
+    const n = steps.length;
+    let at = -1;
+    const show = (i: number) => {
+      if (i === at) return;
+      at = i;
+      steps.forEach((s, k) => {
+        s.classList.toggle('is-on', k === i);
+        s.classList.toggle('is-past', k < i);
+      });
+    };
+    show(0);
+
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (st) => {
+        const p = st.progress;
+        show(Math.min(n - 1, Math.floor(p * n * 0.999)));
+        const g = Math.min(1, p / 0.85);
+        horns.forEach((h, k) => h.style.setProperty('stroke-dashoffset', String(1 - Math.max(0, Math.min(1, g * 1.04 - k * 0.04)))));
+        ring.style.opacity = String(0.6 * g);
+        const inches = Math.round(g * 50);
+        count.textContent = String(inches);
+        mark.style.bottom = `${g * 100}%`;
+        gsap.set(bg, { scale: 1.12 - p * 0.12 });
+      },
+    });
+  });
+</script>
