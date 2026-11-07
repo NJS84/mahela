@@ -1,0 +1,57 @@
+---
+/**
+ * Free-floating 3D line map of the Mahela packhouse (no frame). Drag to spin.
+ * Map data: OpenStreetMap contributors (ODbL); buildings traced from aerial imagery.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div
+  class:list={['packhouse-map relative select-none', className]}
+  data-packhouse-map
+  role="img"
+  aria-label="3D map of the Mahela packhouse at The Junction, Letsitele, with its surrounding citrus orchards, farm dams and the R71/R529 road"
+>
+  <div class="pm-fallback absolute inset-[10%] rounded-full bg-[radial-gradient(circle,rgb(111_155_224/0.18),transparent_65%)]"></div>
+
+  <div data-pm-label class="pm-tag pointer-events-none absolute left-0 top-0 z-10">
+    <span class="absolute bottom-3 left-0 -translate-x-1/2 whitespace-nowrap rounded-2xl border border-ivory/25 bg-[#0b2347]/55 px-3.5 py-2 text-center shadow-[0_10px_40px_rgb(0_0_0/0.35)] backdrop-blur-md">
+      <span class="block text-[0.55rem] font-semibold uppercase tracking-[0.22em] text-[#bcd4ff] md:text-[0.62rem]">The Junction · Letsitele</span>
+      <span class="cond block text-sm font-medium uppercase tracking-[0.05em] text-ivory md:text-lg">Mahela packhouse</span>
+    </span>
+  </div>
+  <div data-pm-road class="pm-tag pointer-events-none absolute left-0 top-0 z-10">
+    <span class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-ivory px-2.5 py-0.5 text-[0.6rem] font-bold tracking-[0.06em] text-[#0b2347]">R71 · R529</span>
+  </div>
+
+  <p class="pm-hint pointer-events-none absolute bottom-[2%] left-1/2 -translate-x-1/2 whitespace-nowrap text-center text-[0.65rem] uppercase tracking-[0.2em] text-ivory/50">
+    Drag to spin · <span class="pointer-events-auto normal-case tracking-normal">Map data © <a class="underline-offset-2 hover:underline" href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a></span>
+  </p>
+</div>
+
+<style>
+  .packhouse-map .pm-tag { opacity: 0; transition: opacity 0.8s ease 1.4s; }
+  .packhouse-map:global(.is-live) .pm-tag { opacity: 1; }
+  .packhouse-map:global([data-mounted]) .pm-fallback { display: none; }
+  .packhouse-map:not([data-mounted]) .pm-tag { display: none; }
+</style>
+
+<script>
+  const els = document.querySelectorAll<HTMLElement>('[data-packhouse-map]');
+  if (els.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          io.unobserve(e.target);
+          import('../../scripts/packhouse3d').then(({ mountPackhouseMap }) => mountPackhouseMap(e.target as HTMLElement));
+        });
+      },
+      { rootMargin: '400px 0px' },
+    );
+    els.forEach((el) => io.observe(el));
+  }
+</script>
