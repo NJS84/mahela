@@ -17,6 +17,8 @@ import AvocadoSplit from '../../components/site/AvocadoSplit.astro';
 import PhotoMosaic from '../../components/site/PhotoMosaic.astro';
 import BananaStory from '../../components/site/BananaStory.astro';
 import BananaRipen from '../../components/site/BananaRipen.astro';
+import MacadamiaStory from '../../components/site/MacadamiaStory.astro';
+import MacadamiaRoute from '../../components/site/MacadamiaRoute.astro';
 import { media } from '../../lib/media';
 import { produceDetail } from '../../data/pages';
 import { produce } from '../../data/site';
@@ -33,8 +35,9 @@ const next = produce[(idx + 1) % produce.length]!;
 const isCitrus = slug === 'citrus';
 const isAvo = slug === 'avocados';
 const isBanana = slug === 'bananas';
+const isMac = slug === 'macadamias';
 const hero = media(p.hero);
-const sibling = isCitrus || isAvo || isBanana;
+const sibling = isCitrus || isAvo || isBanana || isMac;
 /** Avocado farm photography (Mahela fotos 2022 and 2025 Avos shoots). */
 const avoTiles = [
   { src: 'produce/farm/avocado-harvest-bin-105260.jpg', alt: 'Freshly picked avocados tipped from crates into a bin on a tractor trailer in a Mahela orchard', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
@@ -52,6 +55,13 @@ const bananaTiles = [
   { src: 'produce/farm/banana-bunch-flower-105229.jpg', alt: 'A banana bunch with its purple flower hanging beneath the leaves', cls: 'lg:col-span-2' },
   { src: 'produce/farm/banana-bagged-rows-105232.jpg', alt: 'Rows of banana plants with their bunches covered in blue bags along a red-soil road', cls: 'sm:col-span-2 lg:col-span-2' },
   { src: 'produce/farm/banana-young-rows-105235.jpg', alt: 'Neat rows of young banana plants on red soil, with trees on the hill behind', cls: 'sm:col-span-2 lg:col-span-6' },
+];
+/** Macadamia photography (Mahela Elements stock shots and the original site photos). */
+const macTiles = [
+  { src: 'produce/farm/macadamia-burlap-sack.jpg', alt: 'Freshly harvested macadamia nuts in shell spilling from a burlap sack', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/macadamia-kernel-spoon-b.jpg', alt: 'Cream-coloured macadamia kernels heaped on a wooden spoon', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/photos/mahela-aug28.jpg', alt: 'Macadamia nuts in shell in a bowl and scattered on a white table', cls: 'lg:col-span-3' },
+  { src: 'produce/photos/img-9307.jpg', alt: 'A close view of whole macadamia kernels', cls: 'lg:col-span-3' },
 ];
 // The citrus burst below already features a whole orange, so the intro shows orange blossom instead.
 const art = media(isCitrus ? 'produce/renders/citrus-blossom.webp' : produceArt[slug]!);
@@ -112,6 +122,8 @@ const jsonLd = [
   {isAvo && <AvocadoSplit />}
   {isBanana && <BananaStory />}
   {isBanana && <BananaRipen />}
+  {isMac && <MacadamiaStory />}
+  {isMac && <MacadamiaRoute />}
 
   {
     !sibling && p.groups && p.groups.length > 0 && (
@@ -145,9 +157,9 @@ const jsonLd = [
   }
 
   <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="gallery-title">
-    <SectionTitle eyebrow="On the farm" title={`${p.title} at Mahela`} id="gallery-title" />
+    <SectionTitle eyebrow={isMac ? 'In shell and kernel' : 'On the farm'} title={`${p.title} at Mahela`} id="gallery-title" />
     <div class="mt-12 pb-10">
-      {isCitrus ? <CitrusOrchards /> : isAvo ? <PhotoMosaic tiles={avoTiles} /> : isBanana ? <PhotoMosaic tiles={bananaTiles} /> : <Gallery images={[p.hero, ...p.gallery].slice(0, 4).map((src, i) => ({ src, alt: `${p.title} on a Mahela Group farm in Limpopo, photo ${i + 1}` }))} />}
+      {isCitrus ? <CitrusOrchards /> : isAvo ? <PhotoMosaic tiles={avoTiles} /> : isBanana ? <PhotoMosaic tiles={bananaTiles} /> : isMac ? <PhotoMosaic tiles={macTiles} /> : <Gallery images={[p.hero, ...p.gallery].slice(0, 4).map((src, i) => ({ src, alt: `${p.title} on a Mahela Group farm in Limpopo, photo ${i + 1}` }))} />}
     </div>
     <a href={`/produce/${next.slug}`} class="glass group mt-16 flex items-center justify-between gap-6 rounded-[28px] p-6 md:p-8" data-glare>
       <span>

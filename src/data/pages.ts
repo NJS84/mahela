@@ -194,7 +194,7 @@ export const produceDetail: Record<
       { label: 'Markets', value: 'Nuts in shell to China; kernel to the USA and EU' },
     ],
     body: [],
-    hero: 'produce/photos/mahela-aug28.jpg',
+    hero: 'produce/farm/macadamia-nuts-dark-slate.jpg',
     gallery: ['produce/photos/img-9307.jpg'],
     accent: '#9a6b43',
   },
