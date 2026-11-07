@@ -68,8 +68,7 @@ export function initMotion() {
     ScrollTrigger.refresh();
   });
 
-  // WebGL: 3D orange and export globe.
-  lazyMount('[data-orange3d]', () => import('./orange3d').then((m) => m.mountOrange));
+  // WebGL: export globe.
   lazyMount('[data-globe]', () => import('./globe').then((m) => m.mountGlobe));
 
   // Hero film: ease in and drift as the page scrolls away.

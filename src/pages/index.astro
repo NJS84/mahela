@@ -41,6 +41,18 @@ const badges = [
 
 const citrusGroups = ['Grapefruit', 'Valencia oranges', 'Navels', 'Soft citrus', 'Lemons'];
 
+/** Falling orange-blossom petals: x (%), size, duration, delay, sway, rotation, blur, opacity. */
+const petals = [
+  { x: 8, s: 18, d: 17, delay: -2, sway: 40, r: 20, b: 0, o: 0.9 },
+  { x: 22, s: 34, d: 13, delay: -9, sway: 70, r: -40, b: 3, o: 0.75 },
+  { x: 37, s: 14, d: 21, delay: -14, sway: 30, r: 60, b: 0, o: 0.8 },
+  { x: 51, s: 22, d: 16, delay: -5, sway: 55, r: 10, b: 1, o: 0.9 },
+  { x: 63, s: 46, d: 12, delay: -3, sway: 90, r: -70, b: 5, o: 0.6 },
+  { x: 74, s: 16, d: 19, delay: -11, sway: 35, r: 45, b: 0, o: 0.85 },
+  { x: 86, s: 26, d: 15, delay: -7, sway: 60, r: -15, b: 1.5, o: 0.85 },
+  { x: 94, s: 12, d: 23, delay: -17, sway: 25, r: 80, b: 0, o: 0.7 },
+];
+
 const figures = [
   { value: 1942, label: 'Founded', note: 'The Junction, Letsitele', format: 'year' as const },
   { value: 700, label: 'Full-time jobs', note: 'Plus 1 100 non-permanent' },
@@ -103,33 +115,74 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
     </span>
   </section>
 
-  <!-- Intro + 3D orange -->
-  <section class="relative isolate overflow-hidden" aria-labelledby="g-intro">
+  <!-- Intro: the orange breaks out of the glass, blossoms drift past -->
+  <section class="intro relative isolate overflow-hidden" aria-labelledby="g-intro" data-intro>
     <div class="absolute inset-0 -z-10" aria-hidden="true">
       <Image src={media('farms/dsc-7988.jpg')} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="h-full w-full object-cover object-[50%_60%]" />
-      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(12_26_22/0.86)_0%,rgb(12_26_22/0.5)_60%,rgb(12_26_22/0.4)_100%)]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(12_26_22/0.86)_0%,rgb(12_26_22/0.55)_60%,rgb(12_26_22/0.45)_100%)]"></div>
     </div>
-    <Leaves spots={[{ x: '46%', y: '8%', size: 80, r: -20 }, { x: '92%', y: '70%', size: 120, r: 60, blur: true }, { x: '3%', y: '86%', size: 70, r: 140 }]} />
-    <div class="relative z-10 mx-auto grid min-h-[100svh] max-w-[84rem] items-center gap-10 px-4 py-24 md:px-6 lg:grid-cols-12">
-      <div class="glass rounded-[28px] p-7 md:p-10 lg:col-span-6" data-reveal data-glare>
+
+    <!-- Petals at two depths: small sharp ones fall behind the glass card, large soft-focus ones in front of it. -->
+    {
+      [false, true].map((front) => (
+        <div class:list={['petals pointer-events-none absolute inset-0', front ? 'z-20' : 'z-[5]']} aria-hidden="true">
+          {petals.filter((p) => (p.b >= 1.5) === front).map((p) => (
+            <span class="petal" style={`--x:${p.x}%;--s:${p.s}px;--d:${p.d}s;--delay:${p.delay}s;--sway:${p.sway}px;--r:${p.r}deg;--b:${p.b}px;--o:${p.o}`}>
+              <svg viewBox="0 0 40 40"><use href="#mahela-blossom" /></svg>
+            </span>
+          ))}
+        </div>
+      ))
+    }
+    <svg width="0" height="0" class="absolute" aria-hidden="true">
+      <defs>
+        <radialGradient id="petal-fill" cx="50%" cy="85%" r="90%">
+          <stop offset="0" stop-color="#f3ead0" />
+          <stop offset="0.45" stop-color="#fffdf6" />
+          <stop offset="1" stop-color="#ffffff" />
+        </radialGradient>
+        <g id="mahela-blossom">
+          {[0, 72, 144, 216, 288].map((r) => <ellipse cx="20" cy="10.5" rx="5.6" ry="9.5" fill="url(#petal-fill)" transform={`rotate(${r} 20 20)`} />)}
+          <circle cx="20" cy="20" r="3.2" fill="#e7c95a" />
+          {[0, 60, 120, 180, 240, 300].map((r) => <circle cx="20" cy="15.6" r="0.9" fill="#d9a92a" transform={`rotate(${r} 20 20)`} />)}
+        </g>
+      </defs>
+    </svg>
+
+    <div class="mx-auto grid min-h-[100svh] max-w-[84rem] items-center px-4 py-24 md:px-6 lg:grid-cols-12">
+      <!-- The fruit stage sits behind the card so the glass blurs the part it covers. -->
+      <div class="relative order-2 -mt-28 lg:order-none lg:col-span-6 lg:col-start-6 lg:row-start-1 lg:-ml-44 lg:mt-0 xl:-ml-52" aria-hidden="true">
+        <div class="stage relative mx-auto aspect-square w-[92%] max-w-[620px] lg:w-full">
+          <div class="absolute inset-[16%] rounded-full bg-[radial-gradient(circle,rgb(240_125_20/0.35),transparent_68%)] blur-2xl"></div>
+          <div class="absolute -left-[4%] bottom-[2%] w-[38%]" data-depth="0.35">
+            <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={360} class="h-auto w-full -rotate-[28deg] opacity-90 blur-[3px]" />
+          </div>
+          <div class="absolute inset-[6%_8%_4%_10%]" data-depth="0.6">
+            <div data-float-big>
+              <Image src={media('produce/renders/orange.webp')} alt="" widths={[420, 640, 860]} sizes="(min-width: 1024px) 520px, 80vw" loading="eager" class="h-auto w-full drop-shadow-[0_40px_50px_rgba(0,0,0,0.5)]" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass relative z-10 order-1 rounded-[28px] p-7 md:p-10 lg:order-none lg:col-span-6 lg:col-start-1 lg:row-start-1" data-reveal data-glare>
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">{intro.eyebrow}</p>
         <h2 id="g-intro" class="cond mt-4 text-[clamp(2rem,1.4rem+2vw,3.1rem)] font-medium uppercase leading-[1] tracking-[0.02em]">Four generations on the same Lowveld soil</h2>
         <div class="leaf-rule my-6 max-w-[12rem]"><Icon name="leaf" class="size-4" /></div>
         <p class="text-lg leading-relaxed text-ivory/90">{hero.lead}</p>
         <p class="mt-4 leading-relaxed text-ivory/75">{intro.support}</p>
+        <ul class="mt-7 flex flex-wrap gap-2" aria-label="Mahela citrus groups">
+          {citrusGroups.map((g) => <li class="glass-soft rounded-full px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-ivory/85">{g}</li>)}
+        </ul>
         <div class="mt-8 flex flex-wrap gap-3">
           <a href="/about-us" class="glass-soft inline-flex rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">About Mahela</a>
           <a href="/produce/citrus" class="inline-flex items-center gap-2 rounded-full px-2 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-sage">Our citrus <Icon name="arrow" class="size-4" /></a>
         </div>
       </div>
-      <div class="relative lg:col-span-6">
-        <div class="relative mx-auto aspect-square w-full max-w-[560px]" data-orange3d>
-          <Image src={media(produceArt.citrus!)} alt="A Mahela orange with leaves" widths={[360, 540]} sizes="(min-width: 1024px) 480px, 80vw" class="orange-fallback absolute inset-[10%] h-[80%] w-[80%] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.45)]" />
-          <ul class="orange-labels pointer-events-none absolute inset-0" aria-label="Mahela citrus groups">
-            {citrusGroups.map((g, i) => <li class="orange-label cond glass-soft absolute rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={`--i:${i}`}>{g}</li>)}
-          </ul>
-        </div>
-        <p class="hint mt-2 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.18em] text-ivory/60"><Icon name="sun" class="size-4" />Drag to turn · scroll to open</p>
+
+      <!-- A sharp blossom sprig in front of everything, crossing the card's edge. -->
+      <div class="pointer-events-none absolute right-[4%] top-[9%] z-20 hidden w-[17%] max-w-[230px] lg:block" aria-hidden="true" data-depth="1">
+        <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={460} class="h-auto w-full rotate-[18deg] drop-shadow-[0_20px_24px_rgba(0,0,0,0.4)]" />
       </div>
     </div>
   </section>
@@ -247,30 +300,34 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
 </Base>
 
 <style>
-  /* 3D orange: labels fan out around the segments as it splits (--split 0..1). */
-  [data-orange3d] {
-    --split: 0;
-    container-type: inline-size;
+  /* Petals fall the height of the section, swaying and turning. */
+  .petal {
+    position: absolute;
+    top: -8%;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    opacity: var(--o);
+    filter: blur(var(--b)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+    animation: petal-fall var(--d) linear var(--delay) infinite;
   }
-  .orange-label {
-    left: 50%;
-    top: 50%;
-    opacity: 0;
-    transform: translate(-50%, -50%);
-    white-space: nowrap;
+  .petal svg {
+    width: 100%;
+    height: 100%;
+    animation: petal-sway calc(var(--d) / 3) ease-in-out var(--delay) infinite alternate;
   }
-  [data-orange3d]:global(.is-3d) .orange-fallback {
-    display: none;
+  @keyframes petal-fall {
+    0% { transform: translateY(0) rotate(var(--r)); opacity: 0; }
+    8% { opacity: var(--o); }
+    88% { opacity: var(--o); }
+    100% { transform: translateY(118svh) rotate(calc(var(--r) + 300deg)); opacity: 0; }
   }
-  [data-orange3d]:global(.is-3d) .orange-label {
-    opacity: calc(var(--split) * 1.4 - 0.4);
-    transform: translate(-50%, -50%) translate(calc(cos(var(--i) * 72deg - 90deg) * var(--split) * 34cqw), calc(sin(var(--i) * 72deg - 90deg) * var(--split) * 38cqw));
+  @keyframes petal-sway {
+    from { transform: translateX(calc(var(--sway) * -1)) rotateX(0deg); }
+    to { transform: translateX(var(--sway)) rotateX(55deg); }
   }
-  .hint {
-    visibility: hidden;
-  }
-  :global(.js-motion) .hint {
-    visibility: visible;
+  @media (prefers-reduced-motion: reduce) {
+    .petals { display: none; }
   }
 </style>
 
@@ -280,5 +337,34 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
   if (video && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     video.removeAttribute('autoplay');
     video.pause();
+  }
+
+  // Intro: the orange, blossoms and petals move at different depths on scroll and pointer.
+  const intro = document.querySelector<HTMLElement>('[data-intro]');
+  if (intro && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layers = [...intro.querySelectorAll<HTMLElement>('[data-depth]')];
+    let px = 0;
+    let py = 0;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const r = intro.getBoundingClientRect();
+      const p = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight; // -1..1 through the section
+      layers.forEach((l) => {
+        const d = Number(l.dataset.depth);
+        l.style.translate = `${px * d * 18}px ${p * d * 90 + py * d * 14}px`;
+        l.style.rotate = `${p * d * -6}deg`;
+      });
+    };
+    const queue = () => (raf ||= requestAnimationFrame(apply));
+    window.addEventListener('scroll', queue, { passive: true });
+    if (window.matchMedia('(hover: hover)').matches) {
+      intro.addEventListener('pointermove', (e) => {
+        px = e.clientX / window.innerWidth - 0.5;
+        py = e.clientY / window.innerHeight - 0.5;
+        queue();
+      });
+    }
+    apply();
   }
 </script>
