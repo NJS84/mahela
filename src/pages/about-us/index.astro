@@ -5,6 +5,7 @@ import PageHero from '../../components/site/PageHero.astro';
 import Backdrop from '../../components/site/Backdrop.astro';
 import SectionTitle from '../../components/site/SectionTitle.astro';
 import Figures from '../../components/site/Figures.astro';
+import PackhouseMap from '../../components/site/PackhouseMap.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
 import Icon from '../../components/site/Icon.astro';
 import type { IconName } from '../../lib/icons';
@@ -25,8 +26,11 @@ const description = 'Mahela Group was founded in 1942 at The Junction outside Le
   <PageHero image={media('people/about-us-photo1.jpg')} eyebrow="About Mahela Group" title="Rooted in the Letsitele valley since 1942" lead={about.lead} crumbs={[{ name: 'About us', href: '/about-us' }]} position="50% 35%" />
 
   <section class="relative py-24 md:py-32" aria-labelledby="history-title">
-    <div class="mx-auto max-w-[84rem] px-4 md:px-6">
-      <SectionTitle eyebrow="Our history" title="From one rented field to one of South Africa’s biggest privately-owned citrus exporters" id="history-title" />
+    <div class="mx-auto grid max-w-[84rem] items-center gap-12 px-4 md:px-6 lg:grid-cols-12">
+      <div class="lg:col-span-6">
+        <SectionTitle eyebrow="Our history" title="From one rented field to one of South Africa’s biggest privately-owned citrus exporters" id="history-title" />
+      </div>
+      <PackhouseMap class="lg:col-span-6" />
     </div>
     <ol class="mx-auto mt-16 max-w-[84rem] space-y-24 px-4 md:space-y-40 md:px-6">
       {
