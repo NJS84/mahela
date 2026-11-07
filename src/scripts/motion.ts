@@ -64,11 +64,11 @@ export function initMotion() {
         scrollTrigger: { trigger: el, start: 'top 88%', once: true },
       });
     });
+    ScrollTrigger.sort();
     ScrollTrigger.refresh();
   });
 
-  // WebGL: 3D orange and export globe.
-  lazyMount('[data-orange3d]', () => import('./orange3d').then((m) => m.mountOrange));
+  // WebGL: export globe.
   lazyMount('[data-globe]', () => import('./globe').then((m) => m.mountGlobe));
 
   // Hero film: ease in and drift as the page scrolls away.
@@ -171,29 +171,88 @@ export function initMotion() {
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 1024px)', () => {
-    // Produce rail: pinned sideways scroll, page tone follows the centred fruit.
-    const rail = document.querySelector<HTMLElement>('[data-rail]');
-    const track = document.querySelector<HTMLElement>('[data-rail-track]');
-    if (rail && track) {
-      const tint = rail.querySelector<HTMLElement>('[data-rail-tint]');
-      const cards = gsap.utils.toArray<HTMLElement>('[data-rail-card]');
-      const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 48);
-      const tween = gsap.to(track, {
-        x: () => -distance(),
-        ease: 'none',
-        scrollTrigger: { trigger: rail, start: 'top top', end: () => `+=${distance()}`, pin: true, scrub: 0.7, invalidateOnRefresh: true },
+    // Saved for later: OrangeBurst (see components/site/OrangeBurst.astro).
+    document.querySelectorAll<HTMLElement>('[data-burst-section]').forEach((section) => {
+      const q = (sel: string) => section.querySelector<HTMLElement>(sel);
+      const fruit = q('[data-burst-fruit]');
+      if (!fruit) return;
+      const splash = q('[data-burst-splash]');
+      const wedges = q('[data-burst-wedges]');
+      const drops = gsap.utils.toArray<HTMLElement>('[data-burst-drop]', section);
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: section, start: 'top top', end: '+=75%', pin: true, scrub: 0.6, invalidateOnRefresh: true },
       });
-      cards.forEach((card) => {
-        const fruit = card.querySelector('[data-card-fruit]');
-        if (fruit) gsap.fromTo(fruit, { xPercent: -30, scale: 0.8, rotate: -12 }, { xPercent: 0, scale: 1, rotate: 0, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 95%', end: 'center 55%', scrub: true } });
-        ScrollTrigger.create({
-          trigger: card,
-          containerAnimation: tween,
-          start: 'left 60%',
-          end: 'right 40%',
-          onToggle: (self) => self.isActive && tint && gsap.to(tint, { backgroundColor: card.dataset.tone, duration: 0.8 }),
+      tl.to({}, { duration: 0.25 })
+        .to(fruit, { scale: 1.12, rotation: -6, duration: 0.2, ease: 'power2.in' })
+        .to(fruit, { scale: 1.45, opacity: 0, filter: 'blur(6px)', duration: 0.12, ease: 'power3.out' }, '>')
+        .addLabel('pop', '<')
+        .fromTo(splash, { scale: 0.25, opacity: 0, rotation: -20 }, { scale: 1.15, opacity: 1, rotation: 0, duration: 0.18, ease: 'expo.out' }, 'pop')
+        .to(splash, { scale: 1.45, opacity: 0, duration: 0.25, ease: 'power1.in' }, '>')
+        .fromTo(wedges, { scale: 0.3, opacity: 0, rotation: -30 }, { scale: 1.25, opacity: 1, rotation: 25, duration: 0.25, ease: 'expo.out' }, 'pop')
+        .to(wedges, { scale: 1.7, opacity: 0, rotation: 45, duration: 0.2, ease: 'power1.in' }, '>');
+      drops.forEach((d, i) => {
+        const a = (i / drops.length) * Math.PI * 2 + (i % 3) * 0.3;
+        const dist = 190 + (i % 4) * 70;
+        tl.fromTo(d, { x: 0, y: 0, opacity: 0, scale: 0.4 }, { x: Math.cos(a) * dist, y: Math.sin(a) * dist + 60, opacity: 1, scale: 1, duration: 0.2, ease: 'expo.out' }, 'pop').to(d, { opacity: 0, y: `+=${80 + (i % 3) * 40}`, duration: 0.18 }, '>');
+      });
+    });
+
+    // Produce coverflow: pinned; scrolling moves the cards through the centre.
+    // The centre card is full size, the others shrink and stack toward the edges.
+    const flow = document.querySelector<HTMLElement>('[data-flow]');
+    if (flow) {
+      const cards = gsap.utils.toArray<HTMLElement>('[data-flow-card]', flow);
+      const dots = gsap.utils.toArray<HTMLElement>('[data-flow-dot]', flow);
+      const bgs = gsap.utils.toArray<HTMLElement>('[data-flow-bg]', flow);
+      const n = cards.length;
+      // The cards form a loop, so there is always a card either side of the centre one.
+      const wrap = (d: number) => ((((d + n / 2) % n) + n) % n) - n / 2;
+      const place = (pos: number) => {
+        const w = window.innerWidth;
+        cards.forEach((card, i) => {
+          const d = wrap(i - pos);
+          const t = Math.abs(d);
+          const sign = Math.sign(d);
+          const x = t <= 1 ? t * 0.33 * w : 0.33 * w + (t - 1) * 0.03 * w;
+          const scale = t <= 1 ? 1 - 0.55 * t : Math.max(0.2, 0.45 - 0.08 * (t - 1));
+          gsap.set(card, {
+            x: sign * x,
+            scale,
+            zIndex: 100 - Math.round(t * 10),
+            // Fade out before a card could reach the viewport edge, so none is ever cut off.
+            opacity: t > 2.6 ? Math.max(0, 1 - (t - 2.6) * 2.5) : 1,
+            filter: `brightness(${1 - Math.min(t, 1) * 0.25})`,
+            pointerEvents: t < 0.5 ? 'auto' : 'none',
+            // Cards stacked behind the first side card show only glass and fruit, so text never shows through.
+            '--content': Math.max(0, Math.min(1, 1 - (t - 1) * 3)),
+          });
         });
+        const active = Math.round(pos) % n;
+        dots.forEach((d, i) => d.classList.toggle('is-on', i === active));
+        // Background: the centred fruit's colour, blending with its neighbour as cards move.
+        bgs.forEach((bg, i) => (bg.style.opacity = String(Math.max(0, 1 - Math.abs(wrap(i - pos))))));
+      };
+      const state = { pos: 0 };
+      place(0);
+      gsap.to(state, {
+        pos: n - 1,
+        ease: 'none',
+        onUpdate: () => place(state.pos),
+        scrollTrigger: {
+          // The heading scrolls away first; the cards hold once they are centred on screen.
+          trigger: flow.querySelector('[data-flow-pin]') ?? flow,
+          start: 'center center',
+          // The pin's parent is a flex column, where GSAP would otherwise skip pin spacing.
+          pinSpacing: true,
+          end: () => `+=${window.innerHeight * 0.85 * (n - 1)}`,
+          pin: true,
+          scrub: 0.8,
+          snap: { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut', delay: 0.05 },
+          invalidateOnRefresh: true,
+          onRefresh: () => place(state.pos),
+        },
       });
+      return () => cards.forEach((c) => gsap.set(c, { clearProps: 'all' }));
     }
   });
 
@@ -255,4 +314,11 @@ export function initMotion() {
       });
     }
   });
+
+  // Pinned sections (produce rail, heritage) are created after the triggers
+  // further down the page, which would leave those triggers measured without
+  // the pin spacing (the journey line had already finished before it was
+  // reached). Re-order by position and measure again.
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
 }

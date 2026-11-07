@@ -1,0 +1,378 @@
+---
+/**
+ * The shared "story" section used on the Citrus, Avocado and Bananas pages, made generic for the
+ * remaining pages: a big subject on the left in a glass ring (cut-out art or a round photo) with
+ * its name, an optional glass panel (slot "panel"), and on the right square blue-tinted glass cards,
+ * one in view at a time (arrows, click, swipe), with an icon bar below. The section takes each
+ * card's colour; the next arrow breathes warm Mantis green (outline and arrow only).
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { IconName } from '../../lib/icons';
+import { media } from '../../lib/media';
+
+export type GlassCard = {
+  short: string;
+  title: string;
+  text: string;
+  stat?: string;
+  statLabel?: string;
+  /** Rail icon: a cut-out image path, or a line icon name. */
+  icon: { img?: string; line?: IconName };
+  /** Section background tones for this card. */
+  tone: [string, string];
+  /** Left subject: cut-out art (art) or a photo shown in a circle (photo). */
+  art?: string;
+  photo?: string;
+  /** Big word under the subject on the left, and the small line beneath it. */
+  name?: string;
+  sub?: string;
+};
+
+interface Props {
+  id: string;
+  eyebrow: string;
+  title: string;
+  tag: string;
+  cards: GlassCard[];
+  /** Default left name when a card has none. */
+  name?: string;
+  sub?: string;
+}
+const { id, eyebrow, title, tag, cards, name, sub } = Astro.props;
+const cs = cards.map((c, i) => ({ ...c, i, img: c.icon.img ? media(c.icon.img) : undefined, artImg: c.art ? media(c.art) : undefined, photoImg: c.photo ? media(c.photo) : undefined }));
+const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
+const n = cs.length;
+const hasPanel = Astro.slots.has('panel');
+const names = cs.map((c) => c.name ?? name ?? c.short);
+const subs = cs.map((c) => c.sub ?? sub ?? '');
+const oneName = new Set(names).size === 1 && new Set(subs).size === 1;
+---
+
+<section id={id} class="gc relative isolate scroll-mt-20 overflow-hidden bg-[#0d1a2c]" aria-labelledby={`${id}-title`} data-gc>
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    {cs.map((c) => <div class="absolute inset-0" style={`${c.i === 0 ? 'opacity:1' : 'opacity:0'};background:radial-gradient(70% 80% at 70% 50%, ${c.tone[0]}, ${c.tone[1]} 70%, #0b0f0c 120%)`} data-gc-bg={c.i}></div>)}
+    <div class="absolute inset-0 bg-[radial-gradient(40%_50%_at_70%_50%,rgb(255_255_255/0.12),transparent_70%)]"></div>
+  </div>
+
+  <div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-28">
+    <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">{eyebrow}</span>
+    <h2 id={`${id}-title`} class="cond mt-3 max-w-3xl text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">{title}</h2>
+
+    <div class="mt-8 grid items-end gap-12 lg:mt-6 lg:grid-cols-12 lg:gap-8">
+      <div class="lg:col-span-5">
+        <div class="min-w-0 text-center lg:text-left">
+          <div class="relative mx-auto mb-4 aspect-square w-[min(72vw,24rem)] lg:-ml-6" style="perspective:1000px" data-gc-stage-art aria-hidden="true">
+            <div class="absolute inset-[8%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
+            <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-gc-orbit></div>
+            {cs.map((c) => (
+              <div class="absolute inset-0 flex items-center justify-center" style={hidden(c.i)} data-gc-art={c.i}>
+                {c.artImg ? (
+                  <Image src={c.artImg} alt="" widths={[480, 720].filter((w) => w <= c.artImg!.width)} sizes="24rem" class="h-auto max-h-[84%] w-[84%] object-contain drop-shadow-[0_30px_36px_rgba(0,0,0,0.45)]" />
+                ) : c.photoImg ? (
+                  <span class="gc-photo block aspect-square w-[80%] overflow-hidden rounded-full">
+                    <Image src={c.photoImg} alt="" widths={[480, 720]} sizes="20rem" class="h-full w-full object-cover" />
+                  </span>
+                ) : (
+                  <span class="gc-photo flex aspect-square w-[62%] items-center justify-center rounded-full text-white"><Icon name={c.icon.line ?? 'leaf'} class="size-1/3" /></span>
+                )}
+              </div>
+            ))}
+          </div>
+          {
+            oneName ? (
+              <>
+                <p class="cond text-[clamp(2.4rem,1.8rem+2vw,3.6rem)] font-medium uppercase leading-[0.92] text-white">{names[0]}</p>
+                {subs[0] && <p class="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-white/80">{subs[0]}</p>}
+              </>
+            ) : (
+              <div class="grid">
+                {cs.map((c) => (
+                  <div class="[grid-area:1/1]" style={hidden(c.i)} data-gc-name={c.i}>
+                    <p class="cond text-[clamp(2.4rem,1.8rem+2vw,3.6rem)] font-medium uppercase leading-[0.92] text-white">{names[c.i]}</p>
+                    {subs[c.i] && <p class="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-white/80">{subs[c.i]}</p>}
+                  </div>
+                ))}
+              </div>
+            )
+          }
+          {hasPanel && <div class="gc-glass mx-auto mt-7 max-w-[30rem] rounded-[24px] px-5 pb-4 pt-4 text-left lg:mx-0"><slot name="panel" /></div>}
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="relative mx-auto w-full touch-pan-y select-none" data-gc-stage>
+          <ul>
+            {cs.map((c) => (
+              <li class="gc-slot absolute left-1/2 top-0 w-[min(84vw,26rem)] [margin-left:calc(min(84vw,26rem)/-2)]" data-gc-card={c.i} aria-label={`${c.title}, ${c.i + 1} of ${n}`}>
+                <article class="gc-glass relative flex aspect-square w-full flex-col rounded-[30px] p-6 text-white md:p-7" style={`--accent:${c.tone[0]}`} data-gc-article>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="rounded-lg px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-white" style={`background: color-mix(in srgb, ${c.tone[0]} 75%, #0d1a2c)`}>{tag}</span>
+                    <span class="cond text-sm font-semibold tracking-[0.12em] text-white/75">{String(c.i + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}</span>
+                  </div>
+                  <h3 class="cond mt-4 text-[clamp(1.7rem,1.4rem+1vw,2.3rem)] font-medium uppercase leading-[0.95] text-white">{c.title}</h3>
+                  <p class="mt-3 border-t border-white/20 pt-3 text-[0.92rem] leading-relaxed text-white/90">{c.text}</p>
+                  {c.stat && (
+                    <p class="mt-auto flex items-end gap-3 pt-4">
+                      <span class="cond text-[clamp(2.6rem,2.1rem+1.6vw,3.8rem)] font-medium leading-[0.8] text-white">{c.stat}</span>
+                      {c.statLabel && <span class="pb-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">{c.statLabel}</span>}
+                    </p>
+                  )}
+                </article>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="mt-4 flex items-center justify-center gap-4">
+          <button type="button" class="gc-arrow flex size-11 items-center justify-center rounded-full" aria-label="Previous" data-gc-prev><Icon name="arrow" class="size-5 rotate-180" /></button>
+          <ol class="flex items-center gap-2" aria-hidden="true">
+            {cs.map((c) => <li class:list={['gc-dot h-1.5 rounded-full', c.i === 0 && 'is-on']} data-gc-dot={c.i}></li>)}
+          </ol>
+          <button type="button" class="gc-arrow flex size-11 items-center justify-center rounded-full" aria-label="Next" data-gc-next><Icon name="arrow" class="size-5" /></button>
+        </div>
+        <div class="gc-rail mx-auto mt-8 flex w-full justify-between gap-1 rounded-full p-1.5 sm:p-2" style={`max-width:${Math.min(40, 7.4 * n)}rem`} role="tablist" aria-label="Choose a topic">
+          {cs.map((c) => (
+            <button type="button" role="tab" aria-selected={c.i === 0 ? 'true' : 'false'} tabindex={c.i === 0 ? 0 : -1} class="gc-pick group flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[20px] px-1 py-1.5 sm:px-2" style={`--accent:${c.tone[0]}`} data-gc-pick={c.i}>
+              <span class="gc-pick-dot flex size-11 items-center justify-center overflow-hidden rounded-full text-white sm:size-14">
+                {c.img ? <Image src={c.img} alt="" widths={[160]} sizes="56px" class:list={['transition-transform duration-500 group-hover:scale-110', c.icon.img!.endsWith('.jpg') ? 'h-full w-full object-cover' : 'h-[74%] w-auto object-contain']} /> : <Icon name={c.icon.line!} class="size-6 transition-transform duration-500 group-hover:scale-110" />}
+              </span>
+              <span class="w-full truncate text-center text-[0.52rem] font-semibold uppercase tracking-[0.08em] text-white/80 sm:text-[0.6rem]">{c.short}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gc-rail,
+  .gc-arrow {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.32);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .gc-arrow {
+    color: #fff;
+    transition: background-color 0.3s, opacity 0.3s;
+  }
+  .gc-arrow:hover {
+    background: rgb(255 255 255 / 0.22);
+  }
+  .gc-arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .gc-arrow.is-breathe {
+    animation: gc-breathe 1.3s ease-in-out 2;
+  }
+  @keyframes gc-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      color: #fff;
+      border-color: rgb(225 238 255 / 0.32);
+    }
+    50% {
+      transform: scale(1.12);
+      color: #74c365;
+      border-color: #74c365;
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 0 0 1px #74c365, 0 0 16px rgb(116 195 101 / 0.45);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gc-arrow.is-breathe {
+      animation: none;
+    }
+  }
+  .gc-dot {
+    width: 0.75rem;
+    background: rgb(255 255 255 / 0.3);
+    transition: width 0.4s, background-color 0.4s;
+  }
+  .gc-dot.is-on {
+    width: 1.75rem;
+    background: #fff;
+  }
+  .gc-pick-dot {
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    transition: background-color 0.4s, border-color 0.4s, box-shadow 0.4s;
+  }
+  .gc-pick[aria-selected='true'] .gc-pick-dot {
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+    border-color: rgb(255 255 255 / 0.7);
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 0.12), 0 12px 30px -10px var(--accent);
+  }
+  .gc-pick[aria-selected='true'] span:last-child {
+    color: #fff;
+  }
+  .gc-pick:focus-visible,
+  .gc-arrow:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .gc-glass {
+    background:
+      radial-gradient(90% 60% at 85% 0%, color-mix(in srgb, var(--accent, transparent) 20%, transparent), transparent 70%),
+      linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  .gc-photo {
+    border: 1px solid rgb(235 244 255 / 0.55);
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.3), rgb(150 182 222 / 0.14));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 30px 50px -20px rgb(0 0 0 / 0.55);
+  }
+  .gc-slot {
+    will-change: transform;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  document.querySelectorAll<HTMLElement>('[data-gc]').forEach((root) => {
+    const q = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
+    const cards = q('[data-gc-card]');
+    const dots = q('[data-gc-dot]');
+    const picks = q('[data-gc-pick]') as HTMLButtonElement[];
+    const bgs = q('[data-gc-bg]');
+    const arts = q('[data-gc-art]');
+    const names = q('[data-gc-name]');
+    const prev = root.querySelector<HTMLButtonElement>('[data-gc-prev]')!;
+    const next = root.querySelector<HTMLButtonElement>('[data-gc-next]')!;
+    const artStage = root.querySelector<HTMLElement>('[data-gc-stage-art]')!;
+    const stage = root.querySelector<HTMLElement>('[data-gc-stage]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const d = reduce ? 0 : 1;
+    const state = { pos: 0 };
+    let at = 0;
+
+    const place = (pos: number) => {
+      const w = cards[0]!.offsetWidth || 340;
+      const deck = window.innerWidth < 768;
+      const stageW = stage.offsetWidth || w * 2.4;
+      const side = Math.min(w * 0.7, Math.max(0, (stageW - w * 0.78) / 2));
+      cards.forEach((card, i) => {
+        const dd = i - pos;
+        const t = Math.abs(dd);
+        const s = Math.sign(dd);
+        gsap.set(card, {
+          x: deck ? s * Math.min(t, 1.5) * w * 0.07 : s * Math.min(t, 1.6) * side,
+          y: deck ? Math.min(t, 1.5) * -14 : 0,
+          rotation: deck ? s * Math.min(t, 1.5) * 4 : 0,
+          scale: 1 - Math.min(t, 1.5) * (deck ? 0.07 : 0.22),
+          rotationY: deck ? 0 : -s * Math.min(t, 1) * 18,
+          transformPerspective: 1100,
+          zIndex: 50 - Math.round(t * 10),
+          opacity: t > 1.4 ? Math.max(0, 1 - (t - 1.4) * 3) : 1,
+          filter: `brightness(${1 - Math.min(t, 1) * 0.3})`,
+          pointerEvents: t < 1.5 ? 'auto' : 'none',
+        });
+        card.setAttribute('aria-hidden', t < 0.5 ? 'false' : 'true');
+        gsap.set(card.querySelectorAll('h3, p, span'), { opacity: Math.max(0, 1 - t * 1.6) });
+      });
+    };
+
+    const breathe = () => {
+      if (next.disabled) return;
+      next.classList.remove('is-breathe');
+      void next.offsetWidth;
+      next.classList.add('is-breathe');
+      next.addEventListener('animationend', () => next.classList.remove('is-breathe'), { once: true });
+    };
+
+    function go(i: number, first = false) {
+      const to = Math.max(0, Math.min(cards.length - 1, i));
+      const from = at;
+      at = to;
+      gsap.to(state, { pos: to, duration: 0.7 * d, ease: 'power3.out', overwrite: true, onUpdate: () => place(state.pos) });
+      if (!d) place(to);
+      dots.forEach((dot, di) => dot.classList.toggle('is-on', di === to));
+      prev.disabled = to === 0;
+      next.disabled = to === cards.length - 1;
+      picks.forEach((p, pi) => {
+        p.setAttribute('aria-selected', pi === to ? 'true' : 'false');
+        p.tabIndex = pi === to ? 0 : -1;
+      });
+      if (first || from === to) return;
+
+      const dir = to > from ? 1 : -1;
+      gsap.killTweensOf([...bgs, ...arts, ...names]);
+      arts.forEach((el, ai) => ai !== from && ai !== to && gsap.set(el, { autoAlpha: 0 }));
+      gsap.to(arts[from]!, { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.45 * d, ease: 'power3.in' });
+      gsap.fromTo(arts[to]!, { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1 * d, ease: 'back.out(1.4)', delay: 0.15 * d });
+      if (names.length) {
+        names.forEach((el, k) => k !== to && gsap.to(el, { autoAlpha: 0, y: -8, duration: 0.3 * d }));
+        gsap.fromTo(names[to]!, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, delay: 0.2 * d });
+      }
+      bgs.forEach((el, k) => k !== from && k !== to && gsap.set(el, { opacity: 0 }));
+      gsap.to(bgs[from]!, { opacity: 0, duration: 0.7 * d });
+      gsap.to(bgs[to]!, { opacity: 1, duration: 0.7 * d });
+      window.setTimeout(breathe, 700 * d);
+    }
+
+    prev.addEventListener('click', () => go(at - 1));
+    next.addEventListener('click', () => go(at + 1));
+    cards.forEach((c, i) => c.addEventListener('click', () => i !== at && go(i)));
+    picks.forEach((p, i) => {
+      p.addEventListener('click', () => go(i));
+      p.addEventListener('keydown', (e) => {
+        if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+        e.preventDefault();
+        const k = (i + (e.key === 'ArrowRight' ? 1 : picks.length - 1)) % picks.length;
+        picks[k]!.focus();
+        go(k);
+      });
+    });
+    let x0: number | null = null;
+    stage.addEventListener('pointerdown', (e) => (x0 = e.clientX));
+    stage.addEventListener('pointerup', (e) => {
+      if (x0 === null) return;
+      const dx = e.clientX - x0;
+      if (Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1));
+      x0 = null;
+    });
+
+    // Every card is square, or taller only if the longest text needs it; all share that size.
+    const articles = q('[data-gc-article]');
+    const size = () => {
+      articles.forEach((a) => (a.style.height = ''));
+      const h = Math.max(...articles.map((a) => a.offsetHeight));
+      articles.forEach((a) => (a.style.height = `${h}px`));
+      stage.style.height = `${h + 24}px`;
+      place(state.pos);
+    };
+    go(0, true);
+    size();
+    window.addEventListener('resize', size);
+    document.fonts?.ready.then(size);
+
+    if (!reduce) {
+      gsap.to(root.querySelector('[data-gc-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+      arts.forEach((a) => gsap.to(a.firstElementChild, { y: -10, duration: 3.4, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+      if (window.matchMedia('(hover: hover)').matches) {
+        const rx = gsap.quickTo(artStage, 'rotationX', { duration: 0.8, ease: 'power3' });
+        const ry = gsap.quickTo(artStage, 'rotationY', { duration: 0.8, ease: 'power3' });
+        root.addEventListener('pointermove', (e) => {
+          const r = artStage.getBoundingClientRect();
+          ry(((e.clientX - (r.left + r.width / 2)) / window.innerWidth) * 30);
+          rx((-(e.clientY - (r.top + r.height / 2)) / window.innerHeight) * 24);
+        });
+        root.addEventListener('pointerleave', () => (rx(0), ry(0)));
+      }
+      new IntersectionObserver(([e], o) => {
+        if (!e!.isIntersecting) return;
+        window.setTimeout(breathe, 600);
+        o.disconnect();
+      }, { threshold: 0.4 }).observe(stage);
+    }
+  });
+</script>

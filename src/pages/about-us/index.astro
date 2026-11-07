@@ -5,6 +5,7 @@ import PageHero from '../../components/site/PageHero.astro';
 import Backdrop from '../../components/site/Backdrop.astro';
 import SectionTitle from '../../components/site/SectionTitle.astro';
 import Figures from '../../components/site/Figures.astro';
+import PackhouseMap3D from '../../components/site/PackhouseMap3D.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
 import Icon from '../../components/site/Icon.astro';
 import type { IconName } from '../../lib/icons';
@@ -21,12 +22,16 @@ const chapters = [
 const description = 'Mahela Group was founded in 1942 at The Junction outside Letsitele, Limpopo. Today the Vorster family farms citrus, subtropical fruit and nuts, runs a nursery, two packhouses and a game breeding programme.';
 ---
 
-<Base title="About us" description={description} breadcrumbs={[{ name: 'About us', href: '/about-us' }]} ogImage={media('people/about-us-photo1.jpg')}>
-  <PageHero image={media('people/about-us-photo1.jpg')} eyebrow="About Mahela Group" title="Rooted in the Letsitele valley since 1942" lead={about.lead} crumbs={[{ name: 'About us', href: '/about-us' }]} position="50% 35%" />
+<Base title="About us" description={description} breadcrumbs={[{ name: 'About us', href: '/about-us' }]} ogImage={media('packhouse/hkp-103506.jpg')}>
+  <PageHero image={media('packhouse/hkp-103506.jpg')} eyebrow="About Mahela Group" title="Rooted in the Letsitele valley since 1942" lead={about.lead} crumbs={[{ name: 'About us', href: '/about-us' }]} position="50% 50%" />
 
-  <section class="relative py-24 md:py-32" aria-labelledby="history-title">
-    <div class="mx-auto max-w-[84rem] px-4 md:px-6">
-      <SectionTitle eyebrow="Our history" title="From one rented field to one of South Africa’s biggest privately-owned citrus exporters" id="history-title" />
+  <section class="relative overflow-x-clip py-24 md:py-32" aria-labelledby="history-title">
+    <div class="relative mx-auto max-w-[84rem] px-4 md:px-6 lg:flex lg:min-h-[44rem] lg:items-center">
+      <div class="relative z-10 lg:w-1/2">
+        <SectionTitle eyebrow="Our history" title="From one rented field to one of South Africa’s biggest privately-owned citrus exporters" id="history-title" />
+      </div>
+      <!-- Free-floating 3D map: breaks out of the content width and sits under the heading's right edge. -->
+      <PackhouseMap3D class="-mx-4 mt-2 aspect-[5/4] w-[calc(100%+2rem)] md:-mx-6 md:w-[calc(100%+3rem)] lg:absolute lg:-right-[3vw] lg:top-1/2 lg:mx-0 lg:mt-0 lg:aspect-auto lg:h-[52rem] lg:w-[min(70vw,78rem)] lg:-translate-y-1/2" />
     </div>
     <ol class="mx-auto mt-16 max-w-[84rem] space-y-24 px-4 md:space-y-40 md:px-6">
       {
@@ -49,7 +54,7 @@ const description = 'Mahela Group was founded in 1942 at The Junction outside Le
     </ol>
   </section>
 
-  <Backdrop image={media('farms/dsc-1779.jpg')} dim={0.6}>
+  <Backdrop image={media('packhouse/hkp-103489.jpg')} dim={0.68}>
     <section class="glass-dark rounded-[32px] p-8 md:p-12" aria-label="Mahela in numbers" data-reveal data-glare>
       <Figures items={metrics as any} />
     </section>
@@ -78,7 +83,7 @@ const description = 'Mahela Group was founded in 1942 at The Junction outside Le
     </div>
   </section>
 
-  <Backdrop image={media('farms/dhk-8485.jpg')} dim={0.6}>
+  <Backdrop image={media('packhouse/hkp-103502.jpg')} dim={0.62}>
     <SectionTitle eyebrow="Our values" title="What we stand for" align="center" id="values-title" />
     <ul class="mt-14 grid gap-5 md:grid-cols-2">
       {

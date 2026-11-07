@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/site/PageHero.astro';
 import SectionTitle from '../../components/site/SectionTitle.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
+import Icon from '../../components/site/Icon.astro';
 import { media } from '../../lib/media';
 import { leadership } from '../../data/pages';
 
@@ -20,37 +21,90 @@ const jsonLd = [
     })),
   },
 ];
+const [father, ...sons] = leadership.directors;
 ---
 
 <Base title="Board of directors" description={leadership.lead} breadcrumbs={crumbs} jsonLd={jsonLd} ogImage={media('people/byqoe6630.jpg')}>
-  <PageHero image={media('people/byqoe6630.jpg')} eyebrow="Leadership" title={leadership.title} lead={leadership.lead} crumbs={crumbs} position="50% 30%" />
+  <PageHero image={media('people/byqoe6630.jpg')} eyebrow="Leadership" title={leadership.title} lead={leadership.lead} crumbs={crumbs} position="50% 15%" />
 
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="board-title">
-    <SectionTitle eyebrow="The Vorster family" title="Edward and his four sons" id="board-title" />
-    <ul class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-      {
-        leadership.directors.map((d, i) => (
-          <li class:list={[i % 2 === 1 && 'lg:translate-y-12']}>
-            <figure class="glass group overflow-hidden rounded-[26px] p-1.5" data-reveal data-tilt data-glare>
-              <div class="overflow-hidden rounded-[20px]">
-                <Image src={media(`people/${d.image}.jpg`)} alt={`${d.name}, ${d.role} of Mahela Group`} widths={[320, 480, 640]} sizes="(min-width: 1024px) 18vw, (min-width: 640px) 45vw, 90vw" class="aspect-[3/4] w-full object-cover grayscale-[35%] transition duration-700 group-hover:scale-105 group-hover:grayscale-0" />
-              </div>
-              <figcaption class="px-4 pb-4 pt-4">
-                <span class="cond block text-xl font-semibold uppercase tracking-[0.06em]">{d.name}</span>
-                <span class="text-sm text-ivory/65">{d.role}</span>
-              </figcaption>
-            </figure>
-          </li>
-        ))
-      }
-    </ul>
-    <div class="glass mt-28 flex flex-col gap-2 rounded-[28px] p-8 md:flex-row md:items-center md:justify-between" data-reveal>
-      <span>
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">Chairman</span>
-        <span class="cond mt-1 block text-3xl font-medium uppercase">{leadership.chair.name}</span>
-      </span>
-      <span class="text-ivory/70">{leadership.chair.role}</span>
+  <section class="relative overflow-hidden py-24 md:py-32" aria-labelledby="board-title">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_10%,#2f5a8f,#0d1a2c_75%)]"></div>
+    <div class="mx-auto max-w-[84rem] px-4 md:px-6">
+      <div class="text-center"><SectionTitle eyebrow="The Vorster family" title="Edward and his four sons" align="center" id="board-title" /></div>
+
+      <!-- Family tree: Edward above, the line draws down to his four sons as you scroll. -->
+      <div class="mt-14" data-tree>
+        <figure class="ld-card mx-auto w-[min(78vw,17rem)] rounded-[26px] p-1.5" data-reveal>
+          <div class="overflow-hidden rounded-[20px]"><Image src={media(`people/${father!.image}.jpg`)} alt={`${father!.name}, ${father!.role} of Mahela Group`} widths={[320, 480, 640]} sizes="17rem" class="aspect-[4/5] w-full object-cover object-top" /></div>
+          <figcaption class="px-4 pb-4 pt-4 text-center">
+            <span class="cond block text-xl font-semibold uppercase tracking-[0.06em] text-white">{father!.name}</span>
+            <span class="text-sm text-white/75">{father!.role}</span>
+          </figcaption>
+        </figure>
+        <div class="relative mx-auto hidden h-16 w-full lg:block" aria-hidden="true">
+          <span class="ld-line absolute left-1/2 top-0 h-1/2 w-0.5 -translate-x-1/2 origin-top" data-tree-a></span>
+          <span class="ld-line absolute left-[calc(12.5%-0.56rem)] right-[calc(12.5%-0.56rem)] top-1/2 h-0.5" data-tree-b></span>
+          {['calc(12.5% - 0.56rem)', 'calc(37.5% - 0.19rem)', 'calc(62.5% + 0.19rem)', 'calc(87.5% + 0.56rem)'].map((l) => <span class="ld-line absolute top-1/2 h-1/2 w-0.5 -translate-x-1/2 origin-top" style={`left:${l}`} data-tree-c></span>)}
+        </div>
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-0 lg:grid-cols-4">
+          {sons.map((d) => (
+            <li class="flex">
+              <figure class="ld-card group flex w-full flex-col rounded-[26px] p-1.5" data-reveal data-tilt>
+                <div class="overflow-hidden rounded-[20px]">
+                  <Image src={media(`people/${d.image}.jpg`)} alt={`${d.name}, ${d.role} of Mahela Group`} widths={[320, 480, 640]} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw" class="aspect-[4/5] w-full object-cover object-top transition duration-700 group-hover:scale-105" />
+                </div>
+                <figcaption class="flex flex-1 flex-col px-4 pb-4 pt-4">
+                  <span class="cond block text-xl font-semibold uppercase tracking-[0.06em] text-white">{d.name}</span>
+                  <span class="text-sm text-white/75">{d.role}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="ld-card mt-20 grid items-center gap-6 rounded-[28px] p-7 md:grid-cols-[auto_1fr_auto] md:p-9" data-reveal>
+        <span class="flex size-14 items-center justify-center rounded-full border border-white/40 bg-white/10 text-white"><Icon name="shield" class="size-6" /></span>
+        <span>
+          <span class="text-xs font-semibold uppercase tracking-[0.2em] text-white/75">Chairman of the board</span>
+          <span class="cond mt-1 block text-3xl font-medium uppercase text-white md:text-4xl">{leadership.chair.name}</span>
+        </span>
+        <span class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white">Non-executive</span>
+      </div>
+      <div class="mt-16"><CtaBand /></div>
     </div>
-    <div class="mt-16"><CtaBand /></div>
   </section>
 </Base>
+
+<style>
+  .ld-line {
+    background: #74c365;
+    box-shadow: 0 0 10px rgb(116 195 101 / 0.6);
+  }
+  .ld-card {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  document.querySelectorAll<HTMLElement>('[data-tree]').forEach((tree) => {
+    const a = tree.querySelector('[data-tree-a]');
+    const b = tree.querySelector('[data-tree-b]');
+    const c = tree.querySelectorAll('[data-tree-c]');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    gsap.set(a, { scaleY: 0 });
+    gsap.set(b, { scaleX: 0 });
+    gsap.set(c, { scaleY: 0 });
+    gsap.timeline({ scrollTrigger: { trigger: tree, start: 'top 55%', end: 'center 50%', scrub: true } })
+      .to(a, { scaleY: 1, ease: 'none', duration: 1 })
+      .to(b, { scaleX: 1, ease: 'none', duration: 1.4 })
+      .to(c, { scaleY: 1, ease: 'none', duration: 0.8 });
+  });
+</script>

@@ -1,0 +1,129 @@
+---
+/**
+ * Bananas scroll scene: "Packed green, ripened at the market". A green bunch hangs in the middle of
+ * the screen; as the visitor scrolls, it ripens to yellow while the background warms from leaf green
+ * to gold, a ripeness gauge fills, and the three steps of the journey from the approved copy appear:
+ * packed on-farm, straight to the ripening facilities, then markets in South Africa, Botswana and
+ * Namibia. Without motion it shows the ripe bunch and every step.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+import { bananaRoute } from '../../data/banana';
+
+const green = media('produce/renders/banana-green.webp');
+/** Same bunch as the green one, coloured ripe, so the two line up exactly while it ripens. */
+const ripe = media('produce/renders/banana-ripe.webp');
+---
+
+<section class="br relative" aria-labelledby="br-title" data-br>
+  <div class="br-stage sticky top-0 flex min-h-[100svh] flex-col overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#4f7a23,#14240a_75%)]"></div>
+    <div class="br-warm absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#c99a16,#3a2804_75%)]" data-br-warm></div>
+
+    <div class="mx-auto grid w-full max-w-[84rem] flex-1 items-center gap-6 px-4 pb-16 pt-20 md:px-6 md:pt-24 lg:grid-cols-12 lg:gap-10">
+      <!-- The bunch, ripening, with its gauge. -->
+      <div class="relative lg:col-span-6" aria-hidden="true">
+        <div class="relative mx-auto w-[min(58vw,15rem)] md:w-[min(40vw,26rem)] lg:w-[min(36vw,30rem)]" data-br-bunch>
+          <Image src={ripe} alt="" widths={[480, 720, 960]} sizes="30rem" class="h-auto w-full drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]" />
+          <Image src={green} alt="" widths={[480, 720, 960]} sizes="30rem" class="absolute inset-0 h-auto w-full" data-br-green />
+        </div>
+        <div class="mx-auto mt-4 w-[min(80vw,22rem)] md:mt-8">
+          <div class="relative h-2.5 rounded-full bg-[linear-gradient(90deg,#5f8a2a,#a7b83a,#f2cf3c)] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.25)]">
+            <span class="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-white/30 shadow-[0_0_14px_rgb(255_255_255/0.6)] [backdrop-filter:blur(4px)]" style="left:100%" data-br-knob></span>
+          </div>
+          <div class="mt-2 flex justify-between text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">
+            <span>On the farm</span><span>At the market</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heading and the journey. -->
+      <div class="lg:col-span-6">
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">From farm to market</span>
+        <h2 id="br-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Packed green. Ripened at the market.</h2>
+        <ol class="br-list mt-6 grid gap-2.5 md:mt-8 md:gap-3">
+          {
+            bananaRoute.map((r, i) => (
+              <li class="br-chip flex items-start gap-4 rounded-[22px] p-3.5 text-left text-white md:p-5" data-br-chip={i}>
+                <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30"><Icon name={r.icon} class="size-5" /></span>
+                <span>
+                  <span class="cond block text-lg font-semibold uppercase tracking-[0.06em]">{r.title}</span>
+                  <span class="mt-1 block text-[0.9rem] leading-relaxed text-white/85">{r.text}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+    <div class="absolute inset-x-0 bottom-8 mx-auto h-[3px] w-28 overflow-hidden rounded-full bg-white/15" aria-hidden="true"><span class="block h-full w-full origin-left scale-x-0 bg-white/70" data-br-bar></span></div>
+  </div>
+</section>
+
+<style>
+  :global(html.js-motion) .br {
+    height: 280svh;
+  }
+  .br-chip {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 30px 60px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  /* No motion: ripe bunch, warm background. */
+  :global(html:not(.js-motion)) [data-br-green] {
+    opacity: 0;
+  }
+  /* Phones: the steps take turns in one place so the scene fits one screen. */
+  @media (max-width: 767px) {
+    :global(html.js-motion) .br-list {
+      grid-template-areas: 'one';
+    }
+    :global(html.js-motion) .br-list > li {
+      grid-area: one;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-br]').forEach((root) => {
+    if (!document.documentElement.classList.contains('js-motion')) return;
+    const bunch = root.querySelector<HTMLElement>('[data-br-bunch]')!;
+    const green = root.querySelector<HTMLElement>('[data-br-green]')!;
+    const warm = root.querySelector<HTMLElement>('[data-br-warm]')!;
+    const knob = root.querySelector<HTMLElement>('[data-br-knob]')!;
+    const chips = [...root.querySelectorAll<HTMLElement>('[data-br-chip]')];
+    const phone = () => window.innerWidth < 768;
+
+    gsap.set(green, { opacity: 1 });
+    gsap.set(warm, { opacity: 0 });
+    gsap.set(knob, { left: '0%' });
+    gsap.set(bunch, { rotation: -6, transformOrigin: '60% 5%' });
+    gsap.set(chips, { autoAlpha: 0, y: 40, scale: 0.94 });
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true } });
+    tl.to(root.querySelector('[data-br-bar]'), { scaleX: 1, duration: 3.4 }, 0);
+    // The bunch ripens and the light warms across the whole scroll.
+    tl.to(green, { opacity: 0, duration: 2.6, ease: 'power1.inOut' }, 0.3)
+      .to(warm, { opacity: 1, duration: 2.6, ease: 'power1.inOut' }, 0.3)
+      .to(knob, { left: '100%', duration: 2.6, ease: 'power1.inOut' }, 0.3)
+      // A slow swing, as if it is carried along.
+      .to(bunch, { rotation: 6, duration: 1.3, ease: 'sine.inOut' }, 0.3)
+      .to(bunch, { rotation: 0, scale: 1.04, duration: 1.3, ease: 'sine.inOut' }, 1.6);
+    // The steps arrive one after another (on phones each replaces the last).
+    chips.forEach((c, i) => {
+      const t = 0.3 + i * 0.95;
+      tl.to(c, { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: 'power2.out' }, t);
+      if (i > 0) tl.to(chips[i - 1]!, { autoAlpha: () => (phone() ? 0 : 1), y: () => (phone() ? -30 : 0), duration: 0.3 }, t - 0.05);
+    });
+    tl.to({}, { duration: 0.4 });
+  });
+</script>

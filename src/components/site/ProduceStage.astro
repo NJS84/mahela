@@ -1,0 +1,256 @@
+---
+/**
+ * Interactive produce picker for the Produce page. A row of six fruits; picking
+ * one spins its fruit onto the stage, swaps the copy beside it and fades the
+ * section to that fruit's colours. The big fruit tilts in 3D with the pointer.
+ * Cycles on its own until the visitor picks a fruit.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+import { produce } from '../../data/site';
+import { produceArt } from '../../data/produce-art';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  id: string;
+}
+const { eyebrow, title, lead, id } = Astro.props;
+const items = produce.map((p) => ({ ...p, img: media(produceArt[p.slug]!) }));
+const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** Harvest months (0 = January) where the approved copy states them. Citrus has none stated yet, so no timeline shows for it. */
+const harvest: Record<string, { on: number[]; label: string }> = {
+  avocados: { on: [2, 3, 4, 5, 6], label: 'Harvest March to July' },
+  bananas: { on: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], label: 'Harvested year-round, two-thirds in summer' },
+  macadamias: { on: [4, 5, 6], label: 'Harvest May to July' },
+  litchis: { on: [11, 0], label: 'Harvest December to January' },
+  kiwis: { on: [1], label: 'Harvest February' },
+};
+---
+
+<section class="relative isolate overflow-hidden bg-[#0c1c15]" aria-labelledby={id} data-stage>
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    {items.map((p, i) => <div class="stage-bg absolute inset-0" style={`opacity:${i === 0 ? 1 : 0};background:radial-gradient(65% 75% at 72% 50%, ${p.tone[0]}, ${p.tone[1]} 68%, #0b0f0c 118%)`} data-stage-bg={i}></div>)}
+    <div class="absolute inset-0 bg-[radial-gradient(45%_45%_at_72%_50%,rgb(255_255_255/0.14),transparent_70%)]"></div>
+  </div>
+
+  <div class="mx-auto grid max-w-[84rem] grid-cols-1 items-center gap-10 px-4 py-24 md:px-6 md:py-28 lg:grid-cols-12 lg:grid-rows-[auto_auto] lg:gap-x-6 lg:gap-y-10">
+    <div class="min-w-0 lg:col-span-6 lg:row-start-1">
+      <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">{eyebrow}</span>
+      <h2 id={id} class="cond mt-3 text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">{title}</h2>
+      <p class="mt-5 max-w-xl text-lg leading-relaxed text-white/85">{lead}</p>
+
+      <div class="stage-copy relative mt-10 grid">
+        {
+          items.map((p, i) => (
+            <div class="stage-panel col-start-1 row-start-1" style={i === 0 ? '' : 'opacity:0;visibility:hidden'} data-stage-panel={i} aria-hidden={i === 0 ? 'false' : 'true'}>
+              <span class="inline-block rounded-lg px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-white" style={`background: color-mix(in srgb, ${p.tone[0]} 80%, #1e4a30)`}>{p.tag}</span>
+              <h3 class="cond mt-3 text-[clamp(2rem,1.6rem+1.4vw,2.8rem)] font-medium uppercase leading-none text-white">{p.name}</h3>
+              <p class="mt-3 max-w-xl leading-relaxed text-white/85">{p.summary}</p>
+              <a href={`/produce/${p.slug}`} class="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white" tabindex={i === 0 ? 0 : -1}>Explore {p.name.toLowerCase()} <Icon name="arrow" class="size-4" /></a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="relative min-w-0 lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1 lg:self-end" style="perspective:1000px">
+      <div class="stage-fruit relative mx-auto aspect-square w-full max-w-[31rem]" data-stage-fruit>
+        <div class="stage-ring absolute inset-[12%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]" aria-hidden="true"></div>
+        <div class="absolute inset-[6%] rounded-full border border-dashed border-white/15" aria-hidden="true" data-stage-orbit></div>
+        {
+          items.map((p, i) => (
+            <div class="stage-art absolute inset-0 flex items-center justify-center" style={i === 0 ? '' : 'opacity:0;visibility:hidden'} data-stage-art={i} aria-hidden="true">
+              <Image src={p.img} alt="" widths={[480, 720, 960].filter((w) => w <= p.img.width)} sizes="(min-width: 1024px) 34rem, 90vw" class="h-auto drop-shadow-[0_40px_50px_rgba(0,0,0,0.45)]" style={`width:${p.slug === 'avocados' || p.slug === 'bananas' ? 92 : 74}%`} loading={i === 0 ? 'eager' : 'lazy'} />
+            </div>
+          ))
+        }
+      </div>
+      <div class="mx-auto mt-4 grid w-full max-w-[30rem] content-start lg:h-[7.6rem]">
+        {
+          items.map((p, i) => {
+            const h = harvest[p.slug];
+            return (
+              <div class="col-start-1 row-start-1" style={i === 0 ? '' : 'opacity:0;visibility:hidden'} data-stage-time={i} aria-hidden={i === 0 ? 'false' : 'true'}>
+                {h && (
+                  <div class="stage-time rounded-2xl px-4 pb-3 pt-3.5" style={`--accent:${p.tone[0]}`}>
+                    <p class="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/80">{h.label}</p>
+                    <ol class="grid grid-cols-12 gap-1" aria-label={`Harvest months: ${h.on.map((m) => monthNames[m]).join(', ')}`}>
+                      {months.map((m, mi) => (
+                        <li class="flex flex-col items-center gap-1.5">
+                          <span class:list={['stage-month h-2.5 w-full rounded-full', h.on.includes(mi) && 'is-on']} data-month={mi}></span>
+                          <span class:list={['text-[0.6rem] font-semibold', h.on.includes(mi) ? 'text-white' : 'text-white/45']}>{m}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+
+    <div class="min-w-0 lg:col-span-6 lg:row-start-2">
+      <div class="flex justify-center lg:justify-start">
+        <div class="stage-dock flex max-w-full gap-2 overflow-x-auto rounded-full p-2 sm:gap-3" role="tablist" aria-label="Choose a fruit">
+          {
+            items.map((p, i) => (
+              <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={p.name} class="stage-pick group relative flex shrink-0 flex-col items-center gap-1.5 rounded-[22px] px-2.5 pb-2 pt-2.5 sm:px-3" data-stage-pick={i} style={`--accent:${p.tone[0]}`}>
+                <span class="stage-pick-dot flex size-14 items-center justify-center rounded-full sm:size-16">
+                  <Image src={p.img} alt="" widths={[160]} sizes="64px" class="size-[78%] object-contain transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110" />
+                </span>
+                <span class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/80">{p.name.replace('Golden ', '')}</span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stage-dock {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.32);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    scrollbar-width: none;
+  }
+  .stage-pick-dot {
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    transition: background-color 0.4s, border-color 0.4s, box-shadow 0.4s;
+  }
+  .stage-pick[aria-selected='true'] .stage-pick-dot {
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+    border-color: rgb(255 255 255 / 0.7);
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 0.12), 0 12px 30px -10px var(--accent);
+  }
+  .stage-pick[aria-selected='true'] span:last-child {
+    color: #fff;
+  }
+  .stage-pick:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .stage-time {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.18), rgb(150 182 222 / 0.06));
+    border: 1px solid rgb(225 238 255 / 0.28);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+  .stage-month {
+    background: rgb(0 0 0 / 0.22);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .stage-month.is-on {
+    background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--accent) 35%, #fff));
+    box-shadow: 0 0 14px rgb(255 255 255 / 0.45);
+  }
+  .stage-fruit {
+    perspective: 1000px;
+  }
+  .stage-art {
+    transform-style: preserve-3d;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  document.querySelectorAll<HTMLElement>('[data-stage]').forEach((root) => {
+    const picks = [...root.querySelectorAll<HTMLButtonElement>('[data-stage-pick]')];
+    const arts = [...root.querySelectorAll<HTMLElement>('[data-stage-art]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-stage-panel]')];
+    const bgs = [...root.querySelectorAll<HTMLElement>('[data-stage-bg]')];
+    const stage = root.querySelector<HTMLElement>('[data-stage-fruit]')!;
+    const orbit = root.querySelector<HTMLElement>('[data-stage-orbit]');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = 0;
+    let timer: number | undefined;
+    let userPicked = false;
+
+    if (orbit && !reduce) gsap.to(orbit, { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+    // The fruit on stage bobs gently.
+    arts.forEach((a) => !reduce && gsap.to(a.firstElementChild, { y: -14, rotate: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+
+    const times = [...root.querySelectorAll<HTMLElement>('[data-stage-time]')];
+
+    function show(next: number) {
+      if (next === current) return;
+      const dir = next > current ? 1 : -1;
+      const prev = current;
+      const d = reduce ? 0 : 1;
+      // Stop anything still animating from a previous pick, so only one fruit and one block of copy are ever visible.
+      gsap.killTweensOf([...arts, ...panels, ...bgs, ...times, ...root.querySelectorAll('[data-stage-time] .is-on')]);
+      [arts, panels, times].forEach((group) => group.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { autoAlpha: 0 })));
+      bgs.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { opacity: 0 }));
+
+      gsap.to(arts[prev], { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.45 * d, ease: 'power3.in' });
+      gsap.fromTo(arts[next], { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1 * d, ease: 'back.out(1.4)', delay: 0.15 * d });
+      gsap.set(panels[prev], { autoAlpha: 0 });
+      gsap.fromTo(panels[next], { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, ease: 'power3.out' });
+      gsap.set(times[prev], { autoAlpha: 0 });
+      gsap.fromTo(times[next], { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, delay: 0.2 * d, ease: 'power3.out' });
+      const lit = times[next].querySelectorAll('.is-on');
+      if (lit.length) gsap.fromTo(lit, { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.35 * d, stagger: 0.05 * d, delay: 0.35 * d, ease: 'power2.out' });
+      gsap.to(bgs[prev], { opacity: 0, duration: 0.7 * d });
+      gsap.to(bgs[next], { opacity: 1, duration: 0.7 * d });
+      [panels, times].forEach((group) => group.forEach((p, i) => p.setAttribute('aria-hidden', i === next ? 'false' : 'true')));
+      panels.forEach((p, i) => p.querySelector('a')?.setAttribute('tabindex', i === next ? '0' : '-1'));
+      picks.forEach((p, i) => p.setAttribute('aria-selected', i === next ? 'true' : 'false'));
+      current = next;
+    }
+
+    picks.forEach((p, i) => {
+      p.addEventListener('click', () => {
+        userPicked = true;
+        window.clearInterval(timer);
+        show(i);
+      });
+      p.addEventListener('pointerenter', () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
+        userPicked = true;
+        window.clearInterval(timer);
+        show(i);
+      });
+      p.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        const n = (i + (e.key === 'ArrowRight' ? 1 : picks.length - 1)) % picks.length;
+        picks[n].focus();
+        picks[n].click();
+      });
+    });
+
+    // Cycle on its own while in view, until someone picks a fruit.
+    if (!reduce) {
+      new IntersectionObserver(([e]) => {
+        window.clearInterval(timer);
+        if (e.isIntersecting && !userPicked) timer = window.setInterval(() => show((current + 1) % arts.length), 4200);
+      }, { threshold: 0.35 }).observe(root);
+    }
+
+    // 3D tilt of the fruit with the pointer.
+    if (!reduce && window.matchMedia('(hover: hover)').matches) {
+      const rx = gsap.quickTo(stage, 'rotationX', { duration: 0.8, ease: 'power3' });
+      const ry = gsap.quickTo(stage, 'rotationY', { duration: 0.8, ease: 'power3' });
+      root.addEventListener('pointermove', (e) => {
+        const r = stage.getBoundingClientRect();
+        ry(((e.clientX - (r.left + r.width / 2)) / window.innerWidth) * 30);
+        rx((-(e.clientY - (r.top + r.height / 2)) / window.innerHeight) * 24);
+      });
+      root.addEventListener('pointerleave', () => {
+        rx(0);
+        ry(0);
+      });
+    }
+  });
+</script>

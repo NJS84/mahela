@@ -19,9 +19,10 @@ const {
       <h2 id="cta-title" class="cond mt-3 text-[clamp(2rem,1.3rem+2.4vw,3.5rem)] font-medium uppercase leading-[0.98]">{title}</h2>
       <p class="mt-5 max-w-xl leading-relaxed text-ivory/80">{text}</p>
     </div>
-    <div class="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
-      <a href="/contact-us" class="btn-forest inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Contact the export team <Icon name="arrow" class="size-4" /></a>
-      <a href={site.phoneHref} class="glass-soft inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]"><Icon name="phone" class="size-4" />{site.phone}</a>
+    <!-- Both buttons share one width: side by side on tablets, stacked on desktop. -->
+    <div class="grid gap-3 sm:grid-cols-2 lg:col-span-4 lg:ml-auto lg:w-full lg:max-w-[20rem] lg:grid-cols-1">
+      <a href="/contact-us" class="btn-forest inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Contact the export team <Icon name="arrow" class="size-4" /></a>
+      <a href={site.phoneHref} class="glass-soft inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]"><Icon name="phone" class="size-4" />{site.phone}</a>
     </div>
   </div>
 </section>

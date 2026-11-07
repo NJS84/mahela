@@ -5,8 +5,8 @@ import PageHero from '../../components/site/PageHero.astro';
 import Backdrop from '../../components/site/Backdrop.astro';
 import SectionTitle from '../../components/site/SectionTitle.astro';
 import ProduceCard from '../../components/site/ProduceCard.astro';
+import ProduceStage from '../../components/site/ProduceStage.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
-import Leaves from '../../components/site/Leaves.astro';
 import Icon from '../../components/site/Icon.astro';
 import { media } from '../../lib/media';
 import { produce } from '../../data/site';
@@ -28,16 +28,16 @@ const jsonLd = [
 <Base title="Produce" description={description} breadcrumbs={[{ name: 'Produce', href: '/produce' }]} jsonLd={jsonLd} ogImage={media('generated/orchard-aerial.jpg')}>
   <PageHero image={media('generated/orchard-aerial.jpg')} eyebrow="Mahela produce" title={title} lead="The biggest percentage of fruit produced on Mahela farms is citrus, alongside avocados, bananas, macadamias, litchis and golden kiwis, all grown from certified nursery trees." crumbs={[{ name: 'Produce', href: '/produce' }]} />
 
-  <section class="relative overflow-hidden bg-[#1e4a30] py-24 md:py-32" aria-labelledby="all-produce">
-    <div class="absolute inset-0 bg-[radial-gradient(80%_60%_at_70%_30%,rgb(255_255_255/0.12),transparent_70%)]"></div>
-    <Leaves spots={[{ x: '88%', y: '6%', size: 120, r: 30, blur: true }, { x: '6%', y: '70%', size: 80, r: -50 }]} />
+  <ProduceStage eyebrow="Our portfolio" title="Citrus at the core. Subtropicals alongside." lead="The warm days and cold nights of our region are beneficial for producing fruit with well-balanced levels of sugar and acidity as well as good fibre and moisture content." id="all-produce" />
+
+  <section class="relative isolate overflow-hidden bg-[#0c1c15] pb-28 pt-32 md:pb-36 md:pt-40" aria-label="Produce at a glance">
+    <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(70%_50%_at_50%_0%,rgb(39_68_134/0.35),transparent_70%)]" aria-hidden="true"></div>
     <div class="relative mx-auto max-w-[84rem] px-4 md:px-6">
-      <SectionTitle eyebrow="Our portfolio" title="Citrus at the core. Subtropicals alongside." lead="The warm days and cold nights of our region are beneficial for producing fruit with well-balanced levels of sugar and acidity as well as good fibre and moisture content." id="all-produce" />
-      <ul class="mt-16 grid gap-x-10 gap-y-14 md:grid-cols-2 xl:grid-cols-3">
+      <ul class="grid gap-x-10 gap-y-28 md:grid-cols-2 md:gap-y-32 xl:grid-cols-3">
         {
           produce.map((p) => (
             <li id={p.slug} data-reveal>
-              <ProduceCard tag={p.tag} title={p.name} href={`/produce/${p.slug}`} image={media(produceArt[p.slug]!)} icon={produceIcon[p.slug]} points={p.facts.slice(0, 3)} accent={p.tone[0]} headingLevel="h2" />
+              <ProduceCard tag={p.tag} title={p.name} href={`/produce/${p.slug}`} image={media(produceArt[p.slug]!)} icon={produceIcon[p.slug]} points={p.facts.slice(0, 3)} accent={p.tone[0]} fruitSize={p.slug === 'avocados' || p.slug === 'bananas' ? 62 : 52} headingLevel="h2" />
             </li>
           ))
         }
@@ -46,22 +46,83 @@ const jsonLd = [
   </section>
 
   <Backdrop image={media('farms/dhk-9895.jpg')} dim={0.55}>
-    <section id="nursery" class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="nursery-title">
-      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
-        <span class="flex size-14 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8"><Icon name="sprout" class="size-7" /></span>
-        <SectionTitle eyebrow="Nursery" title="Certified nursery trees" id="nursery-title" />
-        <p class="mt-6 text-lg leading-relaxed text-ivory/85">Certified, disease-free trees ensure quality and food safety. Every Mahela orchard starts in our own nursery, and high-quality, disease-free trees establish the foundation for long-term orchard performance.</p>
-        <a href="/contact-us" class="btn-forest mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Enquire about trees <Icon name="arrow" class="size-4" /></a>
+    <section id="nursery" class="grid gap-10 lg:grid-cols-12 lg:items-stretch" aria-labelledby="nursery-title">
+      <div class="nursery-glass flex flex-col justify-center rounded-[32px] p-8 text-white md:p-12 lg:col-span-7" data-reveal data-glare>
+        <span class="flex size-14 items-center justify-center rounded-2xl border border-white/30 bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]"><Icon name="sprout" class="size-7" /></span>
+        <div class="mt-6"><SectionTitle eyebrow="Nursery" title="Certified nursery trees" id="nursery-title" /></div>
+        <p class="mt-6 text-lg leading-relaxed text-white/90">Certified, disease-free trees ensure quality and food safety. Every Mahela orchard starts in our own nursery, and high-quality, disease-free trees establish the foundation for long-term orchard performance.</p>
+        <a href="/contact-us" class="btn-forest mt-8 inline-flex items-center gap-2 self-start rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>Enquire about trees <Icon name="arrow" class="size-4" /></a>
       </div>
-      <div class="lg:col-span-5" data-reveal>
-        <div class="relative">
-        <Image src={media('produce/renders/sapling.webp')} alt="" width={420} class="pointer-events-none absolute -bottom-10 -left-10 z-10 w-[42%] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] md:-left-16" data-float-big />
-        <div class="glass-soft overflow-hidden rounded-[28px] p-1.5" data-tilt>
-          <Image src={media('farms/mahela-ohrigstad-tango-boompies.jpg')} alt="Young Tango citrus trees in a Mahela orchard at Ohrigstad" widths={[480, 720, 960]} sizes="(min-width: 1024px) 34vw, 100vw" class="aspect-[4/5] w-full rounded-[22px] object-cover" />
+      <div class="relative lg:col-span-5" data-reveal>
+        <div class="nursery-frame h-full overflow-hidden rounded-[28px] p-1.5">
+          <Image src={media('farms/mahela-ohrigstad-tango-boompies.jpg')} alt="Young Tango citrus trees in a Mahela orchard at Ohrigstad" widths={[480, 720, 960]} sizes="(min-width: 1024px) 34vw, 100vw" class="aspect-[4/5] h-full w-full rounded-[22px] object-cover lg:aspect-auto" />
         </div>
+        <div class="pointer-events-none absolute -bottom-3 -left-3 z-10 w-[40%] origin-bottom md:-left-12" data-sapling>
+          <Image src={media('produce/renders/sapling.webp')} alt="" width={420} class="h-auto w-full drop-shadow-[0_30px_30px_rgba(0,0,0,0.5)]" />
         </div>
       </div>
     </section>
     <div class="mt-24"><CtaBand /></div>
   </Backdrop>
 </Base>
+
+<style>
+  .nursery-glass {
+    /* Denser blue-tinted glass so the photo behind reads as soft colour, not a smear. */
+    background: linear-gradient(150deg, rgb(39 68 134 / 0.55), rgb(20 40 70 / 0.42));
+    border: 1px solid rgb(225 238 255 / 0.32);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 40px 80px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(40px) saturate(120%);
+    backdrop-filter: blur(40px) saturate(120%);
+  }
+  .nursery-frame {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.25), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.35);
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.55);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Cards tilt in 3D toward the pointer; the fruit lifts further than the glass, so it reads as in front.
+  if (!reduce && window.matchMedia('(hover: hover)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-pp-card]').forEach((card) => {
+      const glass = card.querySelector<HTMLElement>('[data-pp-tilt]')!;
+      const fruit = card.querySelector<HTMLElement>('[data-pp-fruit]')!;
+      const gx = gsap.quickTo(glass, 'rotationY', { duration: 0.6, ease: 'power3' });
+      const gy = gsap.quickTo(glass, 'rotationX', { duration: 0.6, ease: 'power3' });
+      const fx = gsap.quickTo(fruit, 'x', { duration: 0.8, ease: 'power3' });
+      const fy = gsap.quickTo(fruit, 'y', { duration: 0.8, ease: 'power3' });
+      const fr = gsap.quickTo(fruit, 'rotation', { duration: 0.8, ease: 'power3' });
+      const fs = gsap.quickTo(fruit, 'scale', { duration: 0.8, ease: 'power3' });
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        gx(px * 10);
+        gy(-py * 10);
+        fx(px * 26);
+        fy(py * 18 - 10);
+        fr(px * 8);
+        fs(1.06);
+      });
+      card.addEventListener('pointerleave', () => {
+        gx(0); gy(0); fx(0); fy(0); fr(0); fs(1);
+      });
+    });
+  }
+
+  if (!reduce) {
+    // Each fruit drops into its card as the card scrolls in.
+    document.querySelectorAll<HTMLElement>('[data-pp-fruit] img').forEach((img, i) => {
+      gsap.from(img, { yPercent: -40, rotation: i % 2 ? 18 : -18, scale: 0.7, autoAlpha: 0, duration: 1.2, ease: 'back.out(1.6)', scrollTrigger: { trigger: img.closest('[data-pp-card]'), start: 'top 85%', once: true } });
+    });
+    // The nursery sapling grows out of its pot as the section scrolls into view.
+    const sapling = document.querySelector<HTMLElement>('[data-sapling]');
+    if (sapling) gsap.fromTo(sapling, { scaleY: 0.35, scaleX: 0.7, autoAlpha: 0.2 }, { scaleY: 1, scaleX: 1, autoAlpha: 1, ease: 'power2.out', scrollTrigger: { trigger: sapling.parentElement, start: 'top 85%', end: 'center 55%', scrub: 0.6 } });
+  }
+</script>

@@ -2,67 +2,112 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/site/PageHero.astro';
-import Backdrop from '../components/site/Backdrop.astro';
 import SectionTitle from '../components/site/SectionTitle.astro';
-import Gallery from '../components/site/Gallery.astro';
+import GlassCards from '../components/site/GlassCards.astro';
+import KhomananiGrow from '../components/site/KhomananiGrow.astro';
+import PhotoMosaic from '../components/site/PhotoMosaic.astro';
 import CtaBand from '../components/site/CtaBand.astro';
 import Icon from '../components/site/Icon.astro';
+import Leaves from '../components/site/Leaves.astro';
 import { media } from '../lib/media';
 import { cares } from '../data/pages';
 
 const description = 'How Mahela Group cares for its employees, community and environment: SIZA accreditation, training, an on-farm crèche and school, the Khomanani Mahela farmer project, integrated pest management and wildlife conservation.';
+const hero = media('people/team-2025-103319.jpg');
 const pillars = [
-  { id: 'employees', icon: 'people', title: 'Our employees', paras: cares.employees, img: 'packhouse/dscf0510.jpg' },
-  { id: 'environment', icon: 'drop', title: 'Our environment', paras: cares.environment, img: 'generated/drip-irrigation.jpg' },
-  { id: 'community', icon: 'heart', title: 'Our community', paras: cares.community, img: 'community/the-newly-renovated.jpg' },
+  { id: 'employees', icon: 'people', title: 'Our employees' },
+  { id: 'khomanani', icon: 'sprout', title: 'Khomanani Mahela' },
+  { id: 'environment', icon: 'drop', title: 'Our environment' },
+  { id: 'community', icon: 'heart', title: 'Our community' },
 ] as const;
+
+/** All card text is the approved Mahela Cares copy, split into its points. */
+const people = [
+  { short: 'SIZA', title: 'More than a salary', text: 'Mahela Group is accredited with SIZA, which certifies compliance with ethical labour and environmental practices. Our responsibility as an employer goes beyond merely paying our employees a salary.', stat: 'SIZA', statLabel: 'ethical labour accredited', icon: { line: 'shield' as const }, tone: ['#3a6fb0', '#0d1a2c'] as [string, string], photo: 'packhouse/pack-2025-103499.jpg', name: 'SIZA accredited', sub: 'Ethical labour practices' },
+  { short: 'Training', title: 'Training programmes', text: 'Ongoing training programmes such as computer, life skills training and adult literacy classes empower employees to improve their standard of living.', stat: '3', statLabel: 'computer, life skills, adult literacy', icon: { line: 'check' as const }, tone: ['#2e7d5b', '#0b2219'] as [string, string], photo: 'community/mahelacares-community-photo2.jpg', name: 'Training', sub: 'Computer, life skills, literacy' },
+  { short: 'Crèche', title: 'Crèche and school', text: 'Working moms can focus on their careers, knowing that toddlers are well looked after by trained personnel in a Mahela Group crèche. With an on-farm primary school, their children need not walk long distances.', icon: { line: 'heart' as const }, tone: ['#c0446a', '#2a0c18'] as [string, string], photo: 'community/mahelacares-community-photo1.jpg', name: 'Crèche and school', sub: 'On the farm' },
+  { short: 'Sport', title: 'A healthy, balanced life', text: 'Mahela Group promotes a healthy and well-balanced life by organising and sponsoring events such as soccer tournaments, fishing and cycling competitions.', icon: { line: 'sun' as const }, tone: ['#c98a12', '#3a2604'] as [string, string], photo: 'community/mahelacares-people-photo4.jpg', name: 'Sport and events', sub: 'Soccer, fishing, cycling' },
+  { short: 'Vegetables', title: 'Vegetable tunnels', text: 'Vegetable tunnels were erected on farms. Workers are supplied with everything they need to produce vegetables for themselves and their families.', icon: { line: 'sprout' as const }, tone: ['#5f8a2a', '#16260a'] as [string, string], photo: 'generated/soil-hands.jpg', name: 'Vegetable project', sub: 'For workers and families' },
+];
+const earth = [
+  { short: 'Footprint', title: 'Caretaker of the earth', text: 'As caretaker of the earth, we strive towards minimising our environmental footprint. Environmentally sustainable practices are followed diligently.', icon: { line: 'leaf' as const }, tone: ['#2e7d5b', '#0b2219'] as [string, string], photo: 'farms/farm-dam-105275.jpg', name: 'Caretakers', sub: 'Of the earth' },
+  { short: 'IPM', title: 'Integrated pest management', text: 'Spraying of chemicals is kept to a minimum and natural predators are released to help control pests.', stat: 'IPM', statLabel: 'natural predators, minimal spraying', icon: { line: 'shield' as const }, tone: ['#5f8a2a', '#16260a'] as [string, string], photo: 'produce/farm/citrus-orchard-103584.jpg', name: 'Natural predators', sub: 'Integrated pest management' },
+  { short: 'Water', title: 'Every drop counts', text: 'Water management is optimised with the latest technology, such as an irrigation system using continuous drippers.', icon: { line: 'drop' as const }, tone: ['#2a8fb0', '#06222c'] as [string, string], photo: 'generated/drip-irrigation.jpg', name: 'Water', sub: 'Continuous drippers' },
+  { short: 'Trees', title: 'Indigenous trees', text: 'Large indigenous trees are left in place as far as possible when land is cleared for new orchards. We also regularly plant large numbers of indigenous trees on our farms.', icon: { line: 'sprout' as const }, tone: ['#3f7a3a', '#0e1f0c'] as [string, string], photo: 'farms/mahela-gate-105567.jpg', name: 'Indigenous trees', sub: 'Kept and planted' },
+  { short: 'Wildlife', title: 'Wildlife conservation', text: 'Mahela plays an active role in the conservation of wildlife. Game species such as the African wild dog and sable are some of the species we have helped to protect.', icon: { line: 'globe' as const }, tone: ['#a8641c', '#2a1606'] as [string, string], photo: 'conservation/wild-dog-walking.jpg', name: 'Wildlife', sub: 'Wild dog and sable' },
+];
+const tiles = [
+  { src: 'people/team-2025-103338.jpg', alt: 'Mahela colleagues together at the entrance with the Mahela elephant emblem', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2', pos: '50% 30%' },
+  { src: 'people/team-2022-105310.jpg', alt: 'A Mahela colleague in traditional dress in the office reception', cls: 'lg:col-span-2 lg:row-span-2', pos: '50% 12%' },
+  { src: 'people/team-2025-103513.jpg', alt: 'A Mahela family member holding a young child in the packhouse', cls: 'lg:col-span-2' },
+  { src: 'community/img-20190504-wa0014.jpg', alt: 'Mahela employees and community members at a Mahela sports day', cls: 'lg:col-span-2' },
+  { src: 'packhouse/pack-2025-103342.jpg', alt: 'The Mahela packhouse team together on the packhouse floor', cls: 'sm:col-span-2 lg:col-span-2' },
+  { src: 'people/team-2025-103326.jpg', alt: 'Mahela office colleagues together on the lawn', cls: 'sm:col-span-2 lg:col-span-6', pos: '50% 40%' },
+];
 ---
 
-<Base title="Mahela Cares" description={description} breadcrumbs={[{ name: 'Mahela Cares', href: '/mahela-cares' }]} ogImage={media('people/dsc-1211.jpg')}>
-  <PageHero image={media('people/dsc-1211.jpg')} eyebrow="Mahela Cares" title="People, community and the land we farm" lead={cares.lead} crumbs={[{ name: 'Mahela Cares', href: '/mahela-cares' }]} position="50% 60%">
+<Base title="Mahela Cares" description={description} breadcrumbs={[{ name: 'Mahela Cares', href: '/mahela-cares' }]} ogImage={hero}>
+  <PageHero image={hero} eyebrow="Mahela Cares" title="People, community and the land we farm" lead={cares.lead} crumbs={[{ name: "Mahela Cares", href: "/mahela-cares" }]} position="50% 62%">
     <ul class="mt-8 flex flex-wrap gap-2">
-      {pillars.map((p) => <li><a href={`#${p.id}`} class="glass-soft inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"><Icon name={p.icon} class="size-4" />{p.title}</a></li>)}
+      {pillars.map((p) => <li><a href={`#${p.id}`} class="mc-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white"><Icon name={p.icon} class="size-4" />{p.title}</a></li>)}
     </ul>
   </PageHero>
 
-  {
-    pillars.map((p, i) => (
-      <Backdrop image={media(p.img)} dim={0.66}>
-        <section id={p.id} class="grid gap-10 lg:grid-cols-12" aria-labelledby={`${p.id}-title`}>
-          <div class:list={['glass rounded-[32px] p-8 md:p-12 lg:col-span-8', i % 2 === 1 && 'lg:col-start-5']} data-reveal data-glare>
-            <span class="flex size-14 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8"><Icon name={p.icon} class="size-7" /></span>
-            <SectionTitle title={p.title} id={`${p.id}-title`} />
-            {p.paras.map((t) => <p class="mt-5 leading-relaxed text-ivory/85">{t}</p>)}
-            {p.id === 'employees' && (
-              <ul class="mt-8 grid gap-2 sm:grid-cols-2">
-                {cares.programmes.map((x) => <li class="flex items-center gap-2.5 text-sm text-ivory/85"><Icon name="check" class="size-4 text-sage" />{x}</li>)}
-              </ul>
-            )}
-          </div>
-        </section>
-        {p.id === 'employees' && (
-          <aside class="glass-blue mt-16 grid items-center gap-8 overflow-hidden rounded-[32px] p-8 md:p-12 lg:grid-cols-12" aria-labelledby="khomanani-title" data-reveal data-glare>
-            <div class="lg:col-span-4">
-              <Image src={media('generated/soil-hands.jpg')} alt="" widths={[480, 720]} sizes="(min-width: 1024px) 26vw, 90vw" class="mb-6 aspect-[4/3] w-full rounded-[22px] object-cover" />
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ivory/70">Employee empowerment</p>
-              <h3 id="khomanani-title" class="cond mt-3 text-4xl font-medium uppercase leading-none">Khomanani Mahela</h3>
-            </div>
-            <p class="text-lg leading-relaxed text-ivory/85 lg:col-span-8">{cares.khomanani}</p>
-          </aside>
-        )}
-      </Backdrop>
-    ))
-  }
-
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="life-title">
-    <SectionTitle eyebrow="Life at Mahela" title="Moments from our farms" id="life-title" />
-    <div class="mt-12 pb-10">
-      <Gallery images={[
-        { src: 'people/dsc-1424.jpg', alt: 'Mahela Group office team' },
-        { src: 'community/mahelacares-people-photo1.jpg', alt: 'Mahela employees together on the farm' },
-        { src: 'people/staff-photo-no-layers.jpg', alt: 'Mahela Group staff photo' },
-      ]} />
+  <GlassCards id="employees" eyebrow="SIZA accredited employer" title="Our employees" tag="Employees" cards={people}>
+    <div slot="panel">
+      <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white">Programmes on our farms</p>
+      <ul class="grid gap-x-4 gap-y-2 sm:grid-cols-2">
+        {cares.programmes.map((x) => <li class="flex items-center gap-2 text-[0.8rem] text-white/90"><Icon name="check" class="size-3.5 shrink-0 text-[#74c365]" />{x}</li>)}
+      </ul>
     </div>
+  </GlassCards>
+
+  <div id="khomanani" class="scroll-mt-0"><KhomananiGrow /></div>
+
+  <GlassCards id="environment" eyebrow="Custodians of nature" title="Our environment" tag="Environment" cards={earth} />
+
+  <section id="community" class="relative scroll-mt-20 overflow-hidden py-24 md:py-32" aria-labelledby="community-title">
+    <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 30%, rgb(192 68 106 / 0.28), transparent 70%), #10201a"></div>
+    <Leaves />
+    <div class="relative mx-auto grid max-w-[84rem] items-center gap-12 px-4 md:px-6 lg:grid-cols-12">
+      <div class="lg:col-span-6">
+        <SectionTitle eyebrow="Uplifting our community" title="Our community" id="community-title" />
+        {cares.community.map((t, i) => <p class:list={['mt-5 leading-relaxed', i === 0 ? 'text-xl text-ivory/90' : 'text-ivory/80']} data-reveal>{t}</p>)}
+      </div>
+      <div class="grid grid-cols-2 gap-4 lg:col-span-6">
+        <figure class="mc-photo col-span-2 overflow-hidden rounded-[28px]" data-reveal>
+          <Image src={media('community/the-newly-renovated.jpg')} alt="The opening of the newly renovated Hlokomela Junction clinic in Letsitele" widths={[640, 960]} sizes="(min-width: 1024px) 40vw, 92vw" class="aspect-[16/9] w-full object-cover" />
+        </figure>
+        <div class="mc-glass flex aspect-square flex-col justify-between rounded-[28px] p-5 text-white md:p-6" data-reveal>
+          <Icon name="heart" class="size-7" />
+          <p><span class="cond block text-[clamp(1.5rem,1.2rem+1vw,2.2rem)] font-medium uppercase leading-none">Junction primary</span><span class="mt-2 block text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">Funded almost entirely by Mahela, on land Mahela provided</span></p>
+        </div>
+        <figure class="mc-photo aspect-square overflow-hidden rounded-[28px]" data-reveal>
+          <Image src={media('community/mahelacares-community-photo1.jpg')} alt="Learners in green uniforms at a school supported by Mahela Group" widths={[480, 720]} sizes="(min-width: 1024px) 20vw, 46vw" class="h-full w-full object-cover" />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-[84rem] px-4 pb-24 md:px-6 md:pb-32" aria-labelledby="life-title">
+    <SectionTitle eyebrow="Life at Mahela" title="The people behind the fruit" id="life-title" />
+    <div class="mt-12 pb-10"><PhotoMosaic tiles={tiles} /></div>
     <div class="mt-16"><CtaBand title="Partner with a grower that cares." text="Ethically grown, SIZA-accredited fruit from a company invested in its people, its community and the land." /></div>
   </section>
 </Base>
+
+<style>
+  .mc-chip,
+  .mc-glass {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+  }
+  .mc-photo {
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+    outline: 1px solid rgb(225 238 255 / 0.25);
+    outline-offset: -1px;
+  }
+</style>

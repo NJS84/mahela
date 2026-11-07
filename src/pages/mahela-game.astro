@@ -1,49 +1,57 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/site/PageHero.astro';
-import Backdrop from '../components/site/Backdrop.astro';
 import SectionTitle from '../components/site/SectionTitle.astro';
-import Gallery from '../components/site/Gallery.astro';
+import GlassCards from '../components/site/GlassCards.astro';
+import SableHorns from '../components/site/SableHorns.astro';
+import PhotoMosaic from '../components/site/PhotoMosaic.astro';
 import CtaBand from '../components/site/CtaBand.astro';
+import Leaves from '../components/site/Leaves.astro';
 import { media } from '../lib/media';
 import { game } from '../data/pages';
 
 const description = 'Mahela Game breeds rarer game species such as sable and roan to conserve and improve their genetics, in partnership with BJ Vorster and Benchmark Game Breeders in Limpopo.';
+const hero = media('conservation/sable-grazing.jpg');
+
+/** Approved Mahela Game copy, split into its points. */
+const cards = [
+  { short: 'Rare species', title: 'Rarer game species', text: 'Apart from the plentiful plains game that can be found on Mahela Group farms, Mahela breeds some of the rarer game species with the aim of conserving and improving these game genetics.', stat: '8', statLabel: 'species bred and conserved', icon: { line: 'leaf' as const }, tone: ['#a8641c', '#2a1606'] as [string, string], photo: 'conservation/game-and-conservation-photo1.jpg', name: 'Mahela Game', sub: 'Conserving game genetics' },
+  { short: 'BJ Vorster', title: 'Mahela Game and BJ Vorster', text: 'Mahela Group owns and markets game under the name ‘Mahela Game’ as well as through a 50% partnership in BJ Vorster.', stat: '50%', statLabel: 'partnership in BJ Vorster', icon: { line: 'people' as const }, tone: ['#7a5a2a', '#1e1408'] as [string, string], photo: 'conservation/kudu-bull.jpg', name: 'BJ Vorster', sub: '50% partnership' },
+  { short: 'Benchmark', title: 'Benchmark Game Breeders', text: 'BJ Vorster markets its game as a member of Benchmark Game Breeders. Its annual auction is a highlight on South Africa’s game auction calendar, with animals regularly selling for record prices.', icon: { line: 'shield' as const }, tone: ['#c98a12', '#3a2604'] as [string, string], photo: 'conservation/buffalo-golden.jpg', name: 'Benchmark', sub: 'Annual game auction' },
+  { short: 'Wildlife', title: 'Custodians of nature', text: 'Mahela plays an active role in the conservation of wildlife. Game species such as the African wild dog and sable are some of the species we have helped to protect.', icon: { line: 'globe' as const }, tone: ['#5f7a2a', '#16200a'] as [string, string], photo: 'conservation/wild-dog-walking.jpg', name: 'Wildlife', sub: 'Wild dog and sable' },
+];
+
+const tiles = [
+  { src: 'conservation/wild-dogs-pack.jpg', alt: 'A pack of African wild dogs in long grass', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'conservation/wildskamp-dam-7327.jpg', alt: 'A dead tree standing in a dam on a Mahela game camp', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'conservation/wildskamp-nyala-7308.jpg', alt: 'Nyala ewes and young at a feeding area on a Mahela game camp', cls: 'lg:col-span-2' },
+  { src: 'conservation/bushbuck.jpg', alt: 'A bushbuck ram standing alert in green grass', cls: 'lg:col-span-2', pos: '50% 30%' },
+  { src: 'conservation/buffalo-portrait.jpg', alt: 'A Cape buffalo bull in the bushveld', cls: 'sm:col-span-2 lg:col-span-2' },
+  { src: 'conservation/nyala-water.jpg', alt: 'Nyala at the water’s edge', cls: 'sm:col-span-2 lg:col-span-6', pos: '50% 60%' },
+];
 ---
 
-<Base title="Mahela Game" description={description} breadcrumbs={[{ name: 'Mahela Game', href: '/mahela-game' }]} ogImage={media('conservation/dsc-1615.jpg')}>
-  <PageHero image={media('conservation/dsc-1615.jpg')} eyebrow="Mahela Game" title="Conserving rare game genetics" lead={game.lead} crumbs={[{ name: 'Mahela Game', href: '/mahela-game' }]} />
+<Base title="Mahela Game" description={description} breadcrumbs={[{ name: 'Mahela Game', href: '/mahela-game' }]} ogImage={hero}>
+  <PageHero image={hero} eyebrow="Mahela Game" title="Conserving rare game genetics" lead={game.lead} crumbs={[{ name: 'Mahela Game', href: '/mahela-game' }]} position="72% 0%" />
 
-  <Backdrop image={media('conservation/dsc-0526.jpg')} dim={0.66}>
-    <div class="grid gap-10 lg:grid-cols-12">
-      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
-        <SectionTitle eyebrow="Breeding programme" title="Game breeding at Mahela" id="game-title" />
-        {game.body.map((b) => <p class="mt-5 leading-relaxed text-ivory/85">{b}</p>)}
-      </div>
-      <div class="lg:col-span-5">
-        <div class="glass rounded-[32px] p-8" data-reveal>
-          <h2 class="cond text-sm font-semibold uppercase tracking-[0.18em] text-sage">Species we breed and conserve</h2>
-          <ul class="mt-6 flex flex-wrap gap-2">
-            {game.species.map((s) => <li class="glass-soft rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-ivory/20">{s}</li>)}
-          </ul>
-        </div>
-        <div class="glass mt-5 rounded-[32px] p-8" data-reveal>
-          <p class="cond text-6xl font-semibold text-sage">1998</p>
-          <p class="mt-2 text-ivory/80">Mahela co-founded a sable breeding project as part of the Gravelotte Study Group.</p>
-        </div>
-      </div>
+  <GlassCards id="game" eyebrow="Breeding programme" title="Game breeding at Mahela" tag="Mahela Game" cards={cards}>
+    <div slot="panel">
+      <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white">Species we breed and conserve</p>
+      <ul class="flex flex-wrap gap-1.5">
+        {game.species.map((s) => <li class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[0.72rem] font-medium text-white">{s}</li>)}
+      </ul>
     </div>
-  </Backdrop>
+  </GlassCards>
 
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="wild-title">
-    <SectionTitle eyebrow="Wildlife on Mahela farms" title="Custodians of nature" lead="Mahela plays an active role in the conservation of wildlife. Game species such as the African wild dog and sable are some of the species we have helped to protect." id="wild-title" />
-    <div class="mt-12 pb-10">
-      <Gallery images={[
-        { src: 'conservation/dsc-8959.jpg', alt: 'An African wild dog on a Mahela farm' },
-        { src: 'conservation/dsc-0526.jpg', alt: 'A pack of African wild dogs resting' },
-        { src: 'conservation/buffel1.jpg', alt: 'Buffalo on a Mahela game farm' },
-      ]} />
+  <SableHorns />
+
+  <section class="relative overflow-hidden py-24 md:py-32" aria-labelledby="wild-title">
+    <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 20%, rgb(168 100 28 / 0.25), transparent 70%), #10201a"></div>
+    <Leaves />
+    <div class="relative mx-auto max-w-[84rem] px-4 md:px-6">
+      <SectionTitle eyebrow="Wildlife on Mahela farms" title="Custodians of nature" lead="Mahela plays an active role in the conservation of wildlife. Game species such as the African wild dog and sable are some of the species we have helped to protect." id="wild-title" />
+      <div class="mt-12 pb-10"><PhotoMosaic tiles={tiles} /></div>
+      <div class="mt-16"><CtaBand title="Enquire about Mahela Game." text="Contact the Mahela team about game breeding and the Benchmark Game Breeders auction." /></div>
     </div>
-    <div class="mt-16"><CtaBand title="Enquire about Mahela Game." text="Contact the Mahela team about game breeding and the Benchmark Game Breeders auction." /></div>
   </section>
 </Base>

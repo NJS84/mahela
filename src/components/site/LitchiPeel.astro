@@ -1,0 +1,162 @@
+---
+/**
+ * Litchis scroll scene: "Ruby outside. Pearl inside." A whole Mauritius litchi sits in the middle of
+ * the screen. As the visitor scrolls, the ruby shell splits and opens like petals until the
+ * pearl-white flesh stands alone, while the light turns from deep wine to ruby to blush. A three-stop
+ * track (ruby shell, opening, pearl) follows along, and the three steps from the approved copy arrive:
+ * picked December to early January, exported to the EU and Middle East through Westfalia Marketing,
+ * and nothing wasted (fruit below export standard is juiced). Without motion it shows the peeled fruit
+ * and every step.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+import { litchiSteps } from '../../data/litchi';
+
+const arts = [
+  { src: media('produce/cutouts/litchi-whole-b.webp'), w: 'w-[80%]' },
+  { src: media('produce/cutouts/litchi-open-right.webp'), w: 'w-[72%]' },
+  { src: media('produce/cutouts/litchi-open-petals.webp'), w: 'w-[84%]' },
+  { src: media('produce/cutouts/litchi-peeled.webp'), w: 'w-[78%]' },
+];
+const stops = ['Ruby shell', 'Opening', 'Pearl flesh'];
+---
+
+<section class="lp relative" aria-labelledby="lp-title" data-lp>
+  <div class="lp-stage sticky top-0 flex min-h-[100svh] flex-col overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#6e1328,#1d050b_75%)]"></div>
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#b8344f,#2c0912_75%)]" data-lp-bg="1"></div>
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#d9768b,#3a0f1c_75%)]" data-lp-bg="2"></div>
+
+    <div class="mx-auto grid w-full max-w-[84rem] flex-1 items-center gap-6 px-4 pb-16 pt-20 md:px-6 md:pt-24 lg:grid-cols-12 lg:gap-10">
+      <!-- The fruit: whole, then the shell opens, then the pearl stands alone. -->
+      <div class="relative lg:col-span-6" aria-hidden="true">
+        <div class="relative mx-auto aspect-square w-[min(62vw,16rem)] md:w-[min(42vw,26rem)] lg:w-[min(38vw,30rem)]" data-lp-fruit>
+          <div class="absolute inset-[10%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
+          <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-lp-orbit></div>
+          <div class="lp-glow absolute inset-[22%] rounded-full opacity-0" data-lp-glow></div>
+          {
+            arts.map((a, i) => (
+              <div class="absolute inset-0 flex items-center justify-center" data-lp-art={i}>
+                <Image src={a.src} alt="" widths={[480, 720, 960]} sizes="30rem" class:list={['h-auto drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]', a.w]} />
+              </div>
+            ))
+          }
+        </div>
+        <!-- Three-stop track. -->
+        <div class="mx-auto mt-4 w-[min(80vw,22rem)] md:mt-8">
+          <div class="relative h-2.5 rounded-full bg-[linear-gradient(90deg,#b8344f,#e07a95,#f6f1ea)] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.25)]">
+            {stops.map((_, i) => <span class="absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70" style={`left:${i * 50}%`} />)}
+            <span class="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-white/30 shadow-[0_0_14px_rgb(255_255_255/0.6)] [backdrop-filter:blur(4px)]" style="left:100%" data-lp-knob></span>
+          </div>
+          <div class="mt-2 flex justify-between text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">
+            {stops.map((s) => <span>{s}</span>)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Heading and the steps. -->
+      <div class="lg:col-span-6">
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">From the orchard to the world</span>
+        <h2 id="lp-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Ruby outside. Pearl inside.</h2>
+        <ol class="lp-list mt-6 grid gap-2.5 md:mt-8 md:gap-3">
+          {
+            litchiSteps.map((r, i) => (
+              <li class="lp-chip flex items-start gap-4 rounded-[22px] p-3.5 text-left text-white md:p-5" data-lp-chip={i}>
+                <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30"><Icon name={r.icon} class="size-5" /></span>
+                <span>
+                  <span class="cond block text-lg font-semibold uppercase tracking-[0.06em]">{r.title}</span>
+                  <span class="mt-1 block text-[0.9rem] leading-relaxed text-white/85">{r.text}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+    <div class="absolute inset-x-0 bottom-8 mx-auto h-[3px] w-28 overflow-hidden rounded-full bg-white/15" aria-hidden="true"><span class="block h-full w-full origin-left scale-x-0 bg-white/70" data-lp-bar></span></div>
+  </div>
+</section>
+
+<style>
+  :global(html.js-motion) .lp {
+    height: 320svh;
+  }
+  .lp-chip {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 30px 60px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  /* A soft pearl light that blooms behind the flesh once the shell is off. */
+  .lp-glow {
+    background: radial-gradient(circle, rgb(255 248 240 / 0.55), transparent 70%);
+  }
+  /* No motion: only the peeled fruit. */
+  :global(html:not(.js-motion)) [data-lp-art='0'],
+  :global(html:not(.js-motion)) [data-lp-art='1'],
+  :global(html:not(.js-motion)) [data-lp-art='2'] {
+    opacity: 0;
+  }
+  @media (max-width: 767px) {
+    :global(html.js-motion) .lp-list {
+      grid-template-areas: 'one';
+    }
+    :global(html.js-motion) .lp-list > li {
+      grid-area: one;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-lp]').forEach((root) => {
+    if (!document.documentElement.classList.contains('js-motion')) return;
+    const q = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
+    const arts = q('[data-lp-art]');
+    const bgs = q('[data-lp-bg]');
+    const knob = root.querySelector<HTMLElement>('[data-lp-knob]')!;
+    const chips = q('[data-lp-chip]');
+    const phone = () => window.innerWidth < 768;
+
+    gsap.set(arts.slice(1), { autoAlpha: 0, scale: 0.85 });
+    gsap.set(bgs, { opacity: 0 });
+    gsap.set(knob, { left: '0%' });
+    gsap.set(chips, { autoAlpha: 0, y: 40, scale: 0.94 });
+    gsap.to(root.querySelector('[data-lp-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true } });
+    tl.to(root.querySelector('[data-lp-bar]'), { scaleX: 1, duration: 3.6 }, 0);
+
+    // The whole fruit turns as if in the hand, then the shell splits: the first crack appears.
+    tl.to(arts[0]!, { rotation: 35, scale: 1.05, duration: 0.6 }, 0.3)
+      .to(arts[0]!, { autoAlpha: 0, scale: 1.1, duration: 0.35, ease: 'power2.in' }, 0.95)
+      .fromTo(arts[1]!, { autoAlpha: 0, scale: 0.9, rotation: 25 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.45, ease: 'back.out(1.6)' }, 1.0)
+      .to(bgs[0]!, { opacity: 1, duration: 0.6 }, 0.95)
+      .to(knob, { left: '50%', duration: 0.6, ease: 'power1.inOut' }, 0.95);
+
+    // The shell opens wider like petals.
+    tl.to(arts[1]!, { autoAlpha: 0, scaleY: 1.08, duration: 0.3, ease: 'power2.in' }, 1.85)
+      .fromTo(arts[2]!, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(1.8)' }, 1.9);
+
+    // The shell falls away and the pearl flesh rises with a soft glow.
+    tl.to(arts[2]!, { autoAlpha: 0, y: 30, scale: 0.94, duration: 0.35, ease: 'power2.in' }, 2.6)
+      .fromTo(arts[3]!, { autoAlpha: 0, y: 30, scale: 0.8 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: 'back.out(2)' }, 2.7)
+      .to(root.querySelector('[data-lp-glow]'), { opacity: 1, scale: 1.25, duration: 0.6 }, 2.7)
+      .to(bgs[1]!, { opacity: 1, duration: 0.6 }, 2.6)
+      .to(knob, { left: '100%', duration: 0.6, ease: 'power1.inOut' }, 2.6);
+
+    chips.forEach((c, i) => {
+      const t = 0.2 + i * 1.15;
+      tl.to(c, { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: 'power2.out' }, t);
+      if (i > 0) tl.to(chips[i - 1]!, { autoAlpha: () => (phone() ? 0 : 1), y: () => (phone() ? -30 : 0), duration: 0.3 }, t - 0.05);
+    });
+    tl.to({}, { duration: 0.4 });
+  });
+</script>

@@ -11,10 +11,16 @@ interface Props {
 }
 const { title = 'From Limpopo to international markets.', lead = 'Mahela fruit is exported to Europe, Asia, Japan, the Middle East, the Far East and Russia under the Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brands.' } = Astro.props;
 const markets = exportPage.markets;
+const coords: Record<string, { lat: number; lon: number }> = { ...exportPage.extraDestinations };
+markets.forEach((m) => (coords[m.name] = { lat: m.lat, lon: m.lon }));
+// Several produce lines go to the same market: nudge each one's landing point so the streams fan out.
+const routes = exportPage.produceRoutes.flatMap((r, ri) =>
+  r.to.map((to) => ({ produce: r.produce, market: to, color: r.color, lat: coords[to]!.lat + ((ri % 3) - 1) * 2.2, lon: coords[to]!.lon + (Math.floor(ri / 3) - 0.5) * 3 })),
+);
 ---
 
 <section class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="markets-title">
-  <div class="lg:col-span-5">
+  <div class="relative z-10 lg:col-span-5">
     <SectionTitle eyebrow="Global market access" title={title} lead={lead} id="markets-title" />
     <ul class="mt-8 space-y-2" aria-label="Export markets">
       {
@@ -34,19 +40,36 @@ const markets = exportPage.markets;
     </ul>
   </div>
   <div class="relative lg:col-span-7">
+    <!-- Arc colour key, in a row above the globe. -->
+    <ul class="relative z-10 mb-2 flex flex-wrap justify-center gap-2 lg:mb-0 lg:flex-nowrap lg:justify-end lg:gap-1.5" aria-label="Arc colour key">
+      {
+        exportPage.produceRoutes.map((r) => (
+          <li data-produce-key={r.produce} tabindex="0" class="glass-soft flex shrink-0 cursor-default items-center gap-2 rounded-full px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] lg:px-2.5 lg:text-[0.66rem] lg:tracking-[0.1em] text-ivory/85 outline-none hover:bg-ivory/15 focus-visible:bg-ivory/15">
+            <span class="h-1 w-5 shrink-0 rounded-full" style={`background:${r.color};box-shadow:0 0 10px ${r.color}`} />
+            {r.produce}
+          </li>
+        ))
+      }
+    </ul>
+    <!-- On desktop the globe is larger than its column and runs in under the market list. -->
     <div
-      class="relative mx-auto aspect-square w-full max-w-[640px]"
+      class="relative mx-auto aspect-square w-full max-w-none lg:-my-[6%] lg:-ml-[36%] lg:w-[150%]"
       data-globe
       data-origin={JSON.stringify(exportPage.origin)}
-      data-markets={JSON.stringify(markets.map(({ name, lat, lon, primary }) => ({ name, lat, lon, primary })))}
+      data-routes={JSON.stringify(routes)}
     >
       <div class="globe-fallback absolute inset-[12%] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgb(185_209_166/0.35),rgb(15_42_31/0.9)_60%)] shadow-[0_0_80px_rgb(185_209_166/0.25)]"></div>
     </div>
-    <p class="mt-2 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.18em] text-ivory/55"><Icon name="globe" class="size-4" />Drag to spin · origin Letsitele, Limpopo</p>
+    <p class="relative mt-3 flex items-center justify-center gap-2 text-center text-xs uppercase tracking-[0.18em] text-ivory/55"><Icon name="globe" class="size-4 shrink-0" />Drag to spin · origin Letsitele, Limpopo</p>
   </div>
 </section>
 
 <style>
+  /* Belt and braces: anything near the canvas edge fades out, so there is never a hard line. */
+  [data-globe] :global(.globe-canvas) {
+    -webkit-mask-image: radial-gradient(closest-side, #000 80%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 80%, transparent 100%);
+  }
   [data-globe]:global(.is-3d) .globe-fallback {
     opacity: 0;
     transition: opacity 1s;

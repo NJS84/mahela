@@ -1,0 +1,194 @@
+---
+/**
+ * Packhouses scroll scene: "Follow the fruit". The section pins while you scroll; an orange rolls
+ * down a glowing line past six stations (orchard to market). Each station lights up in turn, the
+ * photo on the left opens to that stage, and its blue glass card slides in. Copy is the approved
+ * packhouse journey text.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { IconName } from '../../lib/icons';
+import { media } from '../../lib/media';
+
+interface Props {
+  steps: { title: string; text: string; icon: string; photo: string; alt: string }[];
+}
+const { steps } = Astro.props;
+const orange = media('produce/renders/orange.webp');
+const n = steps.length;
+---
+
+<section class="pf relative isolate bg-[#0d1a2c]" style={`height:${n * 75 + 60}svh`} aria-labelledby="pf-title" data-pf>
+  <div class="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="absolute inset-0 bg-[radial-gradient(60%_70%_at_75%_40%,#2f5a8f,#0d1a2c_70%)]"></div>
+      <div class="absolute inset-0 opacity-0 bg-[radial-gradient(50%_60%_at_25%_60%,#c96a12,transparent_70%)]" data-pf-warm></div>
+    </div>
+    <div class="mx-auto w-full max-w-[84rem] px-4 md:px-6">
+      <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Orchard to port</span>
+      <h2 id="pf-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Follow the fruit</h2>
+      <div class="mt-6 grid items-center gap-6 md:mt-8 md:grid-cols-12 md:gap-10">
+        <!-- Photo stack: each stage opens from a rounded window. -->
+        <div class="relative aspect-[4/3] w-full md:col-span-7 md:aspect-[16/11]">
+          {steps.map((s, i) => (
+            <figure class="pf-photo absolute inset-0 overflow-hidden rounded-[28px]" style={i === 0 ? '' : 'clip-path:inset(50% 50% 50% 50% round 28px)'} data-pf-photo={i}>
+              <Image src={media(s.photo)} alt={s.alt} widths={[640, 960, 1280]} sizes="(min-width: 768px) 55vw, 92vw" class="h-full w-full object-cover" />
+            </figure>
+          ))}
+          <div class="pf-badge absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full px-4 py-2 text-[0.66rem] font-bold uppercase tracking-[0.16em] text-white">
+            <span data-pf-count>01</span><span class="text-white/60">/ {String(n).padStart(2, '0')}</span>
+          </div>
+        </div>
+
+        <!-- The line, stations and the rolling orange. -->
+        <div class="relative md:col-span-5">
+          <div class="relative pl-14 md:pl-16">
+            <div class="absolute bottom-3 left-[1.78rem] top-3 w-px bg-white/20 md:left-[2.03rem]" aria-hidden="true"></div>
+            <div class="pf-fill absolute left-[1.78rem] top-3 -ml-px w-px origin-top md:left-[2.03rem]" style="height:calc(100% - 1.5rem);transform:scaleY(0)" aria-hidden="true" data-pf-fill></div>
+            <ol class="space-y-2 md:space-y-3">
+              {steps.map((s, i) => (
+                <li class="pf-step relative" data-pf-step={i}>
+                  <span class="pf-node absolute -left-[2.6rem] top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full md:-left-[2.85rem]" aria-hidden="true"><Icon name={s.icon as IconName} class="size-3.5" /></span>
+                  <div class="pf-card rounded-[20px] px-4 py-3 md:px-5">
+                    <p class="cond text-lg font-medium uppercase leading-none tracking-[0.04em] text-white md:text-xl">{s.title}</p>
+                    <p class="pf-text text-[0.82rem] leading-snug text-white/85">{s.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <div class="pointer-events-none absolute left-[1.78rem] top-3 z-10 -translate-x-1/2 -translate-y-1/2 md:left-[2.03rem]" aria-hidden="true" data-pf-orange>
+              <Image src={orange} alt="" widths={[160]} sizes="56px" class="size-11 drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)] md:size-14" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pf-photo {
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.6);
+    outline: 1px solid rgb(225 238 255 / 0.3);
+    outline-offset: -1px;
+  }
+  .pf-badge,
+  .pf-card {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.3);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .pf-card {
+    opacity: 0.45;
+    transition: opacity 0.5s, transform 0.5s, background-color 0.5s;
+  }
+  .pf-text {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s, margin-top 0.5s;
+  }
+  .pf-step.is-on .pf-card {
+    opacity: 1;
+    transform: translateX(6px);
+    border-color: rgb(235 244 255 / 0.6);
+  }
+  .pf-step.is-on .pf-text {
+    max-height: 6rem;
+    margin-top: 0.4rem;
+  }
+  .pf-step.is-past .pf-card {
+    opacity: 0.75;
+  }
+  .pf-node {
+    color: rgb(255 255 255 / 0.7);
+    background: #10243d;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    transition: background-color 0.4s, border-color 0.4s, color 0.4s, box-shadow 0.4s;
+  }
+  .pf-step.is-on .pf-node,
+  .pf-step.is-past .pf-node {
+    color: #fff;
+    background: #74c365;
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgb(116 195 101 / 0.25);
+  }
+  .pf-fill {
+    background: linear-gradient(#74c365, #f59a23);
+    box-shadow: 0 0 12px rgb(116 195 101 / 0.6);
+    width: 2px;
+  }
+  @media (max-width: 767px) {
+    .pf-text {
+      font-size: 0.78rem;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-pf]').forEach((root) => {
+    const photos = [...root.querySelectorAll<HTMLElement>('[data-pf-photo]')];
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-pf-step]')];
+    const fill = root.querySelector<HTMLElement>('[data-pf-fill]')!;
+    const orange = root.querySelector<HTMLElement>('[data-pf-orange]')!;
+    const count = root.querySelector<HTMLElement>('[data-pf-count]')!;
+    const warm = root.querySelector<HTMLElement>('[data-pf-warm]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const n = steps.length;
+    let at = -1;
+
+    const show = (i: number) => {
+      if (i === at) return;
+      const from = at;
+      at = i;
+      steps.forEach((s, k) => {
+        s.classList.toggle('is-on', k === i);
+        s.classList.toggle('is-past', k < i);
+      });
+      count.textContent = String(i + 1).padStart(2, '0');
+      photos.forEach((p, k) => {
+        if (k === i) {
+          gsap.set(p, { zIndex: 2 });
+          gsap.fromTo(p, { clipPath: from < 0 ? 'inset(0% 0% 0% 0% round 28px)' : 'inset(12% 18% 12% 18% round 120px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', duration: reduce ? 0 : 0.8, ease: 'power3.out' });
+          gsap.fromTo(p.firstElementChild, { scale: 1.15 }, { scale: 1, duration: reduce ? 0 : 1.4, ease: 'power2.out' });
+        } else gsap.set(p, { zIndex: k === from ? 1 : 0, clipPath: k === from ? 'inset(0% 0% 0% 0% round 28px)' : 'inset(50% 50% 50% 50% round 28px)' });
+      });
+    };
+    show(0);
+
+    // The orange rides the line from the first station's node to the last.
+    const nodeY = (k: number) => {
+      const node = steps[k]!.querySelector<HTMLElement>('.pf-node')!;
+      const base = orange.parentElement!.getBoundingClientRect().top;
+      const r = node.getBoundingClientRect();
+      return r.top + r.height / 2 - base;
+    };
+
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      invalidateOnRefresh: true,
+      onUpdate: (st) => {
+        const p = st.progress;
+        const i = Math.min(n - 1, Math.floor(p * n * 0.999));
+        show(i);
+        const local = Math.min(1, p * n - i);
+        // Ease into each node, then rest there while the stage reads.
+        const t = i < n - 1 ? gsap.parseEase('power2.inOut')(Math.max(0, (local - 0.55) / 0.45)) : 0;
+        const y0 = nodeY(i);
+        const y1 = i < n - 1 ? nodeY(i + 1) : y0;
+        const y = y0 + (y1 - y0) * t;
+        gsap.set(orange, { y: y - 12, rotation: p * 900 });
+        gsap.set(fill, { scaleY: Math.max(0, y - 12) / Math.max(1, fill.offsetHeight) });
+        gsap.set(warm, { opacity: Math.max(0, (p - 0.45) * 1.4) });
+      },
+    });
+  });
+</script>

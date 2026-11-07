@@ -9,7 +9,20 @@ import Gallery from '../../components/site/Gallery.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
 import Leaves from '../../components/site/Leaves.astro';
 import Icon from '../../components/site/Icon.astro';
-import PeelSequence from '../../components/site/PeelSequence.astro';
+import CitrusBurst from '../../components/site/CitrusBurst.astro';
+import CitrusVarieties from '../../components/site/CitrusVarieties.astro';
+import CitrusOrchards from '../../components/site/CitrusOrchards.astro';
+import AvocadoVarieties from '../../components/site/AvocadoVarieties.astro';
+import AvocadoSplit from '../../components/site/AvocadoSplit.astro';
+import PhotoMosaic from '../../components/site/PhotoMosaic.astro';
+import GlassCards from '../../components/site/GlassCards.astro';
+import KiwiVine from '../../components/site/KiwiVine.astro';
+import BananaStory from '../../components/site/BananaStory.astro';
+import BananaRipen from '../../components/site/BananaRipen.astro';
+import MacadamiaStory from '../../components/site/MacadamiaStory.astro';
+import MacadamiaRoute from '../../components/site/MacadamiaRoute.astro';
+import LitchiStory from '../../components/site/LitchiStory.astro';
+import LitchiPeel from '../../components/site/LitchiPeel.astro';
 import { media } from '../../lib/media';
 import { produceDetail } from '../../data/pages';
 import { produce } from '../../data/site';
@@ -23,8 +36,67 @@ const { slug } = Astro.params as { slug: string };
 const p = produceDetail[slug]!;
 const idx = produce.findIndex((x) => x.slug === slug);
 const next = produce[(idx + 1) % produce.length]!;
-const hero = media(p.hero);
-const art = media(produceArt[slug]!);
+const isCitrus = slug === 'citrus';
+const isAvo = slug === 'avocados';
+const isBanana = slug === 'bananas';
+const isMac = slug === 'macadamias';
+const isLitchi = slug === 'litchis';
+const isKiwi = slug === 'kiwis';
+const hero = media(isKiwi ? 'produce/farm/kiwi-vine-105548.jpg' : p.hero);
+const sibling = isCitrus || isAvo || isBanana || isMac || isLitchi || isKiwi;
+/** Avocado farm photography (Mahela fotos 2022 and 2025 Avos shoots). */
+const avoTiles = [
+  { src: 'produce/farm/avocado-harvest-bin-105260.jpg', alt: 'Freshly picked avocados tipped from crates into a bin on a tractor trailer in a Mahela orchard', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/farm/avocado-on-tree-105272.jpg', alt: 'Avocados hanging among the leaves on a Mahela tree', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/avocado-picking-pole-103359.jpg', alt: 'A picking pole with its cloth bag catching an avocado from high in the tree', cls: 'lg:col-span-2' },
+  { src: 'produce/farm/avocado-picker-103362.jpg', alt: 'A Mahela picker with a net bag of avocados in the orchard', cls: 'lg:col-span-2' },
+  { src: 'produce/farm/avocado-worker-105252.jpg', alt: 'A smiling Mahela farm worker holding freshly picked avocados', cls: 'sm:col-span-2 lg:col-span-2' },
+  { src: 'produce/farm/avocado-new-orchard-105562.jpg', alt: 'A young avocado orchard planted on the hills, with mountains behind', cls: 'sm:col-span-2 lg:col-span-6' },
+];
+/** Banana farm photography (Mahela fotos 2022, Piesangs). */
+const bananaTiles = [
+  { src: 'produce/farm/banana-canopy-105231.jpg', alt: 'Looking up through the leaves of a Mahela banana plantation at a young bunch and its flower', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/farm/banana-bunch-on-plant-105215.jpg', alt: 'A bunch of green Cavendish bananas growing on the plant', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/banana-flower-opened-105223.jpg', alt: 'A banana flower opened by hand to show the tiny fruit forming inside', cls: 'lg:col-span-2' },
+  { src: 'produce/farm/banana-bunch-flower-105229.jpg', alt: 'A banana bunch with its purple flower hanging beneath the leaves', cls: 'lg:col-span-2' },
+  { src: 'produce/farm/banana-bagged-rows-105232.jpg', alt: 'Rows of banana plants with their bunches covered in blue bags along a red-soil road', cls: 'sm:col-span-2 lg:col-span-2' },
+  { src: 'produce/farm/banana-young-rows-105235.jpg', alt: 'Neat rows of young banana plants on red soil, with trees on the hill behind', cls: 'sm:col-span-2 lg:col-span-6' },
+];
+/** Macadamia photography (Mahela Elements stock shots and the original site photos). */
+const macTiles = [
+  { src: 'produce/farm/macadamia-burlap-sack.jpg', alt: 'Freshly harvested macadamia nuts in shell spilling from a burlap sack', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/macadamia-kernel-spoon-b.jpg', alt: 'Cream-coloured macadamia kernels heaped on a wooden spoon', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/photos/mahela-aug28.jpg', alt: 'Macadamia nuts in shell in a bowl and scattered on a white table', cls: 'lg:col-span-3' },
+  { src: 'produce/photos/img-9307.jpg', alt: 'A close view of whole macadamia kernels', cls: 'lg:col-span-3' },
+];
+/** Litchi photography: no Mahela orchard shots exist yet, so the original site photos and Elements stock. */
+/** Golden kiwi photography (Mahela kiwi vines in blossom and young fruit, plus golden kiwi stock shots). */
+const kiwiTiles = [
+  { src: 'produce/farm/kiwi-vine-105540.jpg', alt: 'Golden kiwi vines in full blossom among large green leaves', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/kiwi-golden-slices.jpg', alt: 'Golden kiwis sliced open to show the yellow flesh and small seeds', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/farm/kiwi-vine-105549.jpg', alt: 'A cluster of young kiwis hanging from the vine', cls: 'lg:col-span-2' },
+  { src: 'produce/farm/kiwi-vine-105541.jpg', alt: 'Kiwi blossoms with yellow stamens on the vine', cls: 'lg:col-span-2' },
+  { src: 'produce/farm/kiwi-vine-105547.jpg', alt: 'Young kiwis forming along a vine branch', cls: 'sm:col-span-2 lg:col-span-2' },
+  { src: 'produce/farm/kiwi-golden-dark.jpg', alt: 'Whole and halved golden kiwis on a dark surface', cls: 'sm:col-span-2 lg:col-span-6', pos: '50% 50%' },
+];
+/** Golden kiwi cards: approved kiwi copy from mahela.co.za. */
+const kiwiCards = [
+  { short: 'Sorelli', title: 'The Sorelli variety', text: 'We are one of only a handful of golden kiwi producers in South Africa. Our kiwis are of the Sorelli variety.', stat: 'Few', statLabel: 'golden kiwi producers in South Africa', icon: { img: 'produce/renders/kiwi.webp' }, tone: ['#b59a12', '#2e2604'] as [string, string], photo: 'produce/farm/kiwi-golden-slices.jpg', name: 'Sorelli', sub: 'Golden kiwi' },
+  { short: 'Sweeter', title: 'Sweeter, smaller seeds', text: 'Golden kiwis have smaller seeds and are sweeter tasting than green kiwis.', icon: { img: 'produce/cutouts/kiwi-halved.webp' }, tone: ['#d4a514', '#3a2a04'] as [string, string], art: 'produce/cutouts/kiwi-halved.webp', name: 'Golden flesh', sub: 'Sweeter than green' },
+  { short: 'Thin skin', title: 'Thin skin, fewer hairs', text: 'They have a thin skin, and the hairs are shorter and fewer than those of green kiwis.', icon: { line: 'leaf' as const }, tone: ['#8a7a2a', '#20190a'] as [string, string], photo: 'produce/farm/kiwi-vine-105548.jpg', name: 'Thin skin', sub: 'Shorter, fewer hairs' },
+  { short: 'Magoebaskloof', title: 'Grown in Magoebaskloof', text: 'The high altitude and cold climate of Magoebaskloof deter virtually all pests and fungi.', stat: 'Feb', statLabel: 'harvest month', icon: { line: 'sun' as const }, tone: ['#5f8a2a', '#16260a'] as [string, string], photo: 'produce/farm/kiwi-vine-105538.jpg', name: 'Magoebaskloof', sub: 'High altitude, cold climate' },
+  { short: 'Markets', title: 'Where they go', text: 'Our golden kiwis are harvested in February for the EU, the East and the local market.', stat: '3', statLabel: 'the EU, the East, local', icon: { line: 'globe' as const }, tone: ['#3a6fb0', '#0d1a2c'] as [string, string], photo: 'produce/farm/kiwi-golden-dark.jpg', name: 'EU, East, local', sub: 'Markets' },
+];
+const kiwiMonths = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const litchiTiles = [
+  { src: 'produce/photos/mahela-lichis-14.jpg', alt: 'A branch of freshly picked Mauritius litchis with their leaves', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/farm/litchi-floating.jpg', alt: 'Whole and peeled litchis showing the ruby shell and white flesh', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'archive/stock/litchi-fruits-pj3uvdf.jpg', alt: 'A heap of ripe litchis on hessian, one opened to show the flesh', cls: 'lg:col-span-2' },
+  { src: 'archive/stock/healthy-organic-red-lychee-p2yzekx.jpg', alt: 'Close view of the textured red skin of ripe litchis', cls: 'lg:col-span-2' },
+  { src: 'produce/photos/mahela-lichis-2.jpg', alt: 'A bowl of fresh litchis on a white table', cls: 'sm:col-span-2 lg:col-span-2' },
+];
+// The citrus burst below already features a whole orange, so the intro shows orange blossom instead.
+const art = media(isCitrus ? 'produce/renders/citrus-blossom.webp' : produceArt[slug]!);
 const url = `https://www.mahela.co.za/produce/${slug}`;
 const varietyNames = (p.groups ?? []).flatMap((g) => g.varieties.map((v) => v.name));
 
@@ -47,7 +119,15 @@ const jsonLd = [
 ---
 
 <Base title={p.metaTitle} description={p.description} breadcrumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} jsonLd={jsonLd} ogImage={hero}>
-  <PageHero image={hero} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} />
+  <PageHero image={hero} position={isLitchi ? "68% 50%" : isKiwi ? "80% 50%" : undefined} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]}>
+    {
+      isBanana && (
+        <div slot="beside" class="mm-card shrink-0 rounded-[18px] p-2 md:rounded-[26px] md:p-3" data-reveal>
+          <Image src={media('brand/mala-mala-logo.png')} alt="Mala-Mala, the brand Mahela bananas are sold under" widths={[320, 480]} sizes="(min-width: 768px) 15rem, 8rem" class="block h-auto w-32 rounded-[12px] sm:w-44 md:w-60 md:rounded-[18px]" />
+        </div>
+      )
+    }
+  </PageHero>
 
   <section class="relative overflow-hidden py-24 md:py-32" style={`--accent:${p.accent}`} aria-labelledby="answer-title">
     <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 30%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%), #10201a"></div>
@@ -56,8 +136,8 @@ const jsonLd = [
       <div class="lg:col-span-7">
         <SectionTitle eyebrow={`About our ${p.title.toLowerCase()}`} title={`Mahela ${p.title.toLowerCase()}, grown in Limpopo`} id="answer-title" />
         <p class="mt-6 text-xl leading-relaxed text-ivory/90" data-reveal>{p.answer}</p>
-        {p.body.map((b) => <p class="mt-5 leading-relaxed text-ivory/75" data-reveal>{b}</p>)}
-        <div class="mt-10"><FactList facts={p.facts} /></div>
+        {!isBanana && !isLitchi && !isKiwi && p.body.map((b) => <p class="mt-5 leading-relaxed text-ivory/75" data-reveal>{b}</p>)}
+        <div class="mt-10"><FactList facts={p.facts} variant={sibling ? 'blue' : 'default'} /></div>
       </div>
       <div class="relative lg:col-span-5" aria-hidden="true">
         <div class="absolute inset-[15%] rounded-full blur-3xl" style="background: color-mix(in srgb, var(--accent) 55%, transparent)"></div>
@@ -68,12 +148,37 @@ const jsonLd = [
     </div>
   </section>
 
-  {slug === 'citrus' && <PeelSequence />}
+  {isCitrus && <CitrusBurst />}
+  {isCitrus && <CitrusVarieties />}
+  {isAvo && <AvocadoVarieties />}
+  {isAvo && <AvocadoSplit />}
+  {isBanana && <BananaStory />}
+  {isBanana && <BananaRipen />}
+  {isMac && <MacadamiaStory />}
+  {isMac && <MacadamiaRoute />}
+  {isLitchi && <LitchiStory />}
+  {isLitchi && <LitchiPeel />}
+  {
+    isKiwi && (
+      <GlassCards id="sorelli" eyebrow="Variety, taste and growing" title="Sorelli golden kiwis" tag="Golden kiwis" cards={kiwiCards}>
+        <div slot="panel">
+          <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white">Harvest: February</p>
+          <ol class="grid grid-cols-12 gap-1" aria-hidden="true">
+            {kiwiMonths.map((_, i) => <li class="h-3 rounded-full" style={i === 1 ? 'background:#fff;box-shadow:0 0 12px rgb(255 255 255 / 0.45)' : 'background:rgb(255 255 255 / 0.14);box-shadow:inset 0 0 0 1px rgb(255 255 255 / 0.2)'}></li>)}
+          </ol>
+          <ol class="mt-2 grid grid-cols-12 gap-1 text-center text-[0.6rem] font-semibold uppercase text-white/70" aria-hidden="true">
+            {kiwiMonths.map((m) => <li>{m}</li>)}
+          </ol>
+        </div>
+      </GlassCards>
+    )
+  }
+  {isKiwi && <KiwiVine />}
 
   {
-    p.groups && p.groups.length > 0 && (
+    !sibling && p.groups && p.groups.length > 0 && (
       <Backdrop image={media(p.gallery[0] ?? p.hero)} dim={0.72}>
-        <SectionTitle eyebrow="Varieties" title={slug === 'citrus' ? 'Five citrus groups, fourteen varieties' : `${p.title} varieties`} id="varieties-title" />
+        <SectionTitle eyebrow="Varieties" title={`${p.title} varieties`} id="varieties-title" />
         <div class="mt-14 space-y-16">
           {p.groups.map((g) => {
             const gArt = slug === 'citrus' ? citrusArt[g.group as keyof typeof citrusArt] : undefined;
@@ -102,9 +207,9 @@ const jsonLd = [
   }
 
   <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="gallery-title">
-    <SectionTitle eyebrow="On the farm" title={`${p.title} at Mahela`} id="gallery-title" />
+    <SectionTitle eyebrow={isMac ? 'In shell and kernel' : 'On the farm'} title={`${p.title} at Mahela`} id="gallery-title" />
     <div class="mt-12 pb-10">
-      <Gallery images={[p.hero, ...p.gallery].slice(0, 4).map((src, i) => ({ src, alt: `${p.title} on a Mahela Group farm in Limpopo, photo ${i + 1}` }))} />
+      {isCitrus ? <CitrusOrchards /> : isAvo ? <PhotoMosaic tiles={avoTiles} /> : isBanana ? <PhotoMosaic tiles={bananaTiles} /> : isMac ? <PhotoMosaic tiles={macTiles} /> : isLitchi ? <PhotoMosaic tiles={litchiTiles} /> : isKiwi ? <PhotoMosaic tiles={kiwiTiles} /> : <Gallery images={[p.hero, ...p.gallery].slice(0, 4).map((src, i) => ({ src, alt: `${p.title} on a Mahela Group farm in Limpopo, photo ${i + 1}` }))} />}
     </div>
     <a href={`/produce/${next.slug}`} class="glass group mt-16 flex items-center justify-between gap-6 rounded-[28px] p-6 md:p-8" data-glare>
       <span>
@@ -119,3 +224,16 @@ const jsonLd = [
     <div class="mt-16"><CtaBand /></div>
   </section>
 </Base>
+
+<style>
+  /* Mala-Mala logo on frosted blue glass beside the bananas heading: mostly opaque so the label reads cleanly. */
+  .mm-card {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.55), rgb(150 182 222 / 0.38));
+    border: 1px solid rgb(235 244 255 / 0.6);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      0 30px 60px -24px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+  }
+</style>
