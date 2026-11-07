@@ -9,7 +9,7 @@ import Icon from '../components/site/Icon.astro';
 import SectionTitle from '../components/site/SectionTitle.astro';
 import Backdrop from '../components/site/Backdrop.astro';
 import Figures from '../components/site/Figures.astro';
-import ProduceCard from '../components/site/ProduceCard.astro';
+import ProduceGlassCard from '../components/site/ProduceGlassCard.astro';
 import Journey from '../components/site/Journey.astro';
 import ExportGlobe from '../components/site/ExportGlobe.astro';
 import Heritage from '../components/site/Heritage.astro';
@@ -201,21 +201,27 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
     </section>
   </Backdrop>
 
-  <!-- Produce rail -->
-  <section class="relative overflow-hidden" aria-labelledby="g-produce" data-rail>
-    <div class="absolute inset-0 -z-10 bg-[#1e4a30] transition-colors" data-rail-tint></div>
-    <div class="absolute inset-0 -z-10 bg-[radial-gradient(80%_60%_at_70%_40%,rgb(255_255_255/0.14),transparent_70%)]"></div>
-    <Leaves spots={[{ x: '84%', y: '10%', size: 110, r: 30, blur: true }, { x: '40%', y: '86%', size: 70, r: -60 }]} />
-    <div class="flex min-h-[100svh] flex-col justify-center py-24 lg:py-16">
-      <div class="mx-auto w-full max-w-[84rem] px-4 md:px-6">
-        <SectionTitle eyebrow="Mahela produce" title="A diversified fruit portfolio. Citrus at the core." lead="Tried-and-tested orchard management and the Lowveld’s warm days and cool nights support fruit with balanced sugar and acidity, good fibre and moisture, and the consistency international buyers expect." id="g-produce" />
+  <!-- Produce: coverflow of landscape glass cards, driven by scroll on desktop -->
+  <section class="relative isolate overflow-hidden bg-[radial-gradient(90%_70%_at_50%_45%,#163a29,#08140f_75%)]" aria-labelledby="g-produce" data-flow>
+    <Leaves spots={[{ x: '86%', y: '12%', size: 100, r: 30, blur: true }, { x: '6%', y: '78%', size: 70, r: -60 }]} />
+    <div class="flex min-h-[100svh] flex-col justify-center py-24 lg:pb-8 lg:pt-28">
+      <div class="mx-auto flex w-full max-w-[84rem] flex-wrap items-end justify-between gap-8 px-4 md:px-6">
+        <div class="max-w-3xl">
+  <SectionTitle eyebrow="Mahela produce" title="A diversified fruit portfolio. Citrus at the core." lead="Tried-and-tested orchard management and the Lowveld’s warm days and cool nights support fruit with balanced sugar and acidity, good fibre and moisture, and the consistency international buyers expect." id="g-produce" />
+        </div>
+        <div class="hidden items-center gap-5 lg:flex">
+          <ol class="flex items-center gap-2" aria-hidden="true">
+            {produce.map((_, i) => <li class="flow-dot h-1.5 w-6 rounded-full bg-ivory/25 transition-all duration-500" data-flow-dot={i}></li>)}
+          </ol>
+          <a href="/produce" class="btn-forest rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">All produce</a>
+        </div>
       </div>
-      <div class="mt-12 snap-x snap-mandatory overflow-x-auto pb-6 lg:overflow-visible lg:pb-0">
-        <ul class="flex w-max gap-8 px-4 md:px-[max(1.5rem,calc((100vw-84rem)/2+1.5rem))] lg:gap-14" data-rail-track>
+      <div class="flow-stage relative mt-14 lg:mt-10" data-flow-stage>
+        <ul class="flow-track flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 pt-14 lg:block lg:overflow-visible lg:p-0" data-flow-track>
           {
             produce.map((p) => (
-              <li class="w-[82vw] max-w-[26rem] shrink-0 snap-center lg:w-[26rem]" data-rail-card data-tone={p.tone[1]}>
-                <ProduceCard
+              <li class="flow-item w-[86vw] max-w-[34rem] shrink-0 snap-center" data-flow-card>
+                <ProduceGlassCard
                   tag={p.tag}
                   title={p.name}
                   href={`/produce/${p.slug}`}
@@ -227,10 +233,10 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
               </li>
             ))
           }
-          <li class="flex w-[60vw] max-w-[18rem] shrink-0 items-center lg:w-[18rem]">
-            <a href="/produce" class="btn-forest rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">All produce</a>
-          </li>
         </ul>
+      </div>
+      <div class="mt-8 flex justify-center lg:hidden">
+        <a href="/produce" class="btn-forest rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">All produce</a>
       </div>
     </div>
   </section>
@@ -328,6 +334,25 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
   }
   @media (prefers-reduced-motion: reduce) {
     .petals { display: none; }
+  }
+  /* Coverflow (desktop): every card is stacked in the centre and placed by script. */
+  @media (min-width: 1024px) {
+    .flow-stage {
+      height: min(28rem, 48svh);
+    }
+    .flow-item {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(42rem, 44vw);
+      max-width: none;
+      translate: -50% -50%;
+      will-change: transform, opacity;
+    }
+    .flow-dot:global(.is-on) {
+      width: 2.75rem;
+      background: var(--color-sage, #b9d1a6);
+    }
   }
 </style>
 

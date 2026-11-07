@@ -171,29 +171,54 @@ export function initMotion() {
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 1024px)', () => {
-    // Produce rail: pinned sideways scroll, page tone follows the centred fruit.
-    const rail = document.querySelector<HTMLElement>('[data-rail]');
-    const track = document.querySelector<HTMLElement>('[data-rail-track]');
-    if (rail && track) {
-      const tint = rail.querySelector<HTMLElement>('[data-rail-tint]');
-      const cards = gsap.utils.toArray<HTMLElement>('[data-rail-card]');
-      const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 48);
-      const tween = gsap.to(track, {
-        x: () => -distance(),
-        ease: 'none',
-        scrollTrigger: { trigger: rail, start: 'top top', end: () => `+=${distance()}`, pin: true, scrub: 0.7, invalidateOnRefresh: true },
-      });
-      cards.forEach((card) => {
-        const fruit = card.querySelector('[data-card-fruit]');
-        if (fruit) gsap.fromTo(fruit, { xPercent: -30, scale: 0.8, rotate: -12 }, { xPercent: 0, scale: 1, rotate: 0, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 95%', end: 'center 55%', scrub: true } });
-        ScrollTrigger.create({
-          trigger: card,
-          containerAnimation: tween,
-          start: 'left 60%',
-          end: 'right 40%',
-          onToggle: (self) => self.isActive && tint && gsap.to(tint, { backgroundColor: card.dataset.tone, duration: 0.8 }),
+    // Produce coverflow: pinned; scrolling moves the cards through the centre.
+    // The centre card is full size, the others shrink and stack toward the edges.
+    const flow = document.querySelector<HTMLElement>('[data-flow]');
+    if (flow) {
+      const cards = gsap.utils.toArray<HTMLElement>('[data-flow-card]', flow);
+      const dots = gsap.utils.toArray<HTMLElement>('[data-flow-dot]', flow);
+      const n = cards.length;
+      const place = (pos: number) => {
+        const w = window.innerWidth;
+        cards.forEach((card, i) => {
+          const d = i - pos;
+          const t = Math.abs(d);
+          const sign = Math.sign(d);
+          const x = t <= 1 ? t * 0.33 * w : 0.33 * w + (t - 1) * 0.03 * w;
+          const scale = t <= 1 ? 1 - 0.55 * t : Math.max(0.2, 0.45 - 0.08 * (t - 1));
+          gsap.set(card, {
+            x: sign * x,
+            scale,
+            zIndex: 100 - Math.round(t * 10),
+            // Fade out before a card could reach the viewport edge, so none is ever cut off.
+            opacity: t > 2.6 ? Math.max(0, 1 - (t - 2.6) * 2.5) : 1,
+            filter: `brightness(${1 - Math.min(t, 1) * 0.25})`,
+            pointerEvents: t < 0.5 ? 'auto' : 'none',
+            // Cards stacked behind the first side card show only glass and fruit, so text never shows through.
+            '--content': Math.max(0, Math.min(1, 1 - (t - 1) * 3)),
+          });
         });
+        const active = Math.round(pos);
+        dots.forEach((d, i) => d.classList.toggle('is-on', i === active));
+      };
+      const state = { pos: 0 };
+      place(0);
+      gsap.to(state, {
+        pos: n - 1,
+        ease: 'none',
+        onUpdate: () => place(state.pos),
+        scrollTrigger: {
+          trigger: flow,
+          start: 'top top',
+          end: () => `+=${window.innerHeight * 0.85 * (n - 1)}`,
+          pin: true,
+          scrub: 0.8,
+          snap: { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut', delay: 0.05 },
+          invalidateOnRefresh: true,
+          onRefresh: () => place(state.pos),
+        },
       });
+      return () => cards.forEach((c) => gsap.set(c, { clearProps: 'all' }));
     }
   });
 
