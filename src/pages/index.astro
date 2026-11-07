@@ -117,7 +117,7 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
 
   <!-- Intro: the orange breaks out of the glass, blossoms drift past -->
   <section class="intro relative isolate overflow-hidden" aria-labelledby="g-intro" data-intro>
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
+    <div class="absolute inset-0 -z-10 bg-[#0c1c15]" aria-hidden="true">
       <Image src={media('farms/dsc-7988.jpg')} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="h-full w-full object-cover object-[50%_60%]" />
       <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(12_26_22/0.86)_0%,rgb(12_26_22/0.55)_60%,rgb(12_26_22/0.45)_100%)]"></div>
     </div>
@@ -284,7 +284,7 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
 
   <!-- Heritage -->
   <div class="relative">
-    <div class="sticky top-0 -z-10 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden="true">
+    <div class="sticky top-0 -z-10 -mb-[100svh] h-[100svh] overflow-hidden bg-[#0c1c15]" aria-hidden="true">
       <Image src={media('farms/dsc-1689.jpg')} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="h-full w-full object-cover" />
       <div class="absolute inset-0 bg-[rgb(12_26_22/0.68)]"></div>
     </div>
@@ -292,18 +292,23 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
   </div>
 
   <!-- People + news + CTA -->
-  <Backdrop image={media('people/dhk-9884.jpg')} dim={0.64}>
-    <section class="grid gap-8 lg:grid-cols-12 lg:items-stretch" aria-labelledby="g-people">
-      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
+  <Backdrop image={media('generated/orchard-bokeh.jpg')} dim={0.55}>
+    <section class="grid gap-6 lg:grid-cols-12 lg:items-stretch" aria-labelledby="g-people">
+      <div class="glass flex flex-col justify-center rounded-[32px] p-8 md:p-12 lg:col-span-5" data-reveal data-glare>
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">{people.eyebrow}</p>
         <h2 id="g-people" class="cond mt-3 text-[clamp(2rem,1.3rem+2.4vw,3.4rem)] font-medium uppercase leading-[0.98]">{people.title}</h2>
         <p class="mt-5 text-lg leading-relaxed text-ivory/85">{people.text}</p>
-        <a href={people.cta.href} class="btn-forest mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>{people.cta.label}<Icon name="arrow" class="size-4" /></a>
+        <a href={people.cta.href} class="btn-forest mt-8 inline-flex items-center gap-2 self-start rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>{people.cta.label}<Icon name="arrow" class="size-4" /></a>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
-        <div class="glass-dark flex flex-col justify-center rounded-[28px] p-7" data-reveal><span class="cond text-5xl font-semibold tabular" data-count="700">700</span><span class="mt-2 text-sm uppercase tracking-[0.14em] text-ivory/70">Full-time employees</span></div>
-        <div class="glass-dark flex flex-col justify-center rounded-[28px] p-7" data-reveal><span class="cond text-5xl font-semibold tabular" data-count="1100">1 100</span><span class="mt-2 text-sm uppercase tracking-[0.14em] text-ivory/70">Additional non-permanent jobs</span></div>
-      </div>
+      <!-- The team photo sits in its own clear frame, so the glass never blurs anyone's face. -->
+      <figure class="relative overflow-hidden rounded-[32px] border border-ivory/25 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.6)] lg:col-span-7" data-reveal>
+        <Image src={media('people/dhk-9884.jpg')} alt="Members of the Mahela team walking through an orchard" widths={[640, 960, 1280]} sizes="(min-width: 1024px) 56vw, 92vw" class="aspect-[3/2] h-full w-full object-cover object-[50%_45%]" />
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(0deg,rgb(12_26_22/0.55),transparent)]"></div>
+        <div class="absolute inset-x-4 bottom-4 flex flex-wrap gap-3 md:inset-x-6 md:bottom-6">
+          <div class="glass-dark rounded-2xl px-5 py-3"><span class="cond block text-3xl font-semibold tabular md:text-4xl" data-count="700">700</span><span class="text-[0.7rem] uppercase tracking-[0.14em] text-ivory/75">Full-time employees</span></div>
+          <div class="glass-dark rounded-2xl px-5 py-3"><span class="cond block text-3xl font-semibold tabular md:text-4xl" data-count="1100">1 100</span><span class="text-[0.7rem] uppercase tracking-[0.14em] text-ivory/75">Additional non-permanent jobs</span></div>
+        </div>
+      </figure>
     </section>
 
     <div class="mt-24"><CtaBand /></div>
