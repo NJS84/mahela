@@ -77,17 +77,17 @@ const logo = media('brand/mala-mala-logo.png');
                   </div>
                   <h3 class="cond mt-4 text-[clamp(1.9rem,1.5rem+1.2vw,2.5rem)] font-medium uppercase leading-[0.95] text-white">{c.title}</h3>
                   <p class="mt-3 border-t border-white/20 pt-3 text-[0.92rem] leading-relaxed text-white/90">{c.text}</p>
-                  <div class="mt-auto flex items-end justify-between gap-3 pt-4">
-                    <p class="flex items-end gap-3">
-                      <span class="cond text-[clamp(3rem,2.4rem+2vw,4.4rem)] font-medium leading-[0.8] text-white">{c.stat}</span>
-                      <span class="pb-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">{c.statLabel}</span>
-                    </p>
-                    {c.short === 'Mala-Mala' && (
-                      <span class="bn-logo shrink-0 rounded-[12px] p-1.5">
-                        <Image src={logo} alt="Mala-Mala logo" widths={[200, 300]} sizes="6.5rem" class="block h-auto w-[5.5rem] rounded-[8px] md:w-[6.5rem]" />
-                      </span>
-                    )}
-                  </div>
+                  <p class="mt-auto flex items-end gap-3 pt-4">
+                    <span class="cond text-[clamp(3rem,2.4rem+2vw,4.4rem)] font-medium leading-[0.8] text-white">{c.stat}</span>
+                    <span class="flex flex-col items-start gap-2 pb-1">
+                      {c.short === 'Mala-Mala' && (
+                        <span class="bn-logo rounded-[10px] p-1">
+                          <Image src={logo} alt="Mala-Mala logo" widths={[160, 240]} sizes="5rem" class="block h-auto w-[4.5rem] rounded-[7px] md:w-20" />
+                        </span>
+                      )}
+                      <span class="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">{c.statLabel}</span>
+                    </span>
+                  </p>
                 </article>
               </li>
             ))}
