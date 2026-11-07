@@ -176,7 +176,8 @@ export const produceDetail: Record<
       'Bananas are packed on-farm, thereby ensuring minimum bruising due to handling. The packed bananas are transported directly from farm to ripening facilities at all major markets in South Africa. Some are distributed to Botswana and Namibia.',
       'Bananas are marketed under the well-known Mala-Mala brand. This brand was founded in the 1960s by the late BJ Vorster.',
     ],
-    hero: 'produce/photos/mahela-aug18.jpg',
+    // Mahela fotos 2022, Piesangs: banana rows with a bunch and its flower.
+    hero: 'produce/farm/banana-plantation-road-105227.jpg',
     gallery: ['produce/photos/mahela-aug33.jpg'],
     accent: '#d9b13b',
   },
