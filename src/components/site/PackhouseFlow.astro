@@ -1,9 +1,9 @@
 ---
 /**
- * Packhouses scroll scene: "Follow the fruit". The section pins while you scroll; an orange rolls
- * down a glowing line past six stations (orchard to market). Each station lights up in turn, the
- * photo on the left opens to that stage, and its blue glass card slides in. Copy is the approved
- * packhouse journey text.
+ * Packhouses scroll scene: "Follow the fruit". The section pins while you scroll. Each stage's
+ * photo fills the screen; an orange rolls along a conveyor track at the bottom past six stations
+ * (orchard to market), and the next photo opens as a circle out of the orange. A blue glass card
+ * carries the approved journey text for the stage.
  */
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
@@ -11,55 +11,62 @@ import type { IconName } from '../../lib/icons';
 import { media } from '../../lib/media';
 
 interface Props {
-  steps: { title: string; text: string; icon: string; photo: string; alt: string }[];
+  steps: { title: string; text: string; icon: string; photo: string; alt: string; pos?: string }[];
 }
 const { steps } = Astro.props;
 const orange = media('produce/renders/orange.webp');
 const n = steps.length;
 ---
 
-<section class="pf relative isolate bg-[#0d1a2c]" style={`height:${n * 75 + 60}svh`} aria-labelledby="pf-title" data-pf>
-  <div class="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden">
-    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute inset-0 bg-[radial-gradient(60%_70%_at_75%_40%,#2f5a8f,#0d1a2c_70%)]"></div>
-      <div class="absolute inset-0 opacity-0 bg-[radial-gradient(50%_60%_at_25%_60%,#c96a12,transparent_70%)]" data-pf-warm></div>
+<section class="pf relative isolate bg-[#0d1a2c]" style={`height:${n * 70 + 60}svh`} aria-labelledby="pf-title" data-pf>
+  <div class="sticky top-0 h-[100svh] overflow-hidden">
+    <!-- Full-screen photo stack -->
+    <div class="absolute inset-0 -z-10">
+      {steps.map((s, i) => (
+        <figure class="absolute inset-0 overflow-hidden" style={i === 0 ? '' : 'clip-path:circle(0% at 50% 90%)'} data-pf-photo={i}>
+          <Image src={media(s.photo)} alt={s.alt} widths={[768, 1280, 1920]} sizes="100vw" class="h-full w-full object-cover" style={s.pos ? `object-position:${s.pos}` : ''} />
+        </figure>
+      ))}
+      <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(8_18_34/0.7)_0%,rgb(8_18_34/0.15)_35%,rgb(8_18_34/0.25)_60%,rgb(8_18_34/0.88)_100%)]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(8_18_34/0.55),transparent_55%)]"></div>
     </div>
-    <div class="mx-auto w-full max-w-[84rem] px-4 md:px-6">
-      <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Orchard to port</span>
-      <h2 id="pf-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Follow the fruit</h2>
-      <div class="mt-6 grid items-center gap-6 md:mt-8 md:grid-cols-12 md:gap-10">
-        <!-- Photo stack: each stage opens from a rounded window. -->
-        <div class="relative aspect-[4/3] w-full md:col-span-7 md:aspect-[16/11]">
-          {steps.map((s, i) => (
-            <figure class="pf-photo absolute inset-0 overflow-hidden rounded-[28px]" style={i === 0 ? '' : 'clip-path:inset(50% 50% 50% 50% round 28px)'} data-pf-photo={i}>
-              <Image src={media(s.photo)} alt={s.alt} widths={[640, 960, 1280]} sizes="(min-width: 768px) 55vw, 92vw" class="h-full w-full object-cover" />
-            </figure>
-          ))}
-          <div class="pf-badge absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full px-4 py-2 text-[0.66rem] font-bold uppercase tracking-[0.16em] text-white">
-            <span data-pf-count>01</span><span class="text-white/60">/ {String(n).padStart(2, '0')}</span>
-          </div>
-        </div>
 
-        <!-- The line, stations and the rolling orange. -->
-        <div class="relative md:col-span-5">
-          <div class="relative pl-14 md:pl-16">
-            <div class="absolute bottom-3 left-[1.78rem] top-3 w-px bg-white/20 md:left-[2.03rem]" aria-hidden="true"></div>
-            <div class="pf-fill absolute left-[1.78rem] top-3 -ml-px w-px origin-top md:left-[2.03rem]" style="height:calc(100% - 1.5rem);transform:scaleY(0)" aria-hidden="true" data-pf-fill></div>
-            <ol class="space-y-2 md:space-y-3">
-              {steps.map((s, i) => (
-                <li class="pf-step relative" data-pf-step={i}>
-                  <span class="pf-node absolute -left-[2.6rem] top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full md:-left-[2.85rem]" aria-hidden="true"><Icon name={s.icon as IconName} class="size-3.5" /></span>
-                  <div class="pf-card rounded-[20px] px-4 py-3 md:px-5">
-                    <p class="cond text-lg font-medium uppercase leading-none tracking-[0.04em] text-white md:text-xl">{s.title}</p>
-                    <p class="pf-text text-[0.82rem] leading-snug text-white/85">{s.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div class="pointer-events-none absolute left-[1.78rem] top-3 z-10 -translate-x-1/2 -translate-y-1/2 md:left-[2.03rem]" aria-hidden="true" data-pf-orange>
-              <Image src={orange} alt="" widths={[160]} sizes="56px" class="size-11 drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)] md:size-14" />
+    <div class="relative mx-auto flex h-full w-full max-w-[84rem] flex-col px-4 pb-6 pt-24 md:px-6 md:pb-10 md:pt-28">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/80">Orchard to port</span>
+        <h2 id="pf-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.4)]">Follow the fruit</h2>
+      </div>
+
+      <!-- Stage card -->
+      <div class="relative mt-auto mb-8 h-[11.5rem] max-w-md md:mb-12 md:h-[12rem]">
+        {steps.map((s, i) => (
+          <article class="pf-card absolute inset-x-0 bottom-0 rounded-[24px] p-5 md:p-6" data-pf-card={i} style={i === 0 ? '' : 'opacity:0;visibility:hidden'}>
+            <div class="flex items-center gap-3">
+              <span class="flex size-10 items-center justify-center rounded-full bg-[#74c365] text-white shadow-[0_0_0_5px_rgb(116_195_101/0.25)]"><Icon name={s.icon as IconName} class="size-5" /></span>
+              <span class="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-white/75">{String(i + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}</span>
             </div>
-          </div>
+            <h3 class="cond mt-3 text-2xl font-medium uppercase leading-none tracking-[0.03em] text-white md:text-3xl">{s.title}</h3>
+            <p class="mt-2 text-[0.92rem] leading-snug text-white/85">{s.text}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Conveyor track with stations -->
+      <div class="relative" data-pf-track>
+        <div class="pf-belt relative h-4 rounded-full md:h-5" aria-hidden="true">
+          <div class="pf-rollers absolute inset-0 rounded-full" data-pf-rollers></div>
+          <div class="pf-fill absolute inset-y-0 left-0 rounded-full" style="width:0" data-pf-fill></div>
+        </div>
+        <ol class="relative mt-3 grid" style={`grid-template-columns:repeat(${n},minmax(0,1fr))`}>
+          {steps.map((s, i) => (
+            <li class="pf-step flex flex-col items-center text-center" data-pf-step={i}>
+              <span class="pf-node -mt-[2.05rem] flex size-6 items-center justify-center rounded-full md:-mt-[2.3rem] md:size-7" aria-hidden="true"><Icon name={s.icon as IconName} class="size-3 md:size-3.5" /></span>
+              <span class="pf-label mt-2 text-[0.58rem] font-semibold uppercase tracking-[0.12em] md:text-[0.7rem]">{s.title}</span>
+            </li>
+          ))}
+        </ol>
+        <div class="pointer-events-none absolute left-0 top-0 z-10 -translate-x-1/2" style="margin-top:-1.55rem" aria-hidden="true" data-pf-orange>
+          <Image src={orange} alt="" widths={[160]} sizes="64px" class="size-12 drop-shadow-[0_10px_16px_rgba(0,0,0,0.55)] md:size-16" />
         </div>
       </div>
     </div>
@@ -67,44 +74,27 @@ const n = steps.length;
 </section>
 
 <style>
-  .pf-photo {
-    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.6);
-    outline: 1px solid rgb(225 238 255 / 0.3);
-    outline-offset: -1px;
-  }
-  .pf-badge,
-  .pf-card {
-    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
-    border: 1px solid rgb(225 238 255 / 0.3);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+  .pf-card,
+  .pf-belt {
+    background: linear-gradient(160deg, rgb(150 190 240 / 0.28), rgb(60 110 180 / 0.16));
+    border: 1px solid rgb(225 238 255 / 0.35);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 30px 60px -30px rgb(0 0 0 / 0.6);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
     backdrop-filter: blur(18px) saturate(150%);
   }
-  .pf-card {
-    opacity: 0.45;
-    transition: opacity 0.5s, transform 0.5s, background-color 0.5s;
+  .pf-rollers {
+    background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.22) 0 2px, transparent 2px 16px);
+    opacity: 0.8;
   }
-  .pf-text {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.5s, margin-top 0.5s;
-  }
-  .pf-step.is-on .pf-card {
-    opacity: 1;
-    transform: translateX(6px);
-    border-color: rgb(235 244 255 / 0.6);
-  }
-  .pf-step.is-on .pf-text {
-    max-height: 6rem;
-    margin-top: 0.4rem;
-  }
-  .pf-step.is-past .pf-card {
-    opacity: 0.75;
+  .pf-fill {
+    background: linear-gradient(90deg, #74c365, #f59a23);
+    box-shadow: 0 0 16px rgb(245 154 35 / 0.55);
+    opacity: 0.85;
   }
   .pf-node {
-    color: rgb(255 255 255 / 0.7);
+    color: rgb(255 255 255 / 0.75);
     background: #10243d;
-    border: 1px solid rgb(255 255 255 / 0.3);
+    border: 1px solid rgb(255 255 255 / 0.35);
     transition: background-color 0.4s, border-color 0.4s, color 0.4s, box-shadow 0.4s;
   }
   .pf-step.is-on .pf-node,
@@ -114,14 +104,21 @@ const n = steps.length;
     border-color: #fff;
     box-shadow: 0 0 0 4px rgb(116 195 101 / 0.25);
   }
-  .pf-fill {
-    background: linear-gradient(#74c365, #f59a23);
-    box-shadow: 0 0 12px rgb(116 195 101 / 0.6);
-    width: 2px;
+  .pf-label {
+    color: rgb(255 255 255 / 0.55);
+    transition: color 0.4s;
   }
-  @media (max-width: 767px) {
-    .pf-text {
-      font-size: 0.78rem;
+  .pf-step.is-on .pf-label {
+    color: #fff;
+  }
+  @media (max-width: 639px) {
+    .pf-label {
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .pf-step.is-on .pf-label {
+      opacity: 1;
+      white-space: nowrap;
     }
   }
 </style>
@@ -133,14 +130,24 @@ const n = steps.length;
 
   document.querySelectorAll<HTMLElement>('[data-pf]').forEach((root) => {
     const photos = [...root.querySelectorAll<HTMLElement>('[data-pf-photo]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-pf-card]')];
     const steps = [...root.querySelectorAll<HTMLElement>('[data-pf-step]')];
+    const track = root.querySelector<HTMLElement>('[data-pf-track]')!;
     const fill = root.querySelector<HTMLElement>('[data-pf-fill]')!;
+    const rollers = root.querySelector<HTMLElement>('[data-pf-rollers]')!;
     const orange = root.querySelector<HTMLElement>('[data-pf-orange]')!;
-    const count = root.querySelector<HTMLElement>('[data-pf-count]')!;
-    const warm = root.querySelector<HTMLElement>('[data-pf-warm]')!;
+    const sticky = root.firstElementChild as HTMLElement;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const n = steps.length;
-    let at = -1;
+    let at = 0;
+    steps[0]!.classList.add('is-on');
+
+    /** x of station k's node, relative to the track. */
+    const nodeX = (k: number) => {
+      const node = steps[k]!.querySelector<HTMLElement>('.pf-node')!;
+      const r = node.getBoundingClientRect();
+      return r.left + r.width / 2 - track.getBoundingClientRect().left;
+    };
 
     const show = (i: number) => {
       if (i === at) return;
@@ -150,23 +157,22 @@ const n = steps.length;
         s.classList.toggle('is-on', k === i);
         s.classList.toggle('is-past', k < i);
       });
-      count.textContent = String(i + 1).padStart(2, '0');
+      // The new photo opens as a circle out of the orange.
+      const o = orange.getBoundingClientRect();
+      const box = sticky.getBoundingClientRect();
+      const cx = ((o.left + o.width / 2 - box.left) / box.width) * 100;
+      const cy = ((o.top + o.height / 2 - box.top) / box.height) * 100;
       photos.forEach((p, k) => {
         if (k === i) {
           gsap.set(p, { zIndex: 2 });
-          gsap.fromTo(p, { clipPath: from < 0 ? 'inset(0% 0% 0% 0% round 28px)' : 'inset(12% 18% 12% 18% round 120px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', duration: reduce ? 0 : 0.8, ease: 'power3.out' });
-          gsap.fromTo(p.firstElementChild, { scale: 1.15 }, { scale: 1, duration: reduce ? 0 : 1.4, ease: 'power2.out' });
-        } else gsap.set(p, { zIndex: k === from ? 1 : 0, clipPath: k === from ? 'inset(0% 0% 0% 0% round 28px)' : 'inset(50% 50% 50% 50% round 28px)' });
+          gsap.fromTo(p, { clipPath: `circle(0% at ${cx}% ${cy}%)` }, { clipPath: `circle(150% at ${cx}% ${cy}%)`, duration: reduce ? 0 : 1.1, ease: 'power2.inOut' });
+          gsap.fromTo(p.firstElementChild, { scale: 1.12 }, { scale: 1, duration: reduce ? 0 : 1.6, ease: 'power2.out' });
+        } else gsap.set(p, { zIndex: k === from ? 1 : 0, clipPath: k === from ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 90%)' });
       });
-    };
-    show(0);
-
-    // The orange rides the line from the first station's node to the last.
-    const nodeY = (k: number) => {
-      const node = steps[k]!.querySelector<HTMLElement>('.pf-node')!;
-      const base = orange.parentElement!.getBoundingClientRect().top;
-      const r = node.getBoundingClientRect();
-      return r.top + r.height / 2 - base;
+      cards.forEach((c, k) => {
+        if (k === i) gsap.fromTo(c, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.6, ease: 'power3.out', overwrite: true });
+        else gsap.to(c, { autoAlpha: 0, y: -16, duration: reduce ? 0 : 0.35, ease: 'power2.in', overwrite: true });
+      });
     };
 
     ScrollTrigger.create({
@@ -178,17 +184,22 @@ const n = steps.length;
       onUpdate: (st) => {
         const p = st.progress;
         const i = Math.min(n - 1, Math.floor(p * n * 0.999));
-        show(i);
         const local = Math.min(1, p * n - i);
-        // Ease into each node, then rest there while the stage reads.
-        const t = i < n - 1 ? gsap.parseEase('power2.inOut')(Math.max(0, (local - 0.55) / 0.45)) : 0;
-        const y0 = nodeY(i);
-        const y1 = i < n - 1 ? nodeY(i + 1) : y0;
-        const y = y0 + (y1 - y0) * t;
-        gsap.set(orange, { y: y - 12, rotation: p * 900 });
-        gsap.set(fill, { scaleY: Math.max(0, y - 12) / Math.max(1, fill.offsetHeight) });
-        gsap.set(warm, { opacity: Math.max(0, (p - 0.45) * 1.4) });
+        // Roll to the next station in the second half of each stage, rest while it reads.
+        const t = i < n - 1 ? gsap.parseEase('power2.inOut')(Math.max(0, (local - 0.5) / 0.5)) : 0;
+        const x0 = nodeX(i);
+        const x1 = i < n - 1 ? nodeX(i + 1) : x0;
+        const x = x0 + (x1 - x0) * t;
+        const size = orange.offsetWidth || 56;
+        // Rotation follows the distance rolled: angle = distance / radius.
+        gsap.set(orange, { x, rotation: (x / (size / 2)) * (180 / Math.PI) });
+        gsap.set(fill, { width: x });
+        gsap.set(rollers, { backgroundPositionX: -x * 1.5 });
+        // Switch stage as the orange arrives.
+        show(t > 0.92 ? Math.min(n - 1, i + 1) : i);
       },
     });
+    gsap.set(orange, { x: nodeX(0) });
+    ScrollTrigger.addEventListener('refresh', () => gsap.set(orange, { x: nodeX(at) }));
   });
 </script>

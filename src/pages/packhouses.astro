@@ -5,9 +5,9 @@ import SectionTitle from '../components/site/SectionTitle.astro';
 import GlassCards from '../components/site/GlassCards.astro';
 import PackhouseFlow from '../components/site/PackhouseFlow.astro';
 import PhotoMosaic from '../components/site/PhotoMosaic.astro';
-import FactList from '../components/site/FactList.astro';
+import LimpopoMap3D from '../components/site/LimpopoMap3D.astro';
+import GradingScan from '../components/site/GradingScan.astro';
 import CtaBand from '../components/site/CtaBand.astro';
-import Leaves from '../components/site/Leaves.astro';
 import { media } from '../lib/media';
 import { packhouses } from '../data/pages';
 
@@ -20,7 +20,7 @@ const jsonLd = packhouses.sites.map((s) => ({
   address: { '@type': 'PostalAddress', addressLocality: s.place.split(',')[0], addressRegion: 'Limpopo', addressCountry: 'ZA' },
   containedInPlace: { '@type': 'AdministrativeArea', name: 'Limpopo, South Africa' },
 }));
-const hero = media('packhouse/pack-2025-103478.jpg');
+const hero = media('packhouse/pack-2025-103478-hd.jpg');
 
 /** Every line is approved packhouse copy from mahela.co.za. */
 const cards = [
@@ -54,19 +54,16 @@ const tiles = [
 ---
 
 <Base title="Citrus packhouses in Limpopo" description={description} breadcrumbs={[{ name: 'Packhouses', href: '/packhouses' }]} jsonLd={jsonLd} ogImage={hero}>
-  <PageHero image={hero} eyebrow="Packhouses" title="Selected, packed and shipped at the source" lead={packhouses.lead} crumbs={[{ name: 'Packhouses', href: '/packhouses' }]} position="70% 50%" />
+  <PageHero image={hero} eyebrow="Packhouses" title="Selected, packed and shipped at the source" lead={packhouses.lead} crumbs={[{ name: 'Packhouses', href: '/packhouses' }]} position="62% 50%" tall />
 
   <section class="relative overflow-hidden py-24 md:py-32" aria-labelledby="sites-title">
     <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 30%, rgb(224 123 18 / 0.3), transparent 70%), #10201a"></div>
-    <Leaves />
-    <div class="relative mx-auto grid max-w-[84rem] items-start gap-12 px-4 md:px-6 lg:grid-cols-12">
-      <div class="lg:col-span-7">
+    <div class="relative mx-auto grid max-w-[84rem] items-center gap-6 px-4 md:px-6 lg:grid-cols-12">
+      <div class="relative z-[1] lg:col-span-5">
         <SectionTitle eyebrow="Two packhouses" title="The Junction and Ohrigstad" id="sites-title" />
         {packhouses.body.map((b, i) => <p class:list={['mt-5 leading-relaxed', i === 0 ? 'text-xl text-ivory/90' : 'text-ivory/75']} data-reveal>{b}</p>)}
       </div>
-      <div class="lg:col-span-5 lg:pt-16">
-        <FactList variant="blue" facts={[{ label: 'Combined area', value: '20 000 m²' }, { label: 'Season', value: 'End of March to end of September' }, { label: 'Daily capacity', value: 'Up to 1 200 tons (double shifts)' }, { label: 'Inspection', value: 'PPECB inspectors on-site full-time in season' }, { label: 'Not export grade', value: 'Local markets or juicing' }]} />
-      </div>
+      <LimpopoMap3D class="-mx-4 h-[30rem] sm:h-[36rem] md:-mx-6 lg:col-span-7 lg:-mr-24 lg:ml-0 lg:h-[46rem]" />
     </div>
   </section>
 
@@ -81,6 +78,8 @@ const tiles = [
       </ol>
     </div>
   </GlassCards>
+
+  <GradingScan />
 
   <PackhouseFlow steps={flow} />
 
