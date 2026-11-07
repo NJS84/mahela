@@ -171,6 +171,31 @@ export function initMotion() {
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 1024px)', () => {
+    // Intro: the orange starts hidden behind the glass card and spins across to
+    // the centre of the right half while the section holds in place.
+    const intro = document.querySelector<HTMLElement>('[data-intro]');
+    const roll = intro?.querySelector<HTMLElement>('[data-orange-roll]');
+    const stage = intro?.querySelector<HTMLElement>('[data-orange-stage]');
+    const card = intro?.querySelector<HTMLElement>('.glass');
+    if (intro && roll && stage && card) {
+      const offset = () => {
+        const c = card.getBoundingClientRect();
+        const st = stage.getBoundingClientRect();
+        return c.left + c.width / 2 - (st.left + st.width / 2);
+      };
+      gsap.fromTo(
+        roll,
+        { x: offset, rotation: -540, scale: 0.72 },
+        {
+          x: 0,
+          rotation: 0,
+          scale: 1,
+          ease: 'power2.inOut',
+          scrollTrigger: { trigger: intro, start: 'top top', end: '+=90%', pin: true, scrub: 0.8, invalidateOnRefresh: true },
+        },
+      );
+    }
+
     // Produce coverflow: pinned; scrolling moves the cards through the centre.
     // The centre card is full size, the others shrink and stack toward the edges.
     const flow = document.querySelector<HTMLElement>('[data-flow]');
@@ -213,8 +238,11 @@ export function initMotion() {
         ease: 'none',
         onUpdate: () => place(state.pos),
         scrollTrigger: {
-          trigger: flow,
-          start: 'top top',
+          // The heading scrolls away first; the cards hold once they are centred on screen.
+          trigger: flow.querySelector('[data-flow-pin]') ?? flow,
+          start: 'center center',
+          // The pin's parent is a flex column, where GSAP would otherwise skip pin spacing.
+          pinSpacing: true,
           end: () => `+=${window.innerHeight * 0.85 * (n - 1)}`,
           pin: true,
           scrub: 0.8,

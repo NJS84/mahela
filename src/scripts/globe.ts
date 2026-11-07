@@ -13,7 +13,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Market = { name: string; lat: number; lon: number; primary?: boolean };
+type Route = { produce: string; market: string; color: string; lat: number; lon: number };
 
 const R = 1;
 
@@ -67,7 +67,7 @@ export function mountGlobe(el: HTMLElement) {
   el.dataset.mounted = '1';
 
   const origin = JSON.parse(el.dataset.origin ?? '{"lat":-23.88,"lon":30.39}') as { lat: number; lon: number };
-  const markets = JSON.parse(el.dataset.markets ?? '[]') as Market[];
+  const routes = JSON.parse(el.dataset.routes ?? '[]') as Route[];
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
@@ -141,66 +141,105 @@ export function mountGlobe(el: HTMLElement) {
   pulse.lookAt(o.clone().multiplyScalar(2));
   world.add(pulse);
 
-  // Arcs
-  const arcs = markets.map((m) => {
+  // Routes: one arc per produce and destination, coloured by produce. Each arc
+  // has a faint permanent trail and a bright stream of light that shoots along it.
+  const SEG = 120;
+  const RAD = 6;
+  const perSeg = RAD * 6;
+  const arcs = routes.map((m, k) => {
     const end = toVec(m.lat, m.lon, R * 1.005);
     const mid = o.clone().add(end).multiplyScalar(0.5);
-    const lift = 1 + o.distanceTo(end) * 0.32;
+    const lift = Math.min(1.42, 1 + o.distanceTo(end) * (0.24 + (k % 4) * 0.035));
     mid.normalize().multiplyScalar(R * lift);
     const curve = new THREE.QuadraticBezierCurve3(o, mid, end);
-    const geo = new THREE.TubeGeometry(curve, 80, m.primary ? 0.008 : 0.005, 8, false);
-    const mat = new THREE.MeshBasicMaterial({ color: m.primary ? '#f5a524' : '#b9d1a6', transparent: true, opacity: 0.95 });
-    const mesh = new THREE.Mesh(geo, mat);
-    geo.setDrawRange(0, 0);
-    world.add(mesh);
-    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.02, 12, 12), new THREE.MeshBasicMaterial({ color: m.primary ? '#f5a524' : '#e9f1df' }));
+    const color = new THREE.Color(m.color);
+    const trail = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, SEG, 0.0035, RAD, false),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false }),
+    );
+    const glowMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false });
+    const coreMat = new THREE.MeshBasicMaterial({ color: color.clone().lerp(new THREE.Color('#ffffff'), 0.45), transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false });
+    const glow = new THREE.Mesh(new THREE.TubeGeometry(curve, SEG, 0.011, RAD, false), glowMat);
+    const core = new THREE.Mesh(new THREE.TubeGeometry(curve, SEG, 0.0055, RAD, false), coreMat);
+    [glow, core].forEach((x) => x.geometry.setDrawRange(0, 0));
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.016, 12, 12), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 12), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+    head.add(halo);
+    head.visible = false;
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 12), new THREE.MeshBasicMaterial({ color }));
     dot.position.copy(end);
     dot.scale.setScalar(0.001);
-    world.add(dot);
-    const total = geo.index ? geo.index.count : 0;
-    return { m, mesh, mat, dot, total, progress: { v: 0 } };
+    world.add(trail, glow, core, head, dot);
+    // Each stream has its own speed and start, so they don't fire in step.
+    return { m, curve, trail, glow, core, head, dot, dim: 1, trailBase: 0, speed: 0.32 + ((k * 37) % 10) / 60, phase: (k * 0.173) % 1 };
   });
+
+  const windowRange = (g: THREE.BufferGeometry, from: number, to: number) => {
+    const a = Math.max(0, Math.min(SEG, Math.floor(from * SEG)));
+    const b = Math.max(0, Math.min(SEG, Math.ceil(to * SEG)));
+    g.setDrawRange(a * perSeg, Math.max(0, b - a) * perSeg);
+  };
+  let started = false;
+  let startTime = -1;
 
   // Face Africa / Europe first
   const target = { y: -THREE.MathUtils.degToRad(origin.lon + 90) + 0.35, x: 0.32 };
   world.rotation.set(target.x, target.y, 0);
 
-  // Draw arcs once in view
+  // Streams start once the globe is in view; trails and end dots fade in.
   ScrollTrigger.create({
     trigger: el,
     start: 'top 75%',
     once: true,
     onEnter: () => {
+      started = true;
       arcs.forEach((a, i) => {
-        gsap.to(a.progress, {
-          v: 1,
-          duration: 1.6,
-          delay: 0.25 + i * 0.22,
-          ease: 'power2.inOut',
-          onUpdate: () => a.mesh.geometry.setDrawRange(0, Math.floor(a.total * a.progress.v)),
-          onComplete: () => void gsap.to(a.dot.scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: 'back.out(3)' }),
-        });
+        gsap.to(a, { trailBase: 0.18, duration: 1.2, delay: i * 0.05 });
+        gsap.to(a.dot.scale, { x: 1, y: 1, z: 1, duration: 0.6, delay: 0.6 + i * 0.05, ease: 'back.out(3)' });
       });
     },
   });
 
-  // Highlight from the market list
-  document.querySelectorAll<HTMLElement>('[data-market]').forEach((li) => {
-    const a = arcs.find((x) => x.m.name === li.dataset.market);
-    if (!a) return;
-    const on = () => {
-      arcs.forEach((x) => (x.mat.opacity = x === a ? 1 : 0.25));
-      gsap.to(a.dot.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 0.3 });
-    };
-    const off = () => {
-      arcs.forEach((x) => (x.mat.opacity = 0.95));
-      gsap.to(a.dot.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
-    };
-    li.addEventListener('pointerenter', on);
-    li.addEventListener('pointerleave', off);
-    li.addEventListener('focusin', on);
-    li.addEventListener('focusout', off);
-  });
+  // Highlight: a market in the list, or a produce in the colour key.
+  const setFocus = (match: ((r: Route) => boolean) | null) => {
+    arcs.forEach((a) => {
+      const on = !match || match(a.m);
+      a.dim = on ? 1 : 0.12;
+      gsap.to(a.dot.scale, { x: on && match ? 1.6 : 1, y: on && match ? 1.6 : 1, z: on && match ? 1.6 : 1, duration: 0.3 });
+    });
+  };
+  const bind = (els: NodeListOf<HTMLElement>, match: (li: HTMLElement) => (r: Route) => boolean) =>
+    els.forEach((li) => {
+      const on = () => setFocus(match(li));
+      const off = () => setFocus(null);
+      li.addEventListener('pointerenter', on);
+      li.addEventListener('pointerleave', off);
+      li.addEventListener('focusin', on);
+      li.addEventListener('focusout', off);
+    });
+  bind(document.querySelectorAll<HTMLElement>('[data-market]'), (li) => (r) => r.market === li.dataset.market);
+  bind(document.querySelectorAll<HTMLElement>('[data-produce-key]'), (li) => (r) => r.produce === li.dataset.produceKey);
+
+  const tick = (t: number) => {
+    if (!started) return;
+    if (startTime < 0) startTime = t;
+    const p = new THREE.Vector3();
+    arcs.forEach((a) => {
+      const run = ((t - startTime) * a.speed + a.phase) % 1.35; // 0..1 travels, 1..1.35 rests
+      const h = Math.min(run, 1);
+      const resting = run > 1;
+      (a.glow.material as THREE.MeshBasicMaterial).opacity = (resting ? 0 : 0.45) * a.dim;
+      (a.core.material as THREE.MeshBasicMaterial).opacity = (resting ? 0 : 1) * a.dim;
+      (a.trail.material as THREE.MeshBasicMaterial).opacity = a.trailBase * (a.dim < 1 ? 0.3 : 1);
+      windowRange(a.glow.geometry, h - 0.32, h);
+      windowRange(a.core.geometry, h - 0.12, h);
+      a.head.visible = !resting && a.dim > 0.5;
+      if (!resting) {
+        a.curve.getPoint(h, p);
+        a.head.position.copy(p);
+      }
+    });
+  };
 
   // Drag to spin
   let dragging = false;
@@ -242,6 +281,7 @@ export function mountGlobe(el: HTMLElement) {
     const s = 1 + ((t * 0.8) % 1) * 2.5;
     pulse.scale.setScalar(s);
     (pulse.material as THREE.MeshBasicMaterial).opacity = 1 - ((t * 0.8) % 1);
+    tick(t);
     renderer.render(scene, camera);
   });
   el.classList.add('is-3d');

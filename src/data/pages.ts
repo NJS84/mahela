@@ -274,6 +274,26 @@ export const exportPage = {
     { name: 'Far East', text: 'Broader global distribution network.', lat: 1.3, lon: 103.8 },
   ],
   origin: { name: 'Letsitele, Limpopo', lat: -23.88, lon: 30.39 },
+  /**
+   * Globe routes per produce line, from the produce pages: citrus to every export
+   * market; avocados mostly exported (via Westfalia, shown to Europe); bananas to
+   * Botswana and Namibia; macadamias to China, the USA and the EU; litchis to the
+   * EU and Middle East; golden kiwis to the EU and the East.
+   */
+  produceRoutes: [
+    { produce: 'Citrus', color: '#ff9a1f', to: ['Europe', 'Russia', 'Middle East', 'Asia', 'Japan', 'Far East'] },
+    { produce: 'Avocados', color: '#3ecf6e', to: ['Europe'] },
+    { produce: 'Bananas', color: '#ffe14d', to: ['Botswana', 'Namibia'] },
+    { produce: 'Macadamias', color: '#d39a62', to: ['China', 'USA', 'Europe'] },
+    { produce: 'Litchis', color: '#ff4f7b', to: ['Europe', 'Middle East'] },
+    { produce: 'Golden kiwis', color: '#b5f23d', to: ['Europe', 'Far East'] },
+  ],
+  extraDestinations: {
+    Botswana: { lat: -24.65, lon: 25.91 },
+    Namibia: { lat: -22.56, lon: 17.08 },
+    China: { lat: 31.2, lon: 121.5 },
+    USA: { lat: 40.7, lon: -74 },
+  } as Record<string, { lat: number; lon: number }>,
   faq: [
     { q: 'Is Mahela Group GlobalGAP certified?', a: 'Yes. Mahela Group has been fully GlobalGAP certified since 2003 and is SIZA accredited.' },
     { q: 'Which citrus does Mahela export?', a: 'Grapefruit (Star Ruby, Shaddock / pomelo), Valencia oranges (Valencia, Turkey, Midknight, Delta), Cara Cara navels, soft citrus (Nules Clementine, Samba, Gold Nugget, Tango) and lemons (Genoa, Eureka).' },
