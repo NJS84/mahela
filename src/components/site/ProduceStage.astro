@@ -19,6 +19,16 @@ interface Props {
 }
 const { eyebrow, title, lead, id } = Astro.props;
 const items = produce.map((p) => ({ ...p, img: media(produceArt[p.slug]!) }));
+const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** Harvest months (0 = January) where the approved copy states them. Citrus has none stated yet, so no timeline shows for it. */
+const harvest: Record<string, { on: number[]; label: string }> = {
+  avocados: { on: [2, 3, 4, 5, 6], label: 'Harvest March to July' },
+  bananas: { on: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], label: 'Harvested year-round, two-thirds in summer' },
+  macadamias: { on: [4, 5, 6], label: 'Harvest May to July' },
+  litchis: { on: [11, 0], label: 'Harvest December to January' },
+  kiwis: { on: [1], label: 'Harvest February' },
+};
 ---
 
 <section class="relative isolate overflow-hidden bg-[#0c1c15]" aria-labelledby={id} data-stage>
@@ -57,6 +67,30 @@ const items = produce.map((p) => ({ ...p, img: media(produceArt[p.slug]!) }));
               <Image src={p.img} alt="" widths={[480, 720, 960].filter((w) => w <= p.img.width)} sizes="(min-width: 1024px) 34rem, 90vw" class="h-auto drop-shadow-[0_40px_50px_rgba(0,0,0,0.45)]" style={`width:${p.slug === 'avocados' || p.slug === 'bananas' ? 92 : 74}%`} loading={i === 0 ? 'eager' : 'lazy'} />
             </div>
           ))
+        }
+      </div>
+      <div class="mx-auto mt-4 grid w-full max-w-[30rem]">
+        {
+          items.map((p, i) => {
+            const h = harvest[p.slug];
+            return (
+              <div class="col-start-1 row-start-1" style={i === 0 ? '' : 'opacity:0;visibility:hidden'} data-stage-time={i} aria-hidden={i === 0 ? 'false' : 'true'}>
+                {h && (
+                  <div class="stage-time rounded-2xl px-4 pb-3 pt-3.5" style={`--accent:${p.tone[0]}`}>
+                    <p class="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/80">{h.label}</p>
+                    <ol class="grid grid-cols-12 gap-1" aria-label={`Harvest months: ${h.on.map((m) => monthNames[m]).join(', ')}`}>
+                      {months.map((m, mi) => (
+                        <li class="flex flex-col items-center gap-1.5">
+                          <span class:list={['stage-month h-2.5 w-full rounded-full', h.on.includes(mi) && 'is-on']} data-month={mi}></span>
+                          <span class:list={['text-[0.6rem] font-semibold', h.on.includes(mi) ? 'text-white' : 'text-white/45']}>{m}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+            );
+          })
         }
       </div>
     </div>
@@ -106,6 +140,21 @@ const items = produce.map((p) => ({ ...p, img: media(produceArt[p.slug]!) }));
     outline: 2px solid #fff;
     outline-offset: 2px;
   }
+  .stage-time {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.18), rgb(150 182 222 / 0.06));
+    border: 1px solid rgb(225 238 255 / 0.28);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+  .stage-month {
+    background: rgb(0 0 0 / 0.22);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .stage-month.is-on {
+    background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--accent) 35%, #fff));
+    box-shadow: 0 0 14px rgb(255 255 255 / 0.45);
+  }
   .stage-fruit {
     perspective: 1000px;
   }
@@ -133,22 +182,30 @@ const items = produce.map((p) => ({ ...p, img: media(produceArt[p.slug]!) }));
     // The fruit on stage bobs gently.
     arts.forEach((a) => !reduce && gsap.to(a.firstElementChild, { y: -14, rotate: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
 
+    const times = [...root.querySelectorAll<HTMLElement>('[data-stage-time]')];
+
     function show(next: number) {
       if (next === current) return;
       const dir = next > current ? 1 : -1;
-      const out = arts[current];
-      const inn = arts[next];
+      const prev = current;
       const d = reduce ? 0 : 1;
-      gsap.to(out, { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.6 * d, ease: 'power3.in' });
-      gsap.fromTo(inn, { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1.1 * d, ease: 'back.out(1.4)', delay: 0.25 * d });
-      gsap.to(panels[current], { autoAlpha: 0, y: -12, duration: 0.35 * d });
-      gsap.fromTo(panels[next], { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.6 * d, delay: 0.25 * d, ease: 'power3.out' });
-      gsap.to(bgs[current], { opacity: 0, duration: 0.9 * d });
-      gsap.to(bgs[next], { opacity: 1, duration: 0.9 * d });
-      panels.forEach((p, i) => {
-        p.setAttribute('aria-hidden', i === next ? 'false' : 'true');
-        p.querySelector('a')?.setAttribute('tabindex', i === next ? '0' : '-1');
-      });
+      // Stop anything still animating from a previous pick, so only one fruit and one block of copy are ever visible.
+      gsap.killTweensOf([...arts, ...panels, ...bgs, ...times, ...root.querySelectorAll('[data-stage-time] .is-on')]);
+      [arts, panels, times].forEach((group) => group.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { autoAlpha: 0 })));
+      bgs.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { opacity: 0 }));
+
+      gsap.to(arts[prev], { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.45 * d, ease: 'power3.in' });
+      gsap.fromTo(arts[next], { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1 * d, ease: 'back.out(1.4)', delay: 0.15 * d });
+      gsap.set(panels[prev], { autoAlpha: 0 });
+      gsap.fromTo(panels[next], { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, ease: 'power3.out' });
+      gsap.set(times[prev], { autoAlpha: 0 });
+      gsap.fromTo(times[next], { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, delay: 0.2 * d, ease: 'power3.out' });
+      const lit = times[next].querySelectorAll('.is-on');
+      if (lit.length) gsap.fromTo(lit, { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.35 * d, stagger: 0.05 * d, delay: 0.35 * d, ease: 'power2.out' });
+      gsap.to(bgs[prev], { opacity: 0, duration: 0.7 * d });
+      gsap.to(bgs[next], { opacity: 1, duration: 0.7 * d });
+      [panels, times].forEach((group) => group.forEach((p, i) => p.setAttribute('aria-hidden', i === next ? 'false' : 'true')));
+      panels.forEach((p, i) => p.querySelector('a')?.setAttribute('tabindex', i === next ? '0' : '-1'));
       picks.forEach((p, i) => p.setAttribute('aria-selected', i === next ? 'true' : 'false'));
       current = next;
     }
