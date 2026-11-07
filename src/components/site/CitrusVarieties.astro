@@ -28,16 +28,16 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
     <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Varieties and picking calendar</span>
     <h2 id="cv-title" class="cond mt-3 max-w-3xl text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">Five citrus groups, thirteen varieties</h2>
 
-    <div class="mt-12 grid items-center gap-12 lg:mt-14 lg:grid-cols-12 lg:gap-8">
+    <div class="mt-8 grid items-end gap-12 lg:mt-6 lg:grid-cols-12 lg:gap-8">
       <!-- Left: the group's fruit, name and picking calendar. -->
       <div class="lg:col-span-5">
         <div class="min-w-0 text-center lg:text-left">
-          <div class="relative mx-auto mb-6 aspect-square w-[min(56vw,17rem)] lg:mx-0" style="perspective:1000px" data-cv-stage-art aria-hidden="true">
+          <div class="relative mx-auto mb-4 aspect-square w-[min(72vw,24rem)] lg:-ml-6" style="perspective:1000px" data-cv-stage-art aria-hidden="true">
             <div class="absolute inset-[8%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
             <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-cv-orbit></div>
             {groups.map((g) => (
               <div class="absolute inset-0 flex items-center justify-center" style={hidden(g.i)} data-cv-art={g.i}>
-                <Image src={g.img} alt="" widths={[320, 480].filter((w) => w <= g.img.width)} sizes="17rem" class="h-auto w-[80%] drop-shadow-[0_30px_36px_rgba(0,0,0,0.45)]" />
+                <Image src={g.img} alt="" widths={[480, 720].filter((w) => w <= g.img.width)} sizes="24rem" class="h-auto w-[84%] drop-shadow-[0_30px_36px_rgba(0,0,0,0.45)]" />
               </div>
             ))}
           </div>
