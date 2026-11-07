@@ -4,10 +4,12 @@ import { site } from '../data/site';
 ---
 
 <Base title="Privacy and legal" description="Mahela Group privacy notice under the Protection of Personal Information Act (POPIA), and website terms." breadcrumbs={[{ name: 'Legal', href: '/legal' }]}>
+  <div class="relative isolate">
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_70%_0%,#2f5a8f,#0d1a2c_75%)]"></div>
   <article class="mx-auto max-w-[52rem] px-4 pb-24 pt-36 md:px-6 md:pt-44">
-    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sage">Legal</p>
+    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Legal</p>
     <h1 class="cond mt-3 text-[clamp(2.4rem,1.6rem+3.4vw,4.5rem)] font-medium uppercase leading-[0.95]">Privacy notice (POPIA)</h1>
-    <div class="glass prose-glass mt-10 space-y-5 rounded-[28px] p-7 leading-relaxed text-ivory/85 md:p-10">
+    <div class="bl-glass prose-glass mt-10 space-y-5 rounded-[28px] p-7 leading-relaxed text-white/90 md:p-10">
       <p><strong>Draft for Mahela Group to review.</strong> Mahela Group respects your privacy and processes personal information in line with the Protection of Personal Information Act 4 of 2013 (POPIA).</p>
       <h2 class="cond text-2xl uppercase">What we collect</h2>
       <p>When you use our contact form we collect your name, email address and the details you choose to share, such as your company, phone number, country and message.</p>
@@ -19,4 +21,17 @@ import { site } from '../data/site';
       <p>This website does not use advertising or tracking cookies.</p>
     </div>
   </article>
+  </div>
 </Base>
+
+<style>
+  .bl-glass {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.34);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.32), 0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+    color: #fff;
+  }
+</style>
+
