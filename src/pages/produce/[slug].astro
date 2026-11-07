@@ -9,7 +9,6 @@ import Gallery from '../../components/site/Gallery.astro';
 import CtaBand from '../../components/site/CtaBand.astro';
 import Leaves from '../../components/site/Leaves.astro';
 import Icon from '../../components/site/Icon.astro';
-import CitrusHeroArt from '../../components/site/CitrusHeroArt.astro';
 import CitrusBurst from '../../components/site/CitrusBurst.astro';
 import CitrusVarieties from '../../components/site/CitrusVarieties.astro';
 import CitrusOrchards from '../../components/site/CitrusOrchards.astro';
@@ -52,9 +51,7 @@ const jsonLd = [
 ---
 
 <Base title={p.metaTitle} description={p.description} breadcrumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} jsonLd={jsonLd} ogImage={hero}>
-  <PageHero image={hero} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} tall={isCitrus}>
-    {isCitrus && <CitrusHeroArt slot="art" />}
-  </PageHero>
+  <PageHero image={hero} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} />
 
   <section class="relative overflow-hidden py-24 md:py-32" style={`--accent:${p.accent}`} aria-labelledby="answer-title">
     <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 30%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%), #10201a"></div>

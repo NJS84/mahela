@@ -78,7 +78,7 @@ const drops = Array.from({ length: 22 }, (_, i) => ({ a: (i / 22) * 360 + (i % 3
               <li class="cb-fruit absolute w-[24%] -translate-x-1/2 -translate-y-1/2" style={`left:${g.left}%;top:${g.top}%;--accent:${g.tone[0]}`} data-cb-fruit>
                 <a href="#varieties" class="group flex flex-col items-center text-center" data-pick-group={g.i}>
                   <span class="cb-fruit-glow absolute inset-[6%_10%_30%] -z-10 rounded-full" aria-hidden="true"></span>
-                  <Image src={media(g.art)} alt="" widths={[240, 360]} sizes="(min-width: 1024px) 10rem, 24vw" class="h-auto w-[86%] drop-shadow-[0_22px_26px_rgba(0,0,0,0.45)] transition-transform duration-500 group-hover:-translate-y-1.5 group-hover:scale-110" />
+                  <Image src={media(g.art)} alt="" widths={[240, 360]} sizes="(min-width: 1024px) 10rem, 24vw" style={`width:${86 * (g.scale ?? 1)}%`} class="h-auto max-w-none drop-shadow-[0_22px_26px_rgba(0,0,0,0.45)] transition-transform duration-500 group-hover:-translate-y-1.5 group-hover:scale-110" />
                   <span class="cb-label mt-1.5 rounded-full px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-white md:px-3 md:text-[0.7rem]">{g.short}</span>
                 </a>
               </li>

@@ -1,111 +1,118 @@
 ---
 /**
- * Citrus variety picker, matching the Produce page picker. A dock of the five
- * citrus groups; picking one spins its fruit onto the stage, fades the section
- * to that fruit's colours and deals its varieties out as portrait blue-tinted
- * glass cards (white text, even heights). Groups in the burst scene above link
- * straight to a group here.
+ * Citrus varieties and picking calendar in one section.
+ * Left: the five citrus groups as fruit icons, beside the group name and its
+ * picking-window calendar. Right: that group's varieties as portrait
+ * blue-tinted glass cards, one in view at a time, with the neighbours tucked
+ * behind like the home page produce cards. Click, swipe or use the arrows to
+ * move through them. The section fades to each group's colour.
+ * Groups in the burst scene above link straight to a group here.
  */
 import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
 import { media } from '../../lib/media';
 import { citrusGroups, citrusSeason, citrusTotal as total } from '../../data/citrus';
 
 const groups = citrusGroups.map((g, i) => ({ ...g, i, img: media(g.art) }));
 const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 const words = ['', 'One', 'Two', 'Three', 'Four'];
+const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
 ---
 
 <section id="varieties" class="cv relative isolate scroll-mt-20 overflow-hidden bg-[#0c1c15]" aria-labelledby="cv-title" data-cv>
   <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-    {groups.map((g) => <div class="absolute inset-0" style={`opacity:${g.i === 0 ? 1 : 0};background:radial-gradient(70% 80% at 25% 45%, ${g.tone[0]}, ${g.tone[1]} 70%, #0b0f0c 120%)`} data-cv-bg={g.i}></div>)}
-    <div class="absolute inset-0 bg-[radial-gradient(40%_45%_at_22%_45%,rgb(255_255_255/0.14),transparent_70%)]"></div>
+    {groups.map((g) => <div class="absolute inset-0" style={`${g.i === 0 ? 'opacity:1' : 'opacity:0'};background:radial-gradient(70% 80% at 70% 50%, ${g.tone[0]}, ${g.tone[1]} 70%, #0b0f0c 120%)`} data-cv-bg={g.i}></div>)}
+    <div class="absolute inset-0 bg-[radial-gradient(40%_50%_at_70%_50%,rgb(255_255_255/0.12),transparent_70%)]"></div>
   </div>
 
   <div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-28">
-    <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-      <div class="max-w-2xl">
-        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Varieties</span>
-        <h2 id="cv-title" class="cond mt-3 text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">Five citrus groups, thirteen varieties</h2>
-      </div>
-      <div class="cv-dock flex w-full max-w-full justify-between gap-0 self-start overflow-x-auto rounded-full p-1.5 sm:w-auto sm:gap-2 sm:p-2 lg:self-auto" role="tablist" aria-label="Choose a citrus group">
-        {
-          groups.map((g) => (
-            <button type="button" role="tab" id={`cv-tab-${g.i}`} aria-controls={`cv-panel-${g.i}`} aria-selected={g.i === 0 ? 'true' : 'false'} tabindex={g.i === 0 ? 0 : -1} class="cv-pick group flex shrink-0 flex-col items-center gap-1.5 rounded-[22px] px-1 pb-2 pt-2.5 sm:px-3" style={`--accent:${g.tone[0]}`} data-cv-pick={g.i}>
-              <span class="cv-pick-dot flex size-12 items-center justify-center rounded-full sm:size-16">
-                <Image src={g.img} alt="" widths={[160]} sizes="64px" class="size-[78%] object-contain transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110" />
-              </span>
-              <span class="text-[0.58rem] font-semibold uppercase tracking-[0.1em] text-white/80 sm:text-[0.62rem]">{g.short}</span>
-            </button>
-          ))
-        }
-      </div>
-    </div>
+    <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Varieties and picking calendar</span>
+    <h2 id="cv-title" class="cond mt-3 max-w-3xl text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">Five citrus groups, thirteen varieties</h2>
 
-    <div class="mt-14 grid gap-10 lg:grid-cols-12 lg:gap-8">
-      <!-- Stage: the group's fruit, name and count. -->
-      <div class="lg:col-span-4">
-        <div class="lg:sticky lg:top-28">
-          <div class="relative mx-auto aspect-square w-[min(70vw,22rem)]" style="perspective:1000px" data-cv-stage aria-hidden="true">
-            <div class="absolute inset-[10%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
-            <div class="absolute inset-[3%] rounded-full border border-dashed border-white/15" data-cv-orbit></div>
+    <div class="mt-12 grid items-center gap-12 lg:mt-14 lg:grid-cols-12 lg:gap-8">
+      <!-- Left: group icons beside the group name and its calendar. -->
+      <div class="flex flex-col gap-8 sm:flex-row sm:items-center lg:col-span-5">
+        <div class="cv-rail flex shrink-0 justify-between gap-1 self-stretch rounded-[28px] p-1.5 sm:flex-col sm:justify-center sm:self-auto sm:p-2" role="tablist" aria-label="Choose a citrus group" aria-orientation="vertical">
+          {
+            groups.map((g) => (
+              <button type="button" role="tab" id={`cv-tab-${g.i}`} aria-controls={`cv-panel-${g.i}`} aria-selected={g.i === 0 ? 'true' : 'false'} tabindex={g.i === 0 ? 0 : -1} class="cv-pick group flex flex-col items-center gap-1 rounded-[20px] px-1 py-1.5 sm:px-2" style={`--accent:${g.tone[0]}`} data-cv-pick={g.i}>
+                <span class="cv-pick-dot flex size-12 items-center justify-center rounded-full sm:size-14">
+                  <Image src={g.img} alt="" widths={[160]} sizes="56px" class="object-contain transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" style={`width:${78 * Math.min(g.scale ?? 1, 1.15)}%`} />
+                </span>
+                <span class="text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-white/80 sm:text-[0.6rem]">{g.short}</span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <div class="grid">
             {
               groups.map((g) => (
-                <div class="absolute inset-0 flex items-center justify-center" style={g.i === 0 ? '' : 'opacity:0;visibility:hidden'} data-cv-art={g.i}>
-                  <Image src={g.img} alt="" widths={[360, 540, 720].filter((w) => w <= g.img.width)} sizes="22rem" class="h-auto drop-shadow-[0_34px_40px_rgba(0,0,0,0.45)]" style={`width:${g.group === 'Soft citrus' ? 96 : 78}%`} />
-                </div>
-              ))
-            }
-          </div>
-          <div class="mt-6 grid text-center lg:text-left">
-            {
-              groups.map((g) => (
-                <div class="col-start-1 row-start-1" style={g.i === 0 ? '' : 'opacity:0;visibility:hidden'} data-cv-name={g.i} aria-hidden="true">
-                  <p class="cond text-[clamp(2rem,1.6rem+1.4vw,2.8rem)] font-medium uppercase leading-none text-white">{g.group}</p>
+                <div class="col-start-1 row-start-1" style={hidden(g.i)} data-cv-name={g.i} aria-hidden={g.i === 0 ? 'false' : 'true'}>
+                  <p class="cond text-[clamp(2.4rem,1.8rem+2vw,3.6rem)] font-medium uppercase leading-[0.92] text-white">{g.group}</p>
                   <p class="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-white/75">{words[g.varieties.length] ?? g.varieties.length} {g.varieties.length === 1 ? 'variety' : 'varieties'} of {total}</p>
                 </div>
               ))
             }
           </div>
-          <div class="cv-season mt-6 rounded-2xl px-4 pb-3 pt-3.5">
-            <div class="mb-2.5 grid">
+
+          <div class="cv-glass mt-7 rounded-[24px] px-5 pb-4 pt-4">
+            <div class="mb-3 grid">
               {groups.map((g) => (
-                <p class="col-start-1 row-start-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white" style={g.i === 0 ? '' : 'opacity:0;visibility:hidden'} data-cv-pickl={g.i}>{g.pick.label}</p>
+                <p class="col-start-1 row-start-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white" style={hidden(g.i)} data-cv-pickl={g.i}>{g.pick.label}</p>
               ))}
             </div>
             <div class="relative">
-              <span class="absolute top-0 h-2.5 rounded-full bg-white/25" style={`left:${(citrusSeason.start / 12) * 100}%;width:${((citrusSeason.end - citrusSeason.start) / 12) * 100}%`} aria-hidden="true"></span>
+              <span class="absolute top-0 h-3 rounded-full bg-white/25" style={`left:${(citrusSeason.start / 12) * 100}%;width:${((citrusSeason.end - citrusSeason.start) / 12) * 100}%`} aria-hidden="true"></span>
               {groups.map((g) => (
-                <span class:list={['cv-season-bar absolute top-0 h-2.5 rounded-full', g.pick.open && 'is-open']} style={`left:${(g.pick.from / 12) * 100}%;width:${((g.pick.to - g.pick.from) / 12) * 100}%;${g.i === 0 ? '' : 'opacity:0'}`} data-cv-bar={g.i} aria-hidden="true"></span>
+                <span class:list={['cv-bar absolute top-0 h-3 rounded-full', g.pick.open && 'is-open']} style={`left:${(g.pick.from / 12) * 100}%;width:${((g.pick.to - g.pick.from) / 12) * 100}%;${g.i === 0 ? '' : 'opacity:0'}`} data-cv-bar={g.i} aria-hidden="true"></span>
               ))}
               <ol class="grid grid-cols-12 gap-1" aria-label="Months of the year">
                 {months.map((m) => (
-                  <li class="flex flex-col items-center gap-1.5">
-                    <span class="h-2.5 w-full rounded-full bg-black/20 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)]"></span>
-                    <span class="text-[0.6rem] font-semibold text-white/70">{m}</span>
+                  <li class="flex flex-col items-center gap-2">
+                    <span class="h-3 w-full rounded-full bg-black/20 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)]"></span>
+                    <span class="text-[0.62rem] font-semibold text-white/75">{m}</span>
                   </li>
                 ))}
               </ol>
             </div>
-            <p class="mt-2.5 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/70"><span class="inline-block h-1.5 w-5 rounded-full bg-white/30"></span>{citrusSeason.label}</p>
+            <p class="mt-3 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/70"><span class="inline-block h-1.5 w-5 shrink-0 rounded-full bg-white/30"></span>{citrusSeason.label}</p>
           </div>
         </div>
       </div>
 
-      <!-- Variety cards for each group, stacked in one cell so the section never jumps in height. -->
-      <div class="grid lg:col-span-8">
+      <!-- Right: the group's varieties, one portrait card in view at a time. -->
+      <div class="grid lg:col-span-7">
         {
           groups.map((g) => (
-            <div id={`cv-panel-${g.i}`} role="tabpanel" aria-labelledby={`cv-tab-${g.i}`} class="col-start-1 row-start-1" style={g.i === 0 ? '' : 'opacity:0;visibility:hidden'} data-cv-panel={g.i}>
-              <h3 class="sr-only">{g.group}</h3>
-              <ul class="grid auto-rows-fr gap-5 sm:grid-cols-2">
-                {g.varieties.map((v, vi) => (
-                  <li class="cv-card relative flex min-h-[17rem] flex-col overflow-hidden rounded-[28px] p-7 text-white md:min-h-[19rem] md:p-8" style={`--accent:${g.tone[0]}`} data-cv-card>
-                    <span class="cond text-sm font-semibold tracking-[0.12em] text-white/70">{String(vi + 1).padStart(2, '0')}</span>
-                    <h4 class="cond mt-auto pt-10 text-[clamp(1.9rem,1.5rem+1vw,2.5rem)] font-medium uppercase leading-[0.95] text-white">{v.name}</h4>
-                    <p class="mt-3 border-t border-white/20 pt-3 text-[0.95rem] leading-relaxed text-white/90">{v.text}</p>
-                  </li>
-                ))}
-              </ul>
+            <div id={`cv-panel-${g.i}`} role="tabpanel" aria-labelledby={`cv-tab-${g.i}`} class="col-start-1 row-start-1" style={hidden(g.i)} data-cv-panel={g.i}>
+              <div class="cv-stage relative mx-auto h-[33rem] w-full touch-pan-y select-none md:h-[34rem]" data-cv-stage>
+                <ul>
+                  {g.varieties.map((v, vi) => (
+                    <li class="cv-slot absolute left-1/2 top-1/2 w-[min(76vw,21.5rem)] -translate-x-1/2 -translate-y-1/2" data-cv-card={vi} aria-label={`${v.name}, ${vi + 1} of ${g.varieties.length}`}>
+                      <article class="cv-card cv-glass relative flex h-[29rem] flex-col rounded-[30px] p-7 text-white md:h-[30rem] md:p-8" style={`--accent:${g.tone[0]}`}>
+                        <span class="cond text-sm font-semibold tracking-[0.12em] text-white/75">{String(vi + 1).padStart(2, '0')} / {String(g.varieties.length).padStart(2, '0')}</span>
+                        <span class="mt-auto self-start rounded-lg px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-white" style={`background: color-mix(in srgb, ${g.tone[0]} 75%, #1e4a30)`}>{g.group}</span>
+                        <h3 class="cond mt-3 text-[clamp(2rem,1.6rem+1.2vw,2.6rem)] font-medium uppercase leading-[0.95] text-white">{v.name}</h3>
+                        <p class="mt-3 border-t border-white/20 pt-3 text-[0.92rem] leading-relaxed text-white/90">{v.text}</p>
+                      </article>
+                      <div class="cv-fruit pointer-events-none absolute -right-[8%] -top-[9%] z-[2]" style={`width:${46 * (g.scale ?? 1)}%`} aria-hidden="true">
+                        <Image src={g.img} alt="" widths={[240, 360, 480].filter((w) => w <= g.img.width)} sizes="12rem" class="h-auto w-full" />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {g.varieties.length > 1 && (
+                <div class="mt-4 flex items-center justify-center gap-4">
+                  <button type="button" class="cv-arrow flex size-11 items-center justify-center rounded-full" aria-label="Previous variety" data-cv-prev><Icon name="arrow" class="size-5 rotate-180" /></button>
+                  <ol class="flex items-center gap-2" aria-hidden="true">
+                    {g.varieties.map((_, vi) => <li class:list={['cv-dot h-1.5 rounded-full', vi === 0 && 'is-on']} data-cv-dot={vi}></li>)}
+                  </ol>
+                  <button type="button" class="cv-arrow flex size-11 items-center justify-center rounded-full" aria-label="Next variety" data-cv-next><Icon name="arrow" class="size-5" /></button>
+                </div>
+              )}
             </div>
           ))
         }
@@ -115,13 +122,33 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
 </section>
 
 <style>
-  .cv-dock {
+  .cv-rail,
+  .cv-arrow {
     background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
     border: 1px solid rgb(225 238 255 / 0.32);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 30px 60px -30px rgb(0 0 0 / 0.5);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
     backdrop-filter: blur(18px) saturate(150%);
-    scrollbar-width: none;
+  }
+  .cv-arrow {
+    color: #fff;
+    transition: background-color 0.3s, opacity 0.3s;
+  }
+  .cv-arrow:hover {
+    background: rgb(255 255 255 / 0.22);
+  }
+  .cv-arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .cv-dot {
+    width: 0.75rem;
+    background: rgb(255 255 255 / 0.3);
+    transition: width 0.4s, background-color 0.4s;
+  }
+  .cv-dot.is-on {
+    width: 1.75rem;
+    background: #fff;
   }
   .cv-pick-dot {
     background: rgb(255 255 255 / 0.08);
@@ -136,14 +163,14 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
   .cv-pick[aria-selected='true'] span:last-child {
     color: #fff;
   }
-  .cv-pick:focus-visible {
+  .cv-pick:focus-visible,
+  .cv-arrow:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 2px;
   }
-  .cv-card,
-  .cv-season {
+  .cv-glass {
     background:
-      radial-gradient(90% 60% at 85% 0%, color-mix(in srgb, var(--accent, #fff) 18%, transparent), transparent 70%),
+      radial-gradient(90% 60% at 85% 0%, color-mix(in srgb, var(--accent, transparent) 20%, transparent), transparent 70%),
       linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
     border: 1px solid rgb(225 238 255 / 0.36);
     box-shadow:
@@ -152,15 +179,18 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
     -webkit-backdrop-filter: blur(22px) saturate(150%);
     backdrop-filter: blur(22px) saturate(150%);
   }
-  .cv-season {
-    --accent: transparent;
+  .cv-slot {
+    will-change: transform;
   }
-  .cv-season-bar {
+  .cv-fruit img {
+    filter: drop-shadow(0 24px 28px rgb(0 0 0 / 0.38));
+  }
+  .cv-bar {
     background: #fff;
     box-shadow: 0 0 14px rgb(255 255 255 / 0.45);
     z-index: 1;
   }
-  .cv-season-bar.is-open {
+  .cv-bar.is-open {
     /* Start given, end not stated: fade out. */
     background: linear-gradient(90deg, #fff 35%, rgb(255 255 255 / 0));
     box-shadow: none;
@@ -171,24 +201,87 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
   import { gsap } from 'gsap';
 
   document.querySelectorAll<HTMLElement>('[data-cv]').forEach((root) => {
-    const q = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
+    const q = (s: string, el: ParentNode = root) => [...el.querySelectorAll<HTMLElement>(s)];
     const picks = q('[data-cv-pick]') as HTMLButtonElement[];
-    const arts = q('[data-cv-art]');
     const names = q('[data-cv-name]');
+    const labels = q('[data-cv-pickl]');
+    const bars = q('[data-cv-bar]');
     const panels = q('[data-cv-panel]');
     const bgs = q('[data-cv-bg]');
-    const pickLabels = q('[data-cv-pickl]');
-    const bars = q('[data-cv-bar]');
-    const stage = root.querySelector<HTMLElement>('[data-cv-stage]')!;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const d = reduce ? 0 : 1;
     let current = 0;
 
+    // One carousel per group: the active card centred, neighbours smaller and tucked behind.
+    const carousels = panels.map((panel) => {
+      const cards = q('[data-cv-card]', panel);
+      const dots = q('[data-cv-dot]', panel);
+      const prev = panel.querySelector<HTMLButtonElement>('[data-cv-prev]');
+      const next = panel.querySelector<HTMLButtonElement>('[data-cv-next]');
+      const state = { pos: 0 };
+      let at = 0;
+      const place = (pos: number) => {
+        const w = cards[0]!.offsetWidth || 340;
+        // Phones: a stacked deck that never reaches the screen edge. Wider screens: neighbours fan out to the sides.
+        const deck = window.innerWidth < 768;
+        // Side cards stay inside their own column, so they never cover the calendar or reach the screen edge.
+        const stageW = (cards[0]!.parentElement as HTMLElement).offsetWidth || w * 2.4;
+        const side = Math.min(w * 0.7, Math.max(0, (stageW - w * 0.78) / 2));
+        cards.forEach((card, i) => {
+          const dd = i - pos;
+          const t = Math.abs(dd);
+          const s = Math.sign(dd);
+          gsap.set(card, {
+            x: deck ? s * Math.min(t, 1.5) * w * 0.07 : s * Math.min(t, 1.6) * side,
+            y: deck ? Math.min(t, 1.5) * -14 : 0,
+            rotation: deck ? s * Math.min(t, 1.5) * 4 : 0,
+            scale: 1 - Math.min(t, 1.5) * (deck ? 0.07 : 0.22),
+            rotationY: deck ? 0 : -s * Math.min(t, 1) * 18,
+            transformPerspective: 1100,
+            zIndex: 50 - Math.round(t * 10),
+            opacity: t > 1.4 ? Math.max(0, 1 - (t - 1.4) * 3) : 1,
+            filter: `brightness(${1 - Math.min(t, 1) * 0.3})`,
+            pointerEvents: t < 0.5 ? 'auto' : t < 1.5 ? 'auto' : 'none',
+          });
+          card.setAttribute('aria-hidden', t < 0.5 ? 'false' : 'true');
+          // Side cards hide their text so nothing reads through the front card.
+          gsap.set(card.querySelectorAll('h3, p, span'), { opacity: Math.max(0, 1 - t * 1.6) });
+        });
+      };
+      const go = (i: number) => {
+        at = Math.max(0, Math.min(cards.length - 1, i));
+        gsap.to(state, { pos: at, duration: 0.7 * d, ease: 'power3.out', overwrite: true, onUpdate: () => place(state.pos) });
+        if (!d) place(at);
+        dots.forEach((dot, di) => dot.classList.toggle('is-on', di === at));
+        if (prev) prev.disabled = at === 0;
+        if (next) next.disabled = at === cards.length - 1;
+      };
+      prev?.addEventListener('click', () => go(at - 1));
+      next?.addEventListener('click', () => go(at + 1));
+      cards.forEach((c, i) => c.addEventListener('click', () => i !== at && go(i)));
+      // Swipe.
+      const stage = panel.querySelector<HTMLElement>('[data-cv-stage]')!;
+      let x0: number | null = null;
+      stage.addEventListener('pointerdown', (e) => (x0 = e.clientX));
+      stage.addEventListener('pointerup', (e) => {
+        if (x0 === null) return;
+        const dx = e.clientX - x0;
+        if (Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1));
+        x0 = null;
+      });
+      panel.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') go(at + 1);
+        if (e.key === 'ArrowLeft') go(at - 1);
+      });
+      place(0);
+      go(0);
+      return { cards, go, refresh: () => place(state.pos) };
+    });
+    window.addEventListener('resize', () => carousels.forEach((c) => c.refresh()));
+
     if (!reduce) {
-      gsap.to(root.querySelector('[data-cv-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
-      arts.forEach((a) => gsap.to(a.firstElementChild, { y: -12, rotate: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
-      // Picking bar draws in when it scrolls into view.
-      const bar = root.querySelector<HTMLElement>('[data-cv-bar="0"]')!;
+      q('.cv-fruit').forEach((f, i) => gsap.to(f, { y: -10, rotate: 4, duration: 3 + (i % 3) * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+      const bar = bars[0]!;
       gsap.set(bar, { scaleX: 0, transformOrigin: 'left center' });
       new IntersectionObserver(([e], o) => {
         if (!e!.isIntersecting) return;
@@ -199,25 +292,24 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
 
     function show(next: number) {
       if (next === current) return;
-      const dir = next > current ? 1 : -1;
       const prev = current;
-      gsap.killTweensOf([...arts, ...names, ...panels, ...bgs, ...q('[data-cv-card]')]);
-      [arts, names, panels].forEach((group) => group.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { autoAlpha: 0 })));
+      gsap.killTweensOf([...names, ...labels, ...bars, ...panels, ...bgs]);
+      [names, labels, panels].forEach((group) => group.forEach((el, i) => i !== next && gsap.set(el, { autoAlpha: 0 })));
+      bars.forEach((el, i) => i !== next && gsap.set(el, { opacity: 0 }));
       bgs.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { opacity: 0 }));
 
-      gsap.to(arts[prev]!, { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.45 * d, ease: 'power3.in' });
-      gsap.fromTo(arts[next]!, { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1 * d, ease: 'back.out(1.4)', delay: 0.15 * d });
-      gsap.set([names[prev]!, panels[prev]!], { autoAlpha: 0 });
-      gsap.fromTo(names[next]!, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, ease: 'power3.out' });
+      gsap.fromTo(names[next]!, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, ease: 'power3.out' });
+      gsap.set(labels[next]!, { autoAlpha: 1 });
+      gsap.fromTo(bars[next]!, { opacity: 1, scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.8 * d, delay: 0.15 * d, ease: 'power3.out' });
+      // The new group's cards fan in from the right, starting at the first variety.
+      const c = carousels[next]!;
+      c.go(0);
+      c.refresh();
       gsap.set(panels[next]!, { autoAlpha: 1 });
-      // Cards are dealt in with a slight 3D flip.
-      gsap.fromTo(panels[next]!.querySelectorAll('[data-cv-card]'), { autoAlpha: 0, y: 40, rotationX: -25, transformPerspective: 900 }, { autoAlpha: 1, y: 0, rotationX: 0, duration: 0.7 * d, stagger: 0.08 * d, ease: 'power3.out' });
-      gsap.killTweensOf([...pickLabels, ...bars]);
-      pickLabels.forEach((el, i) => gsap.set(el, { autoAlpha: i === next ? 1 : 0 }));
-      bars.forEach((el, i) => i !== next && gsap.set(el, { opacity: 0 }));
-      gsap.fromTo(bars[next]!, { opacity: 1, scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.8 * d, delay: 0.2 * d, ease: 'power3.out' });
+      gsap.fromTo(c.cards.map((card) => card.firstElementChild), { y: 50, rotationX: -18, opacity: 0 }, { y: 0, rotationX: 0, opacity: 1, transformPerspective: 900, duration: 0.7 * d, stagger: 0.06 * d, ease: 'power3.out' });
       gsap.to(bgs[prev]!, { opacity: 0, duration: 0.7 * d });
       gsap.to(bgs[next]!, { opacity: 1, duration: 0.7 * d });
+      names.forEach((n, i) => n.setAttribute('aria-hidden', i === next ? 'false' : 'true'));
       picks.forEach((p, i) => {
         p.setAttribute('aria-selected', i === next ? 'true' : 'false');
         p.tabIndex = i === next ? 0 : -1;
@@ -228,8 +320,10 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
     picks.forEach((p, i) => {
       p.addEventListener('click', () => show(i));
       p.addEventListener('keydown', (e) => {
-        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-        const n = (i + (e.key === 'ArrowRight' ? 1 : picks.length - 1)) % picks.length;
+        if (!['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+        e.preventDefault();
+        const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : picks.length - 1;
+        const n = (i + step) % picks.length;
         picks[n]!.focus();
         show(n);
       });
@@ -237,17 +331,5 @@ const words = ['', 'One', 'Two', 'Three', 'Four'];
 
     // Group links elsewhere on the page (the burst ring) open that group here.
     document.querySelectorAll<HTMLElement>('[data-pick-group]').forEach((a) => a.addEventListener('click', () => show(Number(a.dataset.pickGroup))));
-
-    // 3D tilt of the fruit with the pointer.
-    if (!reduce && window.matchMedia('(hover: hover)').matches) {
-      const rx = gsap.quickTo(stage, 'rotationX', { duration: 0.8, ease: 'power3' });
-      const ry = gsap.quickTo(stage, 'rotationY', { duration: 0.8, ease: 'power3' });
-      root.addEventListener('pointermove', (e) => {
-        const r = stage.getBoundingClientRect();
-        ry(((e.clientX - (r.left + r.width / 2)) / window.innerWidth) * 30);
-        rx((-(e.clientY - (r.top + r.height / 2)) / window.innerHeight) * 24);
-      });
-      root.addEventListener('pointerleave', () => (rx(0), ry(0)));
-    }
   });
 </script>
