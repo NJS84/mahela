@@ -19,6 +19,8 @@ import BananaStory from '../../components/site/BananaStory.astro';
 import BananaRipen from '../../components/site/BananaRipen.astro';
 import MacadamiaStory from '../../components/site/MacadamiaStory.astro';
 import MacadamiaRoute from '../../components/site/MacadamiaRoute.astro';
+import LitchiStory from '../../components/site/LitchiStory.astro';
+import LitchiPeel from '../../components/site/LitchiPeel.astro';
 import { media } from '../../lib/media';
 import { produceDetail } from '../../data/pages';
 import { produce } from '../../data/site';
@@ -36,8 +38,9 @@ const isCitrus = slug === 'citrus';
 const isAvo = slug === 'avocados';
 const isBanana = slug === 'bananas';
 const isMac = slug === 'macadamias';
+const isLitchi = slug === 'litchis';
 const hero = media(p.hero);
-const sibling = isCitrus || isAvo || isBanana || isMac;
+const sibling = isCitrus || isAvo || isBanana || isMac || isLitchi;
 /** Avocado farm photography (Mahela fotos 2022 and 2025 Avos shoots). */
 const avoTiles = [
   { src: 'produce/farm/avocado-harvest-bin-105260.jpg', alt: 'Freshly picked avocados tipped from crates into a bin on a tractor trailer in a Mahela orchard', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
@@ -63,6 +66,14 @@ const macTiles = [
   { src: 'produce/photos/mahela-aug28.jpg', alt: 'Macadamia nuts in shell in a bowl and scattered on a white table', cls: 'lg:col-span-3' },
   { src: 'produce/photos/img-9307.jpg', alt: 'A close view of whole macadamia kernels', cls: 'lg:col-span-3' },
 ];
+/** Litchi photography: no Mahela orchard shots exist yet, so the original site photos and Elements stock. */
+const litchiTiles = [
+  { src: 'produce/photos/mahela-lichis-14.jpg', alt: 'A branch of freshly picked Mauritius litchis with their leaves', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/farm/litchi-floating.jpg', alt: 'Whole and peeled litchis showing the ruby shell and white flesh', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'archive/stock/litchi-fruits-pj3uvdf.jpg', alt: 'A heap of ripe litchis on hessian, one opened to show the flesh', cls: 'lg:col-span-2' },
+  { src: 'archive/stock/healthy-organic-red-lychee-p2yzekx.jpg', alt: 'Close view of the textured red skin of ripe litchis', cls: 'lg:col-span-2' },
+  { src: 'produce/photos/mahela-lichis-2.jpg', alt: 'A bowl of fresh litchis on a white table', cls: 'sm:col-span-2 lg:col-span-2' },
+];
 // The citrus burst below already features a whole orange, so the intro shows orange blossom instead.
 const art = media(isCitrus ? 'produce/renders/citrus-blossom.webp' : produceArt[slug]!);
 const url = `https://www.mahela.co.za/produce/${slug}`;
@@ -87,7 +98,7 @@ const jsonLd = [
 ---
 
 <Base title={p.metaTitle} description={p.description} breadcrumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} jsonLd={jsonLd} ogImage={hero}>
-  <PageHero image={hero} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]}>
+  <PageHero image={hero} position={isLitchi ? "68% 50%" : undefined} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]}>
     {
       isBanana && (
         <div slot="beside" class="mm-card shrink-0 rounded-[18px] p-2 md:rounded-[26px] md:p-3" data-reveal>
@@ -104,7 +115,7 @@ const jsonLd = [
       <div class="lg:col-span-7">
         <SectionTitle eyebrow={`About our ${p.title.toLowerCase()}`} title={`Mahela ${p.title.toLowerCase()}, grown in Limpopo`} id="answer-title" />
         <p class="mt-6 text-xl leading-relaxed text-ivory/90" data-reveal>{p.answer}</p>
-        {!isBanana && p.body.map((b) => <p class="mt-5 leading-relaxed text-ivory/75" data-reveal>{b}</p>)}
+        {!isBanana && !isLitchi && p.body.map((b) => <p class="mt-5 leading-relaxed text-ivory/75" data-reveal>{b}</p>)}
         <div class="mt-10"><FactList facts={p.facts} variant={sibling ? 'blue' : 'default'} /></div>
       </div>
       <div class="relative lg:col-span-5" aria-hidden="true">
@@ -124,6 +135,8 @@ const jsonLd = [
   {isBanana && <BananaRipen />}
   {isMac && <MacadamiaStory />}
   {isMac && <MacadamiaRoute />}
+  {isLitchi && <LitchiStory />}
+  {isLitchi && <LitchiPeel />}
 
   {
     !sibling && p.groups && p.groups.length > 0 && (
@@ -159,7 +172,7 @@ const jsonLd = [
   <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="gallery-title">
     <SectionTitle eyebrow={isMac ? 'In shell and kernel' : 'On the farm'} title={`${p.title} at Mahela`} id="gallery-title" />
     <div class="mt-12 pb-10">
-      {isCitrus ? <CitrusOrchards /> : isAvo ? <PhotoMosaic tiles={avoTiles} /> : isBanana ? <PhotoMosaic tiles={bananaTiles} /> : isMac ? <PhotoMosaic tiles={macTiles} /> : <Gallery images={[p.hero, ...p.gallery].slice(0, 4).map((src, i) => ({ src, alt: `${p.title} on a Mahela Group farm in Limpopo, photo ${i + 1}` }))} />}
+      {isCitrus ? <CitrusOrchards /> : isAvo ? <PhotoMosaic tiles={avoTiles} /> : isBanana ? <PhotoMosaic tiles={bananaTiles} /> : isMac ? <PhotoMosaic tiles={macTiles} /> : isLitchi ? <PhotoMosaic tiles={litchiTiles} /> : <Gallery images={[p.hero, ...p.gallery].slice(0, 4).map((src, i) => ({ src, alt: `${p.title} on a Mahela Group farm in Limpopo, photo ${i + 1}` }))} />}
     </div>
     <a href={`/produce/${next.slug}`} class="glass group mt-16 flex items-center justify-between gap-6 rounded-[28px] p-6 md:p-8" data-glare>
       <span>

@@ -215,7 +215,7 @@ export const produceDetail: Record<
       'The litchis produced on our farms are Mauritius litchis. Our litchis are harvested in December and early January. They are exported to the EU and Middle East. The marketing is done through Westfalia Marketing.',
       'We don’t let any of our fruit go to waste. Any fruit that doesn’t meet export standards is juiced.',
     ],
-    hero: 'produce/photos/mahela-lichis-14.jpg',
+    hero: 'produce/farm/litchi-hero.jpg',
     gallery: ['produce/photos/mahela-lichis-2.jpg', 'produce/photos/mahela-lichis-15.jpg'],
     accent: '#b8344f',
   },
