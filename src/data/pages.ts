@@ -156,7 +156,7 @@ export const produceDetail: Record<
         ],
       },
     ],
-    hero: 'produce/photos/mahela-aug19.jpg',
+    hero: 'produce/farm/avocado-pickers-105249.jpg',
     gallery: ['produce/photos/mahela-aug12.jpg', 'produce/styled/2026-whole-and-cut-avocados-with-green-leaves-on-white.jpg'],
     accent: '#6f8f2e',
   },
