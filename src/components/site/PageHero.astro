@@ -23,7 +23,8 @@ const { image, eyebrow, title, lead, crumbs = [], position = '50% 50%', tall = f
     </div>
     <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.55)_0%,rgb(12_26_22/0.2)_40%,rgb(12_26_22/0.85)_100%)]"></div>
   </div>
-  <div class="mx-auto w-full max-w-[84rem] px-4 pb-14 pt-36 md:px-6 md:pb-20">
+  <slot name="art" />
+  <div class="relative z-[1] mx-auto w-full max-w-[84rem] px-4 pb-14 pt-36 md:px-6 md:pb-20">
     {
       crumbs.length > 0 && (
         <nav aria-label="Breadcrumb" class="mb-6">

@@ -1,0 +1,203 @@
+---
+/**
+ * Citrus page scroll scene. A whole orange turns in the Lowveld light, slices
+ * and leaves gather round it, then it bursts in a spray of juice into the five
+ * citrus groups, which land in a ring. Each group links to its varieties in
+ * the picker below. Captions use the approved citrus copy.
+ *
+ * Without scroll motion (reduced motion) the finished ring shows as a normal section.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+import { citrusGroups } from '../../data/citrus';
+
+const captions = [
+  { title: 'Grown in the Lowveld', text: 'The warm days and cold nights of our region are beneficial for producing citrus.' },
+  { title: 'Balanced and juicy', text: 'Well-balanced levels of sugar and acidity, with good fibre and moisture content.' },
+  { title: 'Five citrus groups', text: 'Grapefruit, Valencia oranges, navels, soft citrus and lemons. Pick a group to see its varieties.' },
+];
+const total = citrusGroups.reduce((n, g) => n + g.varieties.length, 0);
+// Five points round a ring, starting at the top.
+const ring = citrusGroups.map((g, i) => {
+  const a = ((-90 + i * 72) * Math.PI) / 180;
+  return { ...g, i, left: 50 + Math.cos(a) * 36, top: 50 + Math.sin(a) * 34 };
+});
+const orbit = [
+  { img: 'produce/renders/orange-slice.webp', left: 18, top: 30, w: 17, r: -20 },
+  { img: 'produce/renders/lemon-slice.webp', left: 80, top: 70, w: 15, r: 25 },
+  { img: 'produce/renders/leaf.webp', left: 78, top: 24, w: 11, r: 40 },
+  { img: 'produce/renders/leaf2.webp', left: 22, top: 76, w: 12, r: -35 },
+];
+const drops = Array.from({ length: 22 }, (_, i) => ({ a: (i / 22) * 360 + (i % 3) * 7, d: 30 + ((i * 37) % 24), s: 6 + ((i * 5) % 10) }));
+---
+
+<section class="cb relative" aria-labelledby="cb-title" data-cb>
+  <div class="cb-stage sticky top-0 flex min-h-[100svh] items-center overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-[#10201a]"></div>
+    <div class="cb-glow absolute inset-0 -z-10" data-cb-glow></div>
+
+    <div class="mx-auto grid w-full max-w-[84rem] items-center gap-6 px-4 py-20 md:px-6 lg:grid-cols-12 lg:gap-8">
+      <div class="relative order-2 grid lg:order-1 lg:col-span-4">
+        <h2 id="cb-title" class="sr-only">Inside Mahela citrus</h2>
+        {
+          captions.map((c, i) => (
+            <div class="cb-cap col-start-1 row-start-1" data-cb-cap={i}>
+              <p class="cond text-sm font-semibold tracking-[0.1em] text-white/70">{String(i + 1).padStart(2, '0')} / 03</p>
+              <h3 class="cond mt-2 text-[clamp(2.2rem,1.5rem+2.4vw,4rem)] font-medium uppercase leading-[0.95] text-white">{c.title}</h3>
+              <p class="mt-3 max-w-sm text-lg leading-relaxed text-white/85">{c.text}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="relative order-1 mx-auto aspect-square w-full max-w-[min(92vw,44rem)] lg:order-2 lg:col-span-8 lg:max-w-[min(80svh,44rem)]" data-cb-box>
+        <div class="cb-ring absolute inset-[9%] rounded-full border border-dashed border-white/15" aria-hidden="true" data-cb-ringline></div>
+
+        {orbit.map((o) => (
+          <div class="cb-orbit absolute -translate-x-1/2 -translate-y-1/2" style={`left:${o.left}%;top:${o.top}%;width:${o.w}%;--r:${o.r}deg`} aria-hidden="true" data-cb-orbit>
+            <Image src={media(o.img)} alt="" widths={[200, 320]} sizes="120px" class="h-auto w-full drop-shadow-[0_18px_22px_rgba(0,0,0,0.4)]" />
+          </div>
+        ))}
+
+        {drops.map((d) => (
+          <span class="cb-drop absolute left-1/2 top-1/2" style={`width:${d.s}px;height:${d.s}px`} data-a={d.a} data-d={d.d} aria-hidden="true" data-cb-drop></span>
+        ))}
+
+        <div class="cb-core absolute left-1/2 top-1/2 w-[46%] -translate-x-1/2 -translate-y-1/2" aria-hidden="true" data-cb-core>
+          <Image src={media('produce/renders/orange.webp')} alt="" widths={[480, 720]} sizes="(min-width: 1024px) 20rem, 46vw" class="h-auto w-full drop-shadow-[0_40px_50px_rgba(0,0,0,0.5)]" />
+        </div>
+
+        <p class="cb-centre absolute left-1/2 top-1/2 w-[34%] -translate-x-1/2 -translate-y-1/2 text-center" data-cb-centre>
+          <span class="cond block text-[clamp(2.6rem,1.4rem+4vw,5rem)] font-medium leading-none text-white">{total}</span>
+          <span class="mt-1 block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/75 md:text-xs">varieties</span>
+        </p>
+
+        <ul>
+          {
+            ring.map((g) => (
+              <li class="cb-fruit absolute w-[24%] -translate-x-1/2 -translate-y-1/2" style={`left:${g.left}%;top:${g.top}%;--accent:${g.tone[0]}`} data-cb-fruit>
+                <a href="#varieties" class="group flex flex-col items-center text-center" data-pick-group={g.i}>
+                  <span class="cb-fruit-glow absolute inset-[6%_10%_30%] -z-10 rounded-full" aria-hidden="true"></span>
+                  <Image src={media(g.art)} alt="" widths={[240, 360]} sizes="(min-width: 1024px) 10rem, 24vw" class="h-auto w-[86%] drop-shadow-[0_22px_26px_rgba(0,0,0,0.45)] transition-transform duration-500 group-hover:-translate-y-1.5 group-hover:scale-110" />
+                  <span class="cb-label mt-1.5 rounded-full px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-white md:px-3 md:text-[0.7rem]">{g.short}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="absolute bottom-8 left-1/2 hidden h-1 w-40 -translate-x-1/2 overflow-hidden rounded-full bg-white/15 [.js-motion_&]:block" aria-hidden="true"><span class="block h-full w-full origin-left scale-x-0 bg-white/80" data-cb-bar></span></div>
+  </div>
+</section>
+
+<style>
+  :global(html.js-motion) .cb {
+    height: 280svh;
+  }
+  :global(html:not(.js-motion)) .cb-stage {
+    position: relative;
+  }
+  :global(html:not(.js-motion)) .cb-core,
+  :global(html:not(.js-motion)) .cb-orbit,
+  :global(html:not(.js-motion)) .cb-drop,
+  :global(html:not(.js-motion)) [data-cb-cap='0'],
+  :global(html:not(.js-motion)) [data-cb-cap='1'] {
+    display: none;
+  }
+  .cb-glow {
+    background: radial-gradient(50% 50% at 64% 50%, rgb(232 116 42 / 0.4), transparent 72%);
+  }
+  .cb-orbit {
+    rotate: var(--r);
+  }
+  .cb-drop {
+    margin: -3px 0 0 -3px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.9), #ffbe4a 38%, #e8742a 80%);
+    box-shadow: 0 0 10px rgb(255 170 60 / 0.6);
+    opacity: 0;
+  }
+  .cb-fruit-glow {
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 70%, transparent), transparent);
+  }
+  .cb-label {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.24), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.35);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    white-space: nowrap;
+  }
+  .cb-fruit a:focus-visible .cb-label {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-cb]').forEach((root) => {
+    if (!document.documentElement.classList.contains('js-motion')) return;
+    const q = <T extends Element = HTMLElement>(s: string) => [...root.querySelectorAll<T & HTMLElement>(s)];
+    const core = root.querySelector<HTMLElement>('[data-cb-core]')!;
+    const caps = q('[data-cb-cap]');
+    const orbit = q('[data-cb-orbit]');
+    const drops = q('[data-cb-drop]');
+    const fruits = q('[data-cb-fruit]');
+    const centre = root.querySelector<HTMLElement>('[data-cb-centre]')!;
+    const ringline = root.querySelector<HTMLElement>('[data-cb-ringline]')!;
+    const box = root.querySelector<HTMLElement>('[data-cb-box]')!;
+
+    // Start state: one whole orange, first caption.
+    gsap.set(caps.slice(1), { autoAlpha: 0, y: 30 });
+    gsap.set(orbit, { autoAlpha: 0, scale: 0.4, x: (i) => (i % 2 ? 260 : -260), y: (i) => (i < 2 ? 120 : -120) });
+    const targets = fruits.map((f) => ({ left: f.style.left, top: f.style.top }));
+    gsap.set(fruits, { left: '50%', top: '50%', scale: 0.2, autoAlpha: 0 });
+    gsap.set(centre, { autoAlpha: 0, scale: 0.6 });
+    gsap.set(ringline, { autoAlpha: 0, scale: 0.5 });
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
+    tl.to(root.querySelector('[data-cb-bar]'), { scaleX: 1, duration: 3 }, 0);
+
+    // 1. The orange turns slowly.
+    tl.to(core, { rotation: 28, scale: 1.06, duration: 1.2 }, 0);
+
+    // 2. Slices and leaves gather round it.
+    tl.to(caps[0], { autoAlpha: 0, y: -30, duration: 0.3 }, 0.7)
+      .to(caps[1], { autoAlpha: 1, y: 0, duration: 0.3 }, 0.85)
+      .to(orbit, { autoAlpha: 1, scale: 1, x: 0, y: 0, rotation: '+=50', duration: 0.8, ease: 'power2.out', stagger: 0.06 }, 0.7)
+      .to(core, { scale: 1.16, rotation: 60, duration: 0.6 }, 1.2);
+
+    // 3. Burst: juice sprays out and the five groups land in a ring.
+    const B = 1.9;
+    tl.to(core, { scale: 1.3, duration: 0.12, ease: 'power2.in' }, B - 0.12)
+      .to(core, { scale: 0.1, autoAlpha: 0, rotation: 140, duration: 0.25, ease: 'power3.in' }, B)
+      .to(orbit, { autoAlpha: 0, scale: 0.4, x: (i) => (i % 2 ? 1 : -1) * 220, y: (i) => (i < 2 ? -1 : 1) * 160, rotation: '+=120', duration: 0.45, ease: 'power2.in' }, B)
+      .to(drops, {
+        keyframes: [
+          { opacity: 1, duration: 0.05 },
+          {
+            x: (i, el: HTMLElement) => Math.cos((Number(el.dataset.a) * Math.PI) / 180) * (Number(el.dataset.d) / 100) * box.offsetWidth,
+            y: (i, el: HTMLElement) => Math.sin((Number(el.dataset.a) * Math.PI) / 180) * (Number(el.dataset.d) / 100) * box.offsetWidth + 40,
+            scale: 0.4,
+            duration: 0.5,
+            ease: 'power2.out',
+          },
+          { opacity: 0, duration: 0.15 },
+        ],
+      }, B)
+      .to(ringline, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'power2.out' }, B + 0.15)
+      .to(centre, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' }, B + 0.35)
+      .to(caps[1], { autoAlpha: 0, y: -30, duration: 0.3 }, B - 0.1)
+      .to(caps[2], { autoAlpha: 1, y: 0, duration: 0.3 }, B + 0.1)
+      .to(root.querySelector('[data-cb-glow]'), { opacity: 0.55, duration: 0.4 }, B);
+    fruits.forEach((f, i) => {
+      tl.to(f, { left: targets[i]!.left, top: targets[i]!.top, scale: 1, autoAlpha: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.6)' }, B + 0.05 + i * 0.05);
+    });
+    tl.to({}, { duration: 0.3 });
+  });
+</script>

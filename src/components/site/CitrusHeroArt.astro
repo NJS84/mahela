@@ -1,0 +1,89 @@
+---
+/**
+ * Citrus page hero art: sharp cut-out citrus (from the Mahela Elements photo
+ * set) floating over the orchard photo at different depths. They drift in on
+ * load, bob gently, follow the pointer in 3D and scatter upwards on scroll.
+ * Goes in PageHero's "art" slot.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const pieces = [
+  { img: 'produce/elements/citrus-cluster-lemon.webp', depth: 0.55, rot: -8, cls: 'left-[46%] top-[15%] w-[22vw] max-w-[380px] hidden lg:block' },
+  { img: 'produce/elements/orange-half.webp', depth: 0.8, rot: 14, cls: 'right-[5%] top-[12%] w-[30vw] max-w-[150px] md:w-[11vw] md:max-w-[190px]' },
+  { img: 'produce/elements/citrus-cluster-grapefruit.webp', depth: 1, rot: 4, cls: 'right-[2%] top-[40%] w-[30vw] max-w-[520px] hidden md:block' },
+  { img: 'produce/elements/citrus-cluster-lime.webp', depth: 1.35, rot: -12, cls: 'right-[34%] top-[22%] w-[34vw] max-w-[180px] md:right-auto md:left-[55%] md:top-[54%] md:w-[15vw] md:max-w-[260px]' },
+];
+---
+
+<div class="ch-art pointer-events-none absolute inset-0 z-0" aria-hidden="true" data-ch-art style="perspective:1200px">
+  {
+    pieces.map((p) => (
+      <div class:list={['ch-piece absolute', p.cls]} data-ch-piece data-depth={p.depth} style={`--r:${p.rot}deg`}>
+        <div data-ch-in><div data-ch-bob>
+          <Image src={media(p.img)} alt="" widths={[320, 520, 760].filter((w) => w <= media(p.img).width)} sizes="(min-width: 1024px) 30vw, 40vw" loading="eager" class="h-auto w-full" />
+        </div></div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .ch-piece {
+    transform: rotate(var(--r));
+    will-change: transform;
+  }
+  .ch-piece img {
+    filter: drop-shadow(0 30px 36px rgb(0 0 0 / 0.38));
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-ch-art]').forEach((root) => {
+    if (!document.documentElement.classList.contains('js-motion')) return;
+    const pieces = [...root.querySelectorAll<HTMLElement>('[data-ch-piece]')];
+    const hero = root.closest('section')!;
+
+    pieces.forEach((el, i) => {
+      const depth = Number(el.dataset.depth);
+      const bob = el.querySelector<HTMLElement>('[data-ch-bob]')!;
+      // Drift in from below, as if tossed up out of the orchard.
+      gsap.from(el.querySelector('[data-ch-in]'), { yPercent: 60 + depth * 40, opacity: 0, rotation: `+=${i % 2 ? 40 : -40}`, duration: 1.6, delay: 0.25 + i * 0.12, ease: 'expo.out' });
+      gsap.to(bob, { y: -10 - depth * 8, rotation: i % 2 ? 4 : -4, duration: 3 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.6 });
+      // Scatter upwards and spin at different speeds as the hero scrolls away.
+      gsap.to(el, {
+        yPercent: -90 * depth,
+        rotation: `+=${(i % 2 ? 1 : -1) * 30 * depth}`,
+        ease: 'none',
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6 },
+      });
+    });
+
+    // 3D parallax with the pointer: nearer pieces move more.
+    if (window.matchMedia('(hover: hover)').matches) {
+      const movers = pieces.map((el) => {
+        const bob = el.querySelector<HTMLElement>('[data-ch-bob]')!;
+        return {
+          d: Number(el.dataset.depth),
+          x: gsap.quickTo(bob, 'x', { duration: 1, ease: 'power3' }),
+          ry: gsap.quickTo(bob, 'rotationY', { duration: 1, ease: 'power3' }),
+          rx: gsap.quickTo(bob, 'rotationX', { duration: 1, ease: 'power3' }),
+        };
+      });
+      hero.addEventListener('pointermove', (e) => {
+        const nx = e.clientX / window.innerWidth - 0.5;
+        const ny = e.clientY / window.innerHeight - 0.5;
+        movers.forEach((m) => {
+          m.x(nx * 50 * m.d);
+          m.ry(nx * 28 * m.d);
+          m.rx(-ny * 20 * m.d);
+        });
+      });
+      hero.addEventListener('pointerleave', () => movers.forEach((m) => (m.x(0), m.ry(0), m.rx(0))));
+    }
+  });
+</script>

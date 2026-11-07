@@ -1,0 +1,47 @@
+---
+/**
+ * Citrus page photo mosaic: Mahela's own orchard photography (Mahela fotos,
+ * 2025 Sitrus shoot). Each photo opens from a rounded window as it scrolls in,
+ * and the photo drifts inside its frame for depth. Frames have crisp edges.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const tiles = [
+  { src: 'produce/farm/citrus-orchard-103553.jpg', alt: 'Branches heavy with ripe soft citrus in a Mahela orchard in Letsitele, Limpopo', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'produce/farm/citrus-orchard-103570.jpg', alt: 'A Mahela citrus tree laden with orange fruit', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/citrus-orchard-103464.jpg', alt: 'A Mahela farmer checking ripening citrus on the tree', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'produce/farm/citrus-orchard-103337.jpg', alt: 'Rows of citrus trees running towards the mountains on a Mahela farm', cls: 'sm:col-span-2 lg:col-span-4' },
+  { src: 'produce/farm/citrus-orchard-103578.jpg', alt: 'Well-kept citrus orchard rows on red Lowveld soil', cls: 'sm:col-span-2 lg:col-span-4' },
+];
+---
+
+<ul class="grid auto-rows-[15rem] gap-4 sm:grid-cols-2 md:auto-rows-[17rem] lg:grid-cols-6" data-co>
+  {
+    tiles.map((t) => (
+      <li class:list={['co-tile relative overflow-hidden rounded-[24px]', t.cls]} data-co-tile>
+        <Image src={media(t.src)} alt={t.alt} widths={[640, 960, 1440]} sizes="(min-width: 1024px) 60vw, (min-width: 640px) 50vw, 100vw" class="co-img absolute inset-x-0 top-[-8%] h-[116%] w-full object-cover" data-co-img />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .co-tile {
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+    outline: 1px solid rgb(225 238 255 / 0.25);
+    outline-offset: -1px;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  if (document.documentElement.classList.contains('js-motion')) {
+    document.querySelectorAll<HTMLElement>('[data-co-tile]').forEach((tile, i) => {
+      gsap.fromTo(tile, { clipPath: 'inset(14% 10% 14% 10% round 40px)' }, { clipPath: 'inset(0% 0% 0% 0% round 24px)', ease: 'none', scrollTrigger: { trigger: tile, start: 'top 95%', end: 'top 45%', scrub: true } });
+      gsap.fromTo(tile.querySelector('[data-co-img]'), { yPercent: -5, scale: 1.12 }, { yPercent: 5, scale: 1, ease: 'none', scrollTrigger: { trigger: tile, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+  }
+</script>
