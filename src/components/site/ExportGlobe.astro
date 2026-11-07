@@ -8,8 +8,10 @@ interface Props {
   headingLevel?: 'h2' | 'h3';
   title?: string;
   lead?: string;
+  /** Export page: compact market chips that spin the globe, blue globe. */
+  compact?: boolean;
 }
-const { title = 'From Limpopo to international markets.', lead = 'Mahela fruit is exported to Europe, Asia, Japan, the Middle East, the Far East and Russia under the Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brands.' } = Astro.props;
+const { compact = false, title = 'From Limpopo to international markets.', lead = 'Mahela fruit is exported to Europe, Asia, Japan, the Middle East, the Far East and Russia under the Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brands.' } = Astro.props;
 const markets = exportPage.markets;
 const coords: Record<string, { lat: number; lon: number }> = { ...exportPage.extraDestinations };
 markets.forEach((m) => (coords[m.name] = { lat: m.lat, lon: m.lon }));
@@ -22,6 +24,28 @@ const routes = exportPage.produceRoutes.flatMap((r, ri) =>
 <section class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="markets-title">
   <div class="relative z-10 lg:col-span-5">
     <SectionTitle eyebrow="Global market access" title={title} lead={lead} id="markets-title" />
+    {compact ? (
+      <div class="mt-8">
+        <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Export markets: pick one to spin the globe">
+          {markets.map((m, i) => (
+            <li>
+              <button type="button" data-market={m.name} aria-pressed="false" class="ex-chip flex w-full items-center gap-2.5 rounded-2xl px-4 py-3 text-left outline-none">
+                <span class:list={['size-2.5 shrink-0 rounded-full', m.primary ? 'bg-[#f5a524] shadow-[0_0_12px_#f5a524]' : 'bg-[#9cc3f5]']} />
+                <span class="cond text-base font-semibold uppercase tracking-[0.08em]">{m.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div class="ex-chip-detail mt-4 min-h-[5.5rem] rounded-2xl px-5 py-4" aria-live="polite" data-market-detail>
+          {markets.map((m, i) => (
+            <div data-detail-for={m.name} hidden={i !== 0}>
+              <p class="cond text-lg font-semibold uppercase tracking-[0.08em]">{m.name}{m.primary && <span class="ml-2 rounded-md bg-[#f5a524]/20 px-2 py-0.5 align-middle text-[0.65rem] tracking-[0.14em] text-[#ffd48a]">Primary focus</span>}</p>
+              <p class="mt-1 text-sm text-white/75">{m.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
     <ul class="mt-8 space-y-2" aria-label="Export markets">
       {
         markets.map((m) => (
@@ -38,6 +62,7 @@ const routes = exportPage.produceRoutes.flatMap((r, ri) =>
         ))
       }
     </ul>
+    )}
   </div>
   <div class="relative lg:col-span-7">
     <!-- Arc colour key, in a row above the globe. -->
@@ -57,14 +82,43 @@ const routes = exportPage.produceRoutes.flatMap((r, ri) =>
       data-globe
       data-origin={JSON.stringify(exportPage.origin)}
       data-routes={JSON.stringify(routes)}
+      data-theme={compact ? 'blue' : undefined}
+      data-spin-to={compact ? JSON.stringify(Object.fromEntries(markets.map((m) => [m.name, { lat: m.lat, lon: m.lon }]))) : undefined}
     >
-      <div class="globe-fallback absolute inset-[12%] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgb(185_209_166/0.35),rgb(15_42_31/0.9)_60%)] shadow-[0_0_80px_rgb(185_209_166/0.25)]"></div>
+      <div class:list={['globe-fallback absolute inset-[12%] rounded-full', compact ? 'bg-[radial-gradient(circle_at_35%_30%,rgb(143_182_236/0.35),rgb(12_29_54/0.9)_60%)] shadow-[0_0_80px_rgb(143_182_236/0.25)]' : 'bg-[radial-gradient(circle_at_35%_30%,rgb(185_209_166/0.35),rgb(15_42_31/0.9)_60%)] shadow-[0_0_80px_rgb(185_209_166/0.25)]']}></div>
     </div>
-    <p class="relative mt-3 flex items-center justify-center gap-2 text-center text-xs uppercase tracking-[0.18em] text-ivory/55"><Icon name="globe" class="size-4 shrink-0" />Drag to spin · origin Letsitele, Limpopo</p>
+    <p class="relative mt-3 flex items-center justify-center gap-2 text-center text-xs uppercase tracking-[0.18em] text-ivory/55"><Icon name="globe" class="size-4 shrink-0" />{compact ? 'Pick a market or drag to spin' : 'Drag to spin'} · origin Letsitele, Limpopo</p>
   </div>
 </section>
 
+<script>
+  // Chip detail text follows the picked market (works without WebGL too).
+  document.querySelectorAll<HTMLElement>('[data-market-detail]').forEach((box) => {
+    const show = (name: string) => box.querySelectorAll<HTMLElement>('[data-detail-for]').forEach((d) => (d.hidden = d.dataset.detailFor !== name));
+    box.parentElement?.querySelectorAll<HTMLElement>('button[data-market]').forEach((b) => {
+      b.addEventListener('click', () => {
+        show(b.dataset.market!);
+        b.parentElement?.parentElement?.querySelectorAll('button[data-market]').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+      });
+    });
+  });
+</script>
+
 <style>
+  .ex-chip,
+  .ex-chip-detail {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.16), rgb(150 182 222 / 0.06));
+    border: 1px solid rgb(225 238 255 / 0.26);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    color: #fff;
+  }
+  .ex-chip { cursor: pointer; transition: background-color 0.3s, transform 0.3s, border-color 0.3s; }
+  .ex-chip:hover,
+  .ex-chip:focus-visible { background: rgb(214 230 250 / 0.24); transform: translateY(-2px); }
+  .ex-chip[aria-pressed='true'] { background: rgb(214 230 250 / 0.3); border-color: rgb(255 255 255 / 0.7); }
+
   /* Belt and braces: anything near the canvas edge fades out, so there is never a hard line. */
   [data-globe] :global(.globe-canvas) {
     -webkit-mask-image: radial-gradient(closest-side, #000 80%, transparent 100%);

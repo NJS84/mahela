@@ -68,6 +68,9 @@ export function mountGlobe(el: HTMLElement) {
 
   const origin = JSON.parse(el.dataset.origin ?? '{"lat":-23.88,"lon":30.39}') as { lat: number; lon: number };
   const routes = JSON.parse(el.dataset.routes ?? '[]') as Route[];
+  // Optional blue theme (Export page) and click-to-spin market chips.
+  const blue = el.dataset.theme === 'blue';
+  const spinTo = JSON.parse(el.dataset.spinTo ?? 'null') as Record<string, { lat: number; lon: number }> | null;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
@@ -87,7 +90,7 @@ export function mountGlobe(el: HTMLElement) {
   // Core sphere with a soft fresnel-like glow
   const core = new THREE.Mesh(
     new THREE.SphereGeometry(R * 0.995, 64, 48),
-    new THREE.MeshBasicMaterial({ color: '#0f2a1f', transparent: true, opacity: 0.85 }),
+    new THREE.MeshBasicMaterial({ color: blue ? '#0c1d36' : '#0f2a1f', transparent: true, opacity: 0.85 }),
   );
   world.add(core);
   // Atmosphere: a camera-facing disc whose glow fades to nothing well before
@@ -98,7 +101,7 @@ export function mountGlobe(el: HTMLElement) {
       transparent: true,
       depthTest: false,
       depthWrite: false,
-      uniforms: { c: { value: new THREE.Color('#b9d1a6') }, r: { value: R * 1.02 } },
+      uniforms: { c: { value: new THREE.Color(blue ? '#8fb6ec' : '#b9d1a6') }, r: { value: R * 1.02 } },
       vertexShader: 'varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
       fragmentShader: [
         'uniform vec3 c; uniform float r; varying vec2 vP;',
@@ -128,7 +131,7 @@ export function mountGlobe(el: HTMLElement) {
   }
   const dotGeo = new THREE.BufferGeometry();
   dotGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-  const dots = new THREE.Points(dotGeo, new THREE.PointsMaterial({ color: '#d9e6cf', size: 0.012, sizeAttenuation: true, transparent: true, opacity: 0.85 }));
+  const dots = new THREE.Points(dotGeo, new THREE.PointsMaterial({ color: blue ? '#dbe8fb' : '#d9e6cf', size: 0.012, sizeAttenuation: true, transparent: true, opacity: 0.85 }));
   world.add(dots);
 
   // Origin marker
@@ -208,10 +211,13 @@ export function mountGlobe(el: HTMLElement) {
       gsap.to(a.dot.scale, { x: on && match ? 1.6 : 1, y: on && match ? 1.6 : 1, z: on && match ? 1.6 : 1, duration: 0.3 });
     });
   };
+  // A clicked market stays lit (and the globe holds still on it) until another is picked.
+  let sticky: ((r: Route) => boolean) | null = null;
+  let hold = false;
   const bind = (els: NodeListOf<HTMLElement>, match: (li: HTMLElement) => (r: Route) => boolean) =>
     els.forEach((li) => {
       const on = () => setFocus(match(li));
-      const off = () => setFocus(null);
+      const off = () => setFocus(sticky);
       li.addEventListener('pointerenter', on);
       li.addEventListener('pointerleave', off);
       li.addEventListener('focusin', on);
@@ -219,6 +225,29 @@ export function mountGlobe(el: HTMLElement) {
     });
   bind(document.querySelectorAll<HTMLElement>('[data-market]'), (li) => (r) => r.market === li.dataset.market);
   bind(document.querySelectorAll<HTMLElement>('[data-produce-key]'), (li) => (r) => r.produce === li.dataset.produceKey);
+
+  if (spinTo) {
+    const chips = document.querySelectorAll<HTMLElement>('[data-market]');
+    const spin = (name: string) => {
+      const m = spinTo[name];
+      if (!m) return;
+      // Face the midpoint between Letsitele and the market, so the whole route shows.
+      const lat = (m.lat + origin.lat) / 2;
+      const lon = (m.lon + origin.lon) / 2;
+      const want = -THREE.MathUtils.degToRad(lon + 90);
+      let d = (want - world.rotation.y) % (Math.PI * 2);
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d < -Math.PI) d += Math.PI * 2;
+      hold = true;
+      vx = 0;
+      gsap.to(world.rotation, { y: world.rotation.y + d, x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(lat), -0.2, 0.7), duration: 1.4, ease: 'power3.inOut', overwrite: true });
+      sticky = (r) => r.market === name;
+      setFocus(sticky);
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.market === name)));
+      el.dispatchEvent(new CustomEvent('globe:market', { detail: name, bubbles: true }));
+    };
+    chips.forEach((c) => c.addEventListener('click', () => spin(c.dataset.market!)));
+  }
 
   const tick = (t: number) => {
     if (!started) return;
@@ -247,6 +276,7 @@ export function mountGlobe(el: HTMLElement) {
   let lastX = 0;
   canvas.addEventListener('pointerdown', (e) => {
     dragging = true;
+    hold = false;
     lastX = e.clientX;
     canvas.setPointerCapture(e.pointerId);
   });
@@ -276,7 +306,7 @@ export function mountGlobe(el: HTMLElement) {
     if (!visible) return;
     const dt = Math.min(clock.getDelta(), 0.05);
     if (!dragging) vx *= 0.94;
-    world.rotation.y += vx + dt * 0.06;
+    world.rotation.y += vx + (hold ? 0 : dt * 0.06);
     const t = clock.elapsedTime;
     const s = 1 + ((t * 0.8) % 1) * 2.5;
     pulse.scale.setScalar(s);
