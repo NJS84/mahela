@@ -16,8 +16,10 @@ interface Props {
   icon?: IconName;
   points: string[];
   accent?: string;
+  /** Fruit width as a % of the card; squat fruit needs more than tall fruit to look the same size. */
+  fruitSize?: number;
 }
-const { tag, title, href, image, icon = 'leaf', points, accent = '#2c6b44' } = Astro.props;
+const { tag, title, href, image, icon = 'leaf', points, accent = '#2c6b44', fruitSize = 50 } = Astro.props;
 const widths = [320, 480, 640].filter((w) => w <= image.width);
 ---
 
@@ -36,7 +38,7 @@ const widths = [320, 480, 640].filter((w) => w <= image.width);
       <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white">Explore {title.toLowerCase()} <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
     </div>
   </a>
-  <div class="pg-fruit pointer-events-none absolute -right-[7%] -top-[16%] w-[50%]" aria-hidden="true" data-pg-fruit>
+  <div class="pg-fruit pointer-events-none absolute -right-[7%] -top-[16%]" style={`width:${fruitSize}%`} aria-hidden="true" data-pg-fruit>
     <Image src={image} alt="" widths={widths} sizes="(min-width: 1024px) 360px, 45vw" class="pg-fruit-img relative h-auto w-full" />
   </div>
 </article>

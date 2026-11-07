@@ -34,9 +34,9 @@ const certs = ['certifications/globalgap.png', 'certifications/siza.png', 'certi
 <Base title="EU-compliant citrus exporters, South Africa" description={description} breadcrumbs={[{ name: 'Export', href: '/export' }]} jsonLd={jsonLd} ogImage={media('farms/export-port-generated.jpg')}>
   <PageHero image={media('farms/export-port-generated.jpg')} eyebrow="Export" title={exportPage.title} lead={exportPage.lead} crumbs={[{ name: 'Export', href: '/export' }]} />
 
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32">
+  <section class="overflow-x-clip"><div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32">
     <ExportGlobe />
-  </section>
+  </div></section>
 
   <Backdrop image={media('packhouse/dsc-1871.jpg')} dim={0.7}>
     <div class="grid gap-12 lg:grid-cols-12">

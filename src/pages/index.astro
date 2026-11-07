@@ -150,18 +150,12 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
     </svg>
 
     <div class="mx-auto grid min-h-[100svh] max-w-[84rem] items-center px-4 py-24 md:px-6 lg:grid-cols-12">
-      <!-- The orange sits centred in the right half; scrolling on bursts it into juice and wedges. -->
+      <!-- The orange floats centred in the right half. -->
       <div class="relative order-2 -mt-28 lg:order-none lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mt-0" aria-hidden="true" data-orange-stage>
         <div class="stage relative mx-auto aspect-square w-[92%] max-w-[620px] lg:w-full">
           <div class="absolute inset-[16%] rounded-full bg-[radial-gradient(circle,rgb(240_125_20/0.35),transparent_68%)] blur-2xl" data-orange-glow></div>
           <div class="absolute -left-[4%] bottom-[2%] w-[38%]" data-depth="0.35">
             <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={360} class="h-auto w-full -rotate-[28deg] drop-shadow-[0_16px_20px_rgba(0,0,0,0.35)]" />
-          </div>
-          <!-- Burst pieces, hidden until the scroll exit. -->
-          <div class="pointer-events-none absolute inset-0 flex items-center justify-center" data-burst>
-            <Image src={media('produce/renders/juice-splash.webp')} alt="" widths={[640, 1024]} sizes="(min-width: 1024px) 760px, 90vw" class="burst-splash absolute w-[125%] max-w-none opacity-0" data-burst-splash />
-            <Image src={media('produce/renders/segments-exploded.webp')} alt="" widths={[480, 820]} sizes="(min-width: 1024px) 560px, 80vw" class="absolute w-[80%] opacity-0" data-burst-wedges />
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => <span class="burst-drop absolute rounded-full opacity-0" style={`--i:${i}`} data-burst-drop={i}></span>)}
           </div>
           <div class="absolute inset-[8%_14%_6%_14%] flex items-center" data-orange-roll>
             <div class="w-full" data-float-big>
@@ -235,6 +229,7 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
                   icon={produceIcon[p.slug]}
                   points={p.facts.slice(0, 3)}
                   accent={p.tone[0]}
+                  fruitSize={p.slug === 'avocados' || p.slug === 'bananas' ? 60 : 50}
                 />
               </li>
             ))
@@ -349,16 +344,6 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
   }
   @media (prefers-reduced-motion: reduce) {
     .petals { display: none; }
-  }
-  /* Juice burst: the splash is shot on black, so screen-blend drops the black. */
-  .burst-splash {
-    mix-blend-mode: screen;
-  }
-  .burst-drop {
-    width: calc(10px + (var(--i) * 7 % 5) * 5px);
-    aspect-ratio: 1;
-    background: radial-gradient(circle at 35% 30%, #fff6d8, #ffb43a 45%, #e86d08 100%);
-    box-shadow: 0 0 14px rgb(255 160 40 / 0.6);
   }
   /* Coverflow (desktop): every card is stacked in the centre and placed by script. */
   @media (min-width: 1024px) {

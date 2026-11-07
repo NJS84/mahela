@@ -171,24 +171,21 @@ export function initMotion() {
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 1024px)', () => {
-    // Intro: the orange holds centred on the right. As the section scrolls away
-    // it swells, then bursts into a juice splash and flying wedges.
-    const intro = document.querySelector<HTMLElement>('[data-intro]');
-    const roll = intro?.querySelector<HTMLElement>('[data-orange-roll]');
-    if (intro && roll) {
-      const q = (s: string) => intro.querySelector<HTMLElement>(s);
+    // Saved for later: OrangeBurst (see components/site/OrangeBurst.astro).
+    document.querySelectorAll<HTMLElement>('[data-burst-section]').forEach((section) => {
+      const q = (sel: string) => section.querySelector<HTMLElement>(sel);
+      const fruit = q('[data-burst-fruit]');
+      if (!fruit) return;
       const splash = q('[data-burst-splash]');
       const wedges = q('[data-burst-wedges]');
-      const glow = q('[data-orange-glow]');
-      const drops = gsap.utils.toArray<HTMLElement>('[data-burst-drop]', intro);
+      const drops = gsap.utils.toArray<HTMLElement>('[data-burst-drop]', section);
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: intro, start: 'top top', end: '+=75%', pin: true, scrub: 0.6, invalidateOnRefresh: true },
+        scrollTrigger: { trigger: section, start: 'top top', end: '+=75%', pin: true, scrub: 0.6, invalidateOnRefresh: true },
       });
-      tl.to({}, { duration: 0.25 }) // read the card first
-        .to(roll, { scale: 1.12, rotation: -6, duration: 0.2, ease: 'power2.in' })
-        .to(roll, { scale: 1.45, opacity: 0, filter: 'blur(6px)', duration: 0.12, ease: 'power3.out' }, '>')
+      tl.to({}, { duration: 0.25 })
+        .to(fruit, { scale: 1.12, rotation: -6, duration: 0.2, ease: 'power2.in' })
+        .to(fruit, { scale: 1.45, opacity: 0, filter: 'blur(6px)', duration: 0.12, ease: 'power3.out' }, '>')
         .addLabel('pop', '<')
-        .to(glow, { scale: 1.8, opacity: 0, duration: 0.3 }, 'pop')
         .fromTo(splash, { scale: 0.25, opacity: 0, rotation: -20 }, { scale: 1.15, opacity: 1, rotation: 0, duration: 0.18, ease: 'expo.out' }, 'pop')
         .to(splash, { scale: 1.45, opacity: 0, duration: 0.25, ease: 'power1.in' }, '>')
         .fromTo(wedges, { scale: 0.3, opacity: 0, rotation: -30 }, { scale: 1.25, opacity: 1, rotation: 25, duration: 0.25, ease: 'expo.out' }, 'pop')
@@ -198,7 +195,7 @@ export function initMotion() {
         const dist = 190 + (i % 4) * 70;
         tl.fromTo(d, { x: 0, y: 0, opacity: 0, scale: 0.4 }, { x: Math.cos(a) * dist, y: Math.sin(a) * dist + 60, opacity: 1, scale: 1, duration: 0.2, ease: 'expo.out' }, 'pop').to(d, { opacity: 0, y: `+=${80 + (i % 3) * 40}`, duration: 0.18 }, '>');
       });
-    }
+    });
 
     // Produce coverflow: pinned; scrolling moves the cards through the centre.
     // The centre card is full size, the others shrink and stack toward the edges.
