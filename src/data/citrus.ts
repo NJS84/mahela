@@ -12,7 +12,7 @@ const art: Record<string, { art: string; tone: [string, string]; short: string; 
   Grapefruit: { art: 'produce/cutouts/grapefruit-sticker.webp', tone: ['#e0506c', '#5a1426'], short: 'Grapefruit', pick: { from: 3.1, to: 5.5, label: 'Picked early April to mid-June' } },
   'Valencia oranges': { art: 'produce/renders/orange.webp', tone: ['#f08a1c', '#6e3208'], short: 'Valencias', pick: { from: 7.7, to: 9, label: 'Picked late August to end of September' } },
   Navels: { art: 'produce/cutouts/orange-with-leaves-b.webp', tone: ['#e2602a', '#64200b'], short: 'Navels', pick: { from: 4.75, to: 6.6, open: true, label: 'Picking starts in the last week of May' } },
-  'Soft citrus': { art: 'produce/renders/mandarin.webp', tone: ['#f4a024', '#6f400a'], short: 'Soft citrus', scale: 1.3, pick: { from: 6.75, to: 7.8, label: 'Picked end of July to late August' } },
+  'Soft citrus': { art: 'produce/cutouts/naartjie.webp', tone: ['#f4a024', '#6f400a'], short: 'Soft citrus', pick: { from: 6.75, to: 7.8, label: 'Picked end of July to late August' } },
   Lemons: { art: 'produce/renders/lemon.webp', tone: ['#d9bd1c', '#5a4a06'], short: 'Lemons', pick: { from: 2, to: 4, open: true, label: 'First of the season: picking starts in March' } },
 };
 

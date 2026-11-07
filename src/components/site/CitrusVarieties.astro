@@ -1,12 +1,11 @@
 ---
 /**
  * Citrus varieties and picking calendar in one section.
- * Left: the five citrus groups as fruit icons, beside the group name and its
- * picking-window calendar. Right: that group's varieties as portrait
- * blue-tinted glass cards, one in view at a time, with the neighbours tucked
- * behind like the home page produce cards. Click, swipe or use the arrows to
- * move through them. The section fades to each group's colour.
- * Groups in the burst scene above link straight to a group here.
+ * Left: the group's fruit, name and picking-window calendar. Right: that
+ * group's varieties as square blue-tinted glass cards, one in view at a time,
+ * neighbours tucked behind like the home page produce cards (arrows, click or
+ * swipe), with the five group icons in a row below. The section fades to each
+ * group's colour. Groups in the burst scene above link straight to a group here.
  */
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
@@ -30,22 +29,18 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
     <h2 id="cv-title" class="cond mt-3 max-w-3xl text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">Five citrus groups, thirteen varieties</h2>
 
     <div class="mt-12 grid items-center gap-12 lg:mt-14 lg:grid-cols-12 lg:gap-8">
-      <!-- Left: group icons beside the group name and its calendar. -->
-      <div class="flex flex-col gap-8 sm:flex-row sm:items-center lg:col-span-5">
-        <div class="cv-rail flex shrink-0 justify-between gap-1 self-stretch rounded-[28px] p-1.5 sm:flex-col sm:justify-center sm:self-auto sm:p-2" role="tablist" aria-label="Choose a citrus group" aria-orientation="vertical">
-          {
-            groups.map((g) => (
-              <button type="button" role="tab" id={`cv-tab-${g.i}`} aria-controls={`cv-panel-${g.i}`} aria-selected={g.i === 0 ? 'true' : 'false'} tabindex={g.i === 0 ? 0 : -1} class="cv-pick group flex flex-col items-center gap-1 rounded-[20px] px-1 py-1.5 sm:px-2" style={`--accent:${g.tone[0]}`} data-cv-pick={g.i}>
-                <span class="cv-pick-dot flex size-12 items-center justify-center rounded-full sm:size-14">
-                  <Image src={g.img} alt="" widths={[160]} sizes="56px" class="object-contain transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" style={`width:${78 * Math.min(g.scale ?? 1, 1.15)}%`} />
-                </span>
-                <span class="text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-white/80 sm:text-[0.6rem]">{g.short}</span>
-              </button>
-            ))
-          }
-        </div>
-
-        <div class="min-w-0 flex-1">
+      <!-- Left: the group's fruit, name and picking calendar. -->
+      <div class="lg:col-span-5">
+        <div class="min-w-0 text-center lg:text-left">
+          <div class="relative mx-auto mb-6 aspect-square w-[min(56vw,17rem)] lg:mx-0" style="perspective:1000px" data-cv-stage-art aria-hidden="true">
+            <div class="absolute inset-[8%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
+            <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-cv-orbit></div>
+            {groups.map((g) => (
+              <div class="absolute inset-0 flex items-center justify-center" style={hidden(g.i)} data-cv-art={g.i}>
+                <Image src={g.img} alt="" widths={[320, 480].filter((w) => w <= g.img.width)} sizes="17rem" class="h-auto w-[80%] drop-shadow-[0_30px_36px_rgba(0,0,0,0.45)]" />
+              </div>
+            ))}
+          </div>
           <div class="grid">
             {
               groups.map((g) => (
@@ -57,7 +52,7 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
             }
           </div>
 
-          <div class="cv-glass mt-7 rounded-[24px] px-5 pb-4 pt-4">
+          <div class="cv-glass mx-auto mt-7 max-w-[30rem] rounded-[24px] px-5 pb-4 pt-4 text-left lg:mx-0">
             <div class="mb-3 grid">
               {groups.map((g) => (
                 <p class="col-start-1 row-start-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white" style={hidden(g.i)} data-cv-pickl={g.i}>{g.pick.label}</p>
@@ -82,24 +77,25 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
         </div>
       </div>
 
-      <!-- Right: the group's varieties, one portrait card in view at a time. -->
-      <div class="grid lg:col-span-7">
+      <!-- Right: the group's varieties, one square card in view at a time, group icons below. -->
+      <div class="lg:col-span-7">
+      <div class="grid">
         {
           groups.map((g) => (
             <div id={`cv-panel-${g.i}`} role="tabpanel" aria-labelledby={`cv-tab-${g.i}`} class="col-start-1 row-start-1" style={hidden(g.i)} data-cv-panel={g.i}>
-              <div class="cv-stage relative mx-auto h-[33rem] w-full touch-pan-y select-none md:h-[34rem]" data-cv-stage>
+              <div class="cv-stage relative mx-auto w-full touch-pan-y select-none" data-cv-stage>
                 <ul>
                   {g.varieties.map((v, vi) => (
-                    <li class="cv-slot absolute left-1/2 top-1/2 w-[min(76vw,21.5rem)] -translate-x-1/2 -translate-y-1/2" data-cv-card={vi} aria-label={`${v.name}, ${vi + 1} of ${g.varieties.length}`}>
-                      <article class="cv-card cv-glass relative flex h-[29rem] flex-col rounded-[30px] p-7 text-white md:h-[30rem] md:p-8" style={`--accent:${g.tone[0]}`}>
-                        <span class="cond text-sm font-semibold tracking-[0.12em] text-white/75">{String(vi + 1).padStart(2, '0')} / {String(g.varieties.length).padStart(2, '0')}</span>
-                        <span class="mt-auto self-start rounded-lg px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-white" style={`background: color-mix(in srgb, ${g.tone[0]} 75%, #1e4a30)`}>{g.group}</span>
-                        <h3 class="cond mt-3 text-[clamp(2rem,1.6rem+1.2vw,2.6rem)] font-medium uppercase leading-[0.95] text-white">{v.name}</h3>
+                    <li class="cv-slot absolute left-1/2 top-0 w-[min(84vw,26rem)] [margin-left:calc(min(84vw,26rem)/-2)]" data-cv-card={vi} aria-label={`${v.name}, ${vi + 1} of ${g.varieties.length}`}>
+                      <article class="cv-card cv-glass relative flex aspect-square w-full flex-col rounded-[30px] p-6 text-white md:p-7" style={`--accent:${g.tone[0]}`} data-cv-article>
+                        <div class="flex items-center justify-between gap-3">
+                          <span class="rounded-lg px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-white" style={`background: color-mix(in srgb, ${g.tone[0]} 75%, #1e4a30)`}>{g.group}</span>
+                          <span class="cond text-sm font-semibold tracking-[0.12em] text-white/75">{String(vi + 1).padStart(2, '0')} / {String(g.varieties.length).padStart(2, '0')}</span>
+                        </div>
+                        <h3 class="cond mt-4 text-[clamp(1.9rem,1.5rem+1.2vw,2.5rem)] font-medium uppercase leading-[0.95] text-white">{v.name}</h3>
                         <p class="mt-3 border-t border-white/20 pt-3 text-[0.92rem] leading-relaxed text-white/90">{v.text}</p>
+                        <p class="mt-auto flex items-center gap-2 pt-4 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/70"><span class="inline-block h-1.5 w-5 shrink-0 rounded-full bg-white"></span>{g.pick.label}</p>
                       </article>
-                      <div class="cv-fruit pointer-events-none absolute -right-[8%] -top-[9%] z-[2]" style={`width:${46 * (g.scale ?? 1)}%`} aria-hidden="true">
-                        <Image src={g.img} alt="" widths={[240, 360, 480].filter((w) => w <= g.img.width)} sizes="12rem" class="h-auto w-full" />
-                      </div>
                     </li>
                   ))}
                 </ul>
@@ -116,6 +112,19 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
             </div>
           ))
         }
+      </div>
+        <div class="cv-rail mx-auto mt-8 flex w-full max-w-[30rem] justify-between gap-1 rounded-full p-1.5 sm:p-2" role="tablist" aria-label="Choose a citrus group">
+          {
+            groups.map((g) => (
+              <button type="button" role="tab" id={`cv-tab-${g.i}`} aria-controls={`cv-panel-${g.i}`} aria-selected={g.i === 0 ? 'true' : 'false'} tabindex={g.i === 0 ? 0 : -1} class="cv-pick group flex flex-col items-center gap-1 rounded-[20px] px-1 py-1.5 sm:px-2" style={`--accent:${g.tone[0]}`} data-cv-pick={g.i}>
+                <span class="cv-pick-dot flex size-12 items-center justify-center rounded-full sm:size-14">
+                  <Image src={g.img} alt="" widths={[160]} sizes="56px" class="object-contain transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" style="width:78%" />
+                </span>
+                <span class="text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-white/80 sm:text-[0.6rem]">{g.short}</span>
+              </button>
+            ))
+          }
+        </div>
       </div>
     </div>
   </div>
@@ -182,9 +191,6 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
   .cv-slot {
     will-change: transform;
   }
-  .cv-fruit img {
-    filter: drop-shadow(0 24px 28px rgb(0 0 0 / 0.38));
-  }
   .cv-bar {
     background: #fff;
     box-shadow: 0 0 14px rgb(255 255 255 / 0.45);
@@ -208,6 +214,8 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
     const bars = q('[data-cv-bar]');
     const panels = q('[data-cv-panel]');
     const bgs = q('[data-cv-bg]');
+    const arts = q('[data-cv-art]');
+    const artStage = root.querySelector<HTMLElement>('[data-cv-stage-art]')!;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const d = reduce ? 0 : 1;
     let current = 0;
@@ -277,10 +285,34 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
       go(0);
       return { cards, go, refresh: () => place(state.pos) };
     });
-    window.addEventListener('resize', () => carousels.forEach((c) => c.refresh()));
+    // Every card is square, or taller only if the longest description needs it; all cards share that size.
+    const articles = q('[data-cv-article]');
+    const stages = q('[data-cv-stage]');
+    const size = () => {
+      articles.forEach((a) => (a.style.height = ''));
+      const h = Math.max(...articles.map((a) => a.offsetHeight));
+      articles.forEach((a) => (a.style.height = `${h}px`));
+      stages.forEach((st) => (st.style.height = `${h + 24}px`));
+      carousels.forEach((c) => c.refresh());
+    };
+    size();
+    window.addEventListener('resize', size);
+    document.fonts?.ready.then(size);
 
     if (!reduce) {
-      q('.cv-fruit').forEach((f, i) => gsap.to(f, { y: -10, rotate: 4, duration: 3 + (i % 3) * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+      gsap.to(root.querySelector('[data-cv-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+      arts.forEach((a) => gsap.to(a.firstElementChild, { y: -12, rotate: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+      // 3D tilt of the fruit with the pointer.
+      if (window.matchMedia('(hover: hover)').matches) {
+        const rx = gsap.quickTo(artStage, 'rotationX', { duration: 0.8, ease: 'power3' });
+        const ry = gsap.quickTo(artStage, 'rotationY', { duration: 0.8, ease: 'power3' });
+        root.addEventListener('pointermove', (e) => {
+          const r = artStage.getBoundingClientRect();
+          ry(((e.clientX - (r.left + r.width / 2)) / window.innerWidth) * 30);
+          rx((-(e.clientY - (r.top + r.height / 2)) / window.innerHeight) * 24);
+        });
+        root.addEventListener('pointerleave', () => (rx(0), ry(0)));
+      }
       const bar = bars[0]!;
       gsap.set(bar, { scaleX: 0, transformOrigin: 'left center' });
       new IntersectionObserver(([e], o) => {
@@ -293,7 +325,11 @@ const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
     function show(next: number) {
       if (next === current) return;
       const prev = current;
-      gsap.killTweensOf([...names, ...labels, ...bars, ...panels, ...bgs]);
+      gsap.killTweensOf([...names, ...labels, ...bars, ...panels, ...bgs, ...arts]);
+      const dir = next > prev ? 1 : -1;
+      arts.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { autoAlpha: 0 }));
+      gsap.to(arts[prev]!, { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.45 * d, ease: 'power3.in' });
+      gsap.fromTo(arts[next]!, { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1 * d, ease: 'back.out(1.4)', delay: 0.15 * d });
       [names, labels, panels].forEach((group) => group.forEach((el, i) => i !== next && gsap.set(el, { autoAlpha: 0 })));
       bars.forEach((el, i) => i !== next && gsap.set(el, { opacity: 0 }));
       bgs.forEach((el, i) => i !== prev && i !== next && gsap.set(el, { opacity: 0 }));
