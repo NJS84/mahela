@@ -66,7 +66,7 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
 
 <Base jsonLd={[website]} description="Mahela Group is a 4th generation, GlobalGAP-certified grower and exporter of premium citrus, avocados, bananas, macadamias, litchis and golden kiwis from Letsitele in Limpopo, South Africa.">
   <!-- Hero -->
-  <section class="relative isolate flex min-h-[100svh] items-end overflow-hidden" aria-labelledby="g-hero">
+  <section class="relative isolate flex min-h-[100svh] items-center overflow-hidden" aria-labelledby="g-hero">
     <div class="absolute inset-0 -z-10" aria-hidden="true">
       <div class="absolute inset-0" data-hero-media>
         <Image src={heroImage} alt="" widths={[768, 1280]} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover" />
@@ -77,7 +77,7 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
       </div>
       <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.45)_0%,rgb(12_26_22/0.15)_35%,rgb(12_26_22/0.75)_100%)]"></div>
     </div>
-    <div class="mx-auto w-full max-w-[84rem] px-4 pb-14 pt-32 md:px-6 md:pb-20">
+    <div class="mx-auto w-full max-w-[84rem] px-4 py-28 md:px-6">
       <p class="cond mb-3 text-[clamp(1.5rem,1.1rem+1.4vw,2.4rem)] font-semibold uppercase leading-none tracking-[0.42em] text-ivory drop-shadow-[0_2px_16px_rgba(0,0,0,0.35)]">Mahela</p>
       <p class="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-ivory/80">{hero.eyebrow}</p>
       <h1 id="g-hero" class="cond max-w-4xl text-[clamp(3.4rem,2rem+6.5vw,7.25rem)] font-medium uppercase leading-[0.9] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>
@@ -150,16 +150,22 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
     </svg>
 
     <div class="mx-auto grid min-h-[100svh] max-w-[84rem] items-center px-4 py-24 md:px-6 lg:grid-cols-12">
-      <!-- The orange starts behind the glass card (blurred by it) and rolls out to the centre of the right half as you scroll. -->
+      <!-- The orange sits centred in the right half; scrolling on bursts it into juice and wedges. -->
       <div class="relative order-2 -mt-28 lg:order-none lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mt-0" aria-hidden="true" data-orange-stage>
         <div class="stage relative mx-auto aspect-square w-[92%] max-w-[620px] lg:w-full">
-          <div class="absolute inset-[16%] rounded-full bg-[radial-gradient(circle,rgb(240_125_20/0.35),transparent_68%)] blur-2xl"></div>
+          <div class="absolute inset-[16%] rounded-full bg-[radial-gradient(circle,rgb(240_125_20/0.35),transparent_68%)] blur-2xl" data-orange-glow></div>
           <div class="absolute -left-[4%] bottom-[2%] w-[38%]" data-depth="0.35">
-            <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={360} class="h-auto w-full -rotate-[28deg] opacity-90 blur-[3px]" />
+            <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={360} class="h-auto w-full -rotate-[28deg] drop-shadow-[0_16px_20px_rgba(0,0,0,0.35)]" />
           </div>
-          <div class="absolute inset-[6%_8%_4%_10%]" data-orange-roll>
-            <div data-float-big>
-              <Image src={media('produce/renders/orange.webp')} alt="" widths={[420, 640, 860]} sizes="(min-width: 1024px) 520px, 80vw" loading="eager" class="h-auto w-full drop-shadow-[0_40px_50px_rgba(0,0,0,0.5)]" />
+          <!-- Burst pieces, hidden until the scroll exit. -->
+          <div class="pointer-events-none absolute inset-0 flex items-center justify-center" data-burst>
+            <Image src={media('produce/renders/juice-splash.webp')} alt="" widths={[640, 1024]} sizes="(min-width: 1024px) 760px, 90vw" class="burst-splash absolute w-[125%] max-w-none opacity-0" data-burst-splash />
+            <Image src={media('produce/renders/segments-exploded.webp')} alt="" widths={[480, 820]} sizes="(min-width: 1024px) 560px, 80vw" class="absolute w-[80%] opacity-0" data-burst-wedges />
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => <span class="burst-drop absolute rounded-full opacity-0" style={`--i:${i}`} data-burst-drop={i}></span>)}
+          </div>
+          <div class="absolute inset-[8%_14%_6%_14%] flex items-center" data-orange-roll>
+            <div class="w-full" data-float-big>
+              <Image src={media('produce/renders/orange.webp')} alt="" widths={[420, 640, 860]} sizes="(min-width: 1024px) 460px, 70vw" loading="eager" class="h-auto w-full drop-shadow-[0_40px_50px_rgba(0,0,0,0.5)]" />
             </div>
           </div>
         </div>
@@ -343,6 +349,16 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
   }
   @media (prefers-reduced-motion: reduce) {
     .petals { display: none; }
+  }
+  /* Juice burst: the splash is shot on black, so screen-blend drops the black. */
+  .burst-splash {
+    mix-blend-mode: screen;
+  }
+  .burst-drop {
+    width: calc(10px + (var(--i) * 7 % 5) * 5px);
+    aspect-ratio: 1;
+    background: radial-gradient(circle at 35% 30%, #fff6d8, #ffb43a 45%, #e86d08 100%);
+    box-shadow: 0 0 14px rgb(255 160 40 / 0.6);
   }
   /* Coverflow (desktop): every card is stacked in the centre and placed by script. */
   @media (min-width: 1024px) {
