@@ -1,7 +1,9 @@
 ---
 /**
- * The "leaf card": a frosted panel with the fruit sitting half behind the
- * glass (blurred by the backdrop filter) and half breaking out of its edge.
+ * Portrait produce card for the Produce page: blue-tinted frosted glass with
+ * white text, a fruit-coloured glow behind it, and the fruit sharp in front of
+ * the glass, breaking out of the top-right corner. All cards in a row stretch
+ * to the same height.
  */
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
@@ -16,24 +18,63 @@ interface Props {
   icon?: IconName;
   points: string[];
   accent?: string;
+  /** Fruit width as a % of the card. */
+  fruitSize?: number;
   headingLevel?: 'h2' | 'h3';
 }
-const { tag, title, href, image, icon = 'leaf', points, accent = '#2c6b44', headingLevel: H = 'h3' } = Astro.props;
+const { tag, title, href, image, icon = 'leaf', points, accent = '#2c6b44', fruitSize = 52, headingLevel: H = 'h3' } = Astro.props;
+const widths = [320, 480, 640].filter((w) => w <= image.width);
 ---
 
-<article class="produce-card group relative isolate pr-[18%]" style={`--accent:${accent}`} data-produce-card>
-  <div class="absolute right-0 top-1/2 -z-10 w-[62%] -translate-y-1/2 transition-transform duration-700 ease-out group-hover:-translate-y-[54%] group-hover:rotate-3" data-card-fruit>
-    <div class="absolute inset-[18%] rounded-full blur-3xl" style="background: color-mix(in srgb, var(--accent) 55%, transparent)"></div>
-    <Image src={image} alt="" widths={[320, 480, 640].filter((w) => w <= image.width)} sizes="(min-width: 1024px) 320px, 60vw" class="relative h-auto w-full drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" />
-  </div>
-  <a href={href} class="glass relative flex min-h-[26rem] flex-col rounded-[28px] p-7 md:p-8" data-glare>
-    <span class="self-start rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]" style="background: color-mix(in srgb, var(--accent) 70%, #1e4a30); color: #f5f2ea">{tag}</span>
-    <H class="cond mt-5 text-[2.6rem] font-medium leading-none tracking-[0.01em]">{title}</H>
-    <span class="mt-6 flex size-16 items-center justify-center rounded-2xl border border-ivory/20 bg-ivory/8 shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]"><Icon name={icon} class="size-8 text-ivory" /></span>
-    <span class="mt-7 block border-t border-ivory/15 pt-6 text-sm font-semibold uppercase tracking-[0.14em] text-ivory/90">At a glance</span>
-    <ul class="mt-3 space-y-2 text-[0.95rem] text-ivory/80">
-      {points.map((p) => <li class="flex gap-2.5"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-ivory/70"></span>{p}</li>)}
+<article class="pp-card group relative h-full" style={`--accent:${accent}`} data-pp-card>
+  <div class="pp-glow pointer-events-none absolute -inset-[8%] -z-10 rounded-[48px]" aria-hidden="true"></div>
+  <a href={href} class="pp-glass relative flex h-full min-h-[30rem] flex-col overflow-hidden rounded-[30px] p-7 text-white md:p-8" data-pp-tilt>
+    <span class="mb-20 flex size-12 items-center justify-center rounded-xl border border-white/30 bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]"><Icon name={icon} class="size-6 text-white" /></span>
+    <span class="mt-auto self-start rounded-lg px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-white" style="background: color-mix(in srgb, var(--accent) 80%, #1e4a30)">{tag}</span>
+    <H class="cond mt-3 text-[clamp(2.4rem,1.9rem+1.2vw,3.1rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.25)]">{title}</H>
+    <span class="mt-5 block border-t border-white/20 pt-5 text-xs font-semibold uppercase tracking-[0.16em] text-white/75">At a glance</span>
+    <ul class="mt-3 min-h-[5.4rem] space-y-1.5 text-[0.95rem] leading-snug text-white/90">
+      {points.map((p) => <li class="flex gap-2.5"><span class="mt-[0.45rem] size-1.5 shrink-0 rounded-full" style="background: color-mix(in srgb, var(--accent) 55%, #fff)"></span>{p}</li>)}
     </ul>
-    <span class="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-semibold uppercase tracking-[0.16em] text-sage">Explore <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+    <span class="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white">Explore {title.toLowerCase()} <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
   </a>
+  <div class="pp-fruit pointer-events-none absolute right-2 top-[-9%] z-[2] md:-right-[7%] md:top-[-12%]" style={`width:${fruitSize}%`} aria-hidden="true" data-pp-fruit>
+    <Image src={image} alt="" widths={widths} sizes="(min-width: 1280px) 240px, (min-width: 768px) 30vw, 55vw" class="pp-fruit-img h-auto w-full" />
+  </div>
 </article>
+
+<style>
+  .pp-card {
+    perspective: 1200px;
+  }
+  .pp-glow {
+    background: radial-gradient(60% 55% at 70% 25%, color-mix(in srgb, var(--accent) 75%, transparent), transparent 72%);
+    opacity: 0.7;
+    filter: blur(10px);
+    transition: opacity 0.5s;
+  }
+  .pp-card:hover .pp-glow {
+    opacity: 1;
+  }
+  .pp-glass {
+    /* Frosted glass with a slight blue tint, matching the home page cards. */
+    background:
+      radial-gradient(90% 60% at 85% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+      linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.38);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      inset 0 0 0 3px rgb(200 220 245 / 0.08),
+      0 40px 80px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .pp-fruit {
+    will-change: transform;
+  }
+  .pp-fruit-img {
+    filter: drop-shadow(0 26px 30px rgb(0 0 0 / 0.35));
+  }
+</style>
