@@ -77,7 +77,15 @@ const jsonLd = [
 ---
 
 <Base title={p.metaTitle} description={p.description} breadcrumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} jsonLd={jsonLd} ogImage={hero}>
-  <PageHero image={hero} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]} />
+  <PageHero image={hero} eyebrow="Mahela produce" title={p.title} lead={p.description} crumbs={[{ name: 'Produce', href: '/produce' }, { name: p.title, href: `/produce/${slug}` }]}>
+    {
+      isBanana && (
+        <div slot="beside" class="mm-card shrink-0 rounded-[18px] p-2 md:rounded-[26px] md:p-3" data-reveal>
+          <Image src={media('brand/mala-mala-logo.png')} alt="Mala-Mala, the brand Mahela bananas are sold under" widths={[320, 480]} sizes="(min-width: 768px) 15rem, 8rem" class="block h-auto w-32 rounded-[12px] sm:w-44 md:w-60 md:rounded-[18px]" />
+        </div>
+      )
+    }
+  </PageHero>
 
   <section class="relative overflow-hidden py-24 md:py-32" style={`--accent:${p.accent}`} aria-labelledby="answer-title">
     <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 30%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%), #10201a"></div>
@@ -154,3 +162,16 @@ const jsonLd = [
     <div class="mt-16"><CtaBand /></div>
   </section>
 </Base>
+
+<style>
+  /* Mala-Mala logo on frosted blue glass beside the bananas heading: mostly opaque so the label reads cleanly. */
+  .mm-card {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.55), rgb(150 182 222 / 0.38));
+    border: 1px solid rgb(235 244 255 / 0.6);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      0 30px 60px -24px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+  }
+</style>

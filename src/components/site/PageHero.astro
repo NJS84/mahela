@@ -40,7 +40,16 @@ const { image, eyebrow, title, lead, crumbs = [], position = '50% 50%', tall = f
       )
     }
     {eyebrow && <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-sage">{eyebrow}</p>}
-    <h1 id="page-title" class="cond max-w-5xl text-[clamp(2.8rem,1.6rem+5vw,6.25rem)] font-medium uppercase leading-[0.92] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>{title}</h1>
+    {
+      Astro.slots.has('beside') ? (
+        <div class="flex items-center gap-x-4 gap-y-5 sm:flex-wrap md:gap-x-12">
+          <h1 id="page-title" class="cond max-w-5xl text-[clamp(2.8rem,1.6rem+5vw,6.25rem)] font-medium uppercase leading-[0.92] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>{title}</h1>
+          <slot name="beside" />
+        </div>
+      ) : (
+        <h1 id="page-title" class="cond max-w-5xl text-[clamp(2.8rem,1.6rem+5vw,6.25rem)] font-medium uppercase leading-[0.92] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>{title}</h1>
+      )
+    }
     {lead && <p class="mt-7 max-w-2xl text-lg leading-relaxed text-ivory/85 md:text-xl" data-reveal>{lead}</p>}
     <slot />
   </div>
