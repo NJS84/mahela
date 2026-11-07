@@ -202,7 +202,12 @@ const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colou
   </Backdrop>
 
   <!-- Produce: coverflow of landscape glass cards, driven by scroll on desktop -->
-  <section class="relative isolate overflow-hidden bg-[radial-gradient(90%_70%_at_50%_45%,#163a29,#08140f_75%)]" aria-labelledby="g-produce" data-flow>
+  <section class="relative isolate overflow-hidden bg-[#0c1c15]" aria-labelledby="g-produce" data-flow>
+    <!-- One gradient per fruit; the one whose card is in the centre fades in. -->
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      {produce.map((p, i) => <div class="absolute inset-0" style={`opacity:${i === 0 ? 1 : 0};background:radial-gradient(70% 70% at 60% 55%, ${p.tone[0]}, ${p.tone[1]} 70%, #0b0f0c 120%)`} data-flow-bg={i}></div>)}
+      <div class="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_60%,rgb(255_255_255/0.08),transparent_70%)]"></div>
+    </div>
     <Leaves spots={[{ x: '86%', y: '12%', size: 100, r: 30, blur: true }, { x: '6%', y: '78%', size: 70, r: -60 }]} />
     <div class="flex min-h-[100svh] flex-col justify-center py-24 lg:pb-8 lg:pt-28">
       <div class="mx-auto flex w-full max-w-[84rem] flex-wrap items-end justify-between gap-8 px-4 md:px-6">

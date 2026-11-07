@@ -23,18 +23,18 @@ const widths = [320, 480, 640].filter((w) => w <= image.width);
 ---
 
 <article class="pg-card group relative" style={`--accent:${accent}`}>
-  <a href={href} class="pg-glass relative flex h-full flex-col overflow-hidden rounded-[30px] p-7 text-forest md:p-9">
+  <a href={href} class="pg-glass relative flex h-full flex-col overflow-hidden rounded-[30px] p-7 text-ivory md:p-9">
     <span class="self-start rounded-lg px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-ivory" style="background: color-mix(in srgb, var(--accent) 80%, #1e4a30)">{tag}</span>
-    <h3 class="cond mt-4 max-w-[58%] text-[clamp(2.2rem,1.6rem+1.6vw,3.2rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-[#173a28]">{title}</h3>
+    <h3 class="cond mt-4 max-w-[58%] text-[clamp(2.2rem,1.6rem+1.6vw,3.2rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.25)]">{title}</h3>
     <div class="mt-auto grid max-w-[64%] gap-5 pt-6">
       <div class="flex items-center gap-3">
-        <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#173a28]/15 bg-white/60 shadow-[inset_0_1px_0_#fff]"><Icon name={icon} class="size-5 text-[#2c6b44]" /></span>
-        <span class="text-xs font-semibold uppercase tracking-[0.16em] text-[#173a28]/70">At a glance</span>
+        <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]"><Icon name={icon} class="size-5 text-white" /></span>
+        <span class="text-xs font-semibold uppercase tracking-[0.16em] text-white/75">At a glance</span>
       </div>
-      <ul class="space-y-1.5 text-[0.95rem] leading-snug text-[#173a28]/85">
-        {points.map((p) => <li class="flex gap-2.5"><span class="mt-[0.45rem] size-1.5 shrink-0 rounded-full" style="background: var(--accent)"></span>{p}</li>)}
+      <ul class="space-y-1.5 text-[0.95rem] leading-snug text-white/90">
+        {points.map((p) => <li class="flex gap-2.5"><span class="mt-[0.45rem] size-1.5 shrink-0 rounded-full" style="background: color-mix(in srgb, var(--accent) 55%, #fff)"></span>{p}</li>)}
       </ul>
-      <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#2c6b44]">Explore {title.toLowerCase()} <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+      <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white">Explore {title.toLowerCase()} <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
     </div>
   </a>
   <div class="pg-fruit pointer-events-none absolute -right-[7%] -top-[16%] w-[50%]" aria-hidden="true" data-pg-fruit>
@@ -51,16 +51,15 @@ const widths = [320, 480, 640].filter((w) => w <= image.width);
     opacity: var(--content, 1);
   }
   .pg-glass {
-    background:
-      radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%),
-      linear-gradient(160deg, rgb(244 247 251 / 0.9), rgb(226 234 243 / 0.82));
-    border: 1px solid rgb(255 255 255 / 0.9);
+    /* Same frosted glass as the rest of the site, with a slight blue tint. */
+    background: linear-gradient(135deg, rgb(214 230 250 / 0.22), rgb(160 190 225 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.38);
     box-shadow:
-      inset 0 0 0 4px rgb(205 222 240 / 0.45),
-      inset 0 1px 0 #fff,
-      0 40px 80px -30px rgb(0 0 0 / 0.65);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    backdrop-filter: blur(24px) saturate(150%);
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      inset 0 0 0 3px rgb(200 220 245 / 0.08),
+      0 40px 80px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
   }
   /* The soft copy is the part "inside" the glass; the sharp copy fades out toward it. */
   .pg-fruit-soft {

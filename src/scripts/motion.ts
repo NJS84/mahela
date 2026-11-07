@@ -177,11 +177,14 @@ export function initMotion() {
     if (flow) {
       const cards = gsap.utils.toArray<HTMLElement>('[data-flow-card]', flow);
       const dots = gsap.utils.toArray<HTMLElement>('[data-flow-dot]', flow);
+      const bgs = gsap.utils.toArray<HTMLElement>('[data-flow-bg]', flow);
       const n = cards.length;
+      // The cards form a loop, so there is always a card either side of the centre one.
+      const wrap = (d: number) => ((((d + n / 2) % n) + n) % n) - n / 2;
       const place = (pos: number) => {
         const w = window.innerWidth;
         cards.forEach((card, i) => {
-          const d = i - pos;
+          const d = wrap(i - pos);
           const t = Math.abs(d);
           const sign = Math.sign(d);
           const x = t <= 1 ? t * 0.33 * w : 0.33 * w + (t - 1) * 0.03 * w;
@@ -198,8 +201,10 @@ export function initMotion() {
             '--content': Math.max(0, Math.min(1, 1 - (t - 1) * 3)),
           });
         });
-        const active = Math.round(pos);
+        const active = Math.round(pos) % n;
         dots.forEach((d, i) => d.classList.toggle('is-on', i === active));
+        // Background: the centred fruit's colour, blending with its neighbour as cards move.
+        bgs.forEach((bg, i) => (bg.style.opacity = String(Math.max(0, 1 - Math.abs(wrap(i - pos))))));
       };
       const state = { pos: 0 };
       place(0);
