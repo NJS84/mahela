@@ -1,4 +1,3 @@
+# PREVIEW ONLY: restore "Allow: /" and the Sitemap line before going live
 User-agent: *
-Allow: /
-
-Sitemap: https://www.mahela.co.za/sitemap-index.xml
+Disallow: /

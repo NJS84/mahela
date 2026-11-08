@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/site/PageHero.astro';
+import { Image } from 'astro:assets';
 import Icon from '../components/site/Icon.astro';
+import PackhouseMap3D from '../components/site/PackhouseMap3D.astro';
 import { media } from '../lib/media';
 import { site } from '../data/site';
 
@@ -19,28 +21,30 @@ const jsonLd = [
     },
   },
 ];
-const field = 'mt-2 w-full rounded-2xl border border-ivory/20 bg-ivory/8 px-4 py-3 text-ivory placeholder:text-ivory/40 outline-none transition focus:border-sage focus:bg-ivory/12 focus:ring-2 focus:ring-sage/40';
-const label = 'text-xs font-semibold uppercase tracking-[0.16em] text-ivory/75';
+const field = 'mt-2 w-full rounded-2xl border border-white/30 bg-white/10 px-4 py-3 text-white placeholder:text-white/40 outline-none transition focus:border-[#74c365] focus:bg-white/15 focus:ring-2 focus:ring-[#74c365]/40';
+const label = 'text-xs font-semibold uppercase tracking-[0.16em] text-white/80';
 ---
 
 <Base title="Contact us" description={`Contact Mahela Group in Letsitele, Limpopo: ${site.phone}, ${site.email}. Main Road, R71, The Junction. Export, produce, nursery and game enquiries.`} breadcrumbs={[{ name: 'Contact us', href: '/contact-us' }]} jsonLd={jsonLd}>
   {siteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
   <PageHero image={media('farms/dsc-9156.jpg')} eyebrow="Contact" title="Talk to the Mahela team" lead="Discuss varieties, specifications, market windows, packhouse capability and export requirements, or any other enquiry." crumbs={[{ name: 'Contact us', href: '/contact-us' }]} />
 
-  <section class="mx-auto grid max-w-[84rem] gap-8 px-4 py-24 md:px-6 md:py-32 lg:grid-cols-12" id="form">
-    <div class="glass rounded-[32px] p-7 md:p-12 lg:col-span-7" data-reveal>
+  <section class="relative overflow-hidden" id="form">
+   <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_70%_20%,#2f5a8f,#0d1a2c_75%)]"></div>
+   <div class="mx-auto grid max-w-[84rem] gap-8 px-4 py-24 md:px-6 md:py-32 lg:grid-cols-12">
+    <div class="ct-glass rounded-[32px] p-7 text-white md:p-12 lg:col-span-7" data-reveal>
       <h2 class="cond text-4xl font-medium uppercase">Send an enquiry</h2>
-      <p class="mt-2 text-ivory/70">We usually reply within one working day.</p>
+      <p class="mt-2 text-white/75">We usually reply within one working day.</p>
       <form action="/api/contact" method="post" class="mt-8 grid gap-5 sm:grid-cols-2" data-contact novalidate>
         <label class="sm:col-span-1"><span class={label}>Name *</span><input class={field} name="name" autocomplete="name" required maxlength="120" /></label>
         <label class="sm:col-span-1"><span class={label}>Company</span><input class={field} name="company" autocomplete="organization" maxlength="160" /></label>
         <label><span class={label}>Email *</span><input class={field} type="email" name="email" autocomplete="email" required maxlength="200" /></label>
         <label><span class={label}>Phone</span><input class={field} type="tel" name="phone" autocomplete="tel" maxlength="40" /></label>
         <label><span class={label}>Country</span><input class={field} name="country" autocomplete="country-name" maxlength="80" /></label>
-        <label><span class={label}>Topic</span><select class={field} name="topic">{topics.map((t) => <option class="bg-[#10201a]">{t}</option>)}</select></label>
+        <label><span class={label}>Topic</span><select class={field} name="topic">{topics.map((t) => <option class="bg-[#0d1a2c]">{t}</option>)}</select></label>
         <label class="sm:col-span-2"><span class={label}>Message *</span><textarea class={field} name="message" rows="6" required maxlength="5000"></textarea></label>
         <label class="hidden" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
-        <label class="flex items-start gap-3 text-sm text-ivory/80 sm:col-span-2">
+        <label class="flex items-start gap-3 text-sm text-white/85 sm:col-span-2">
           <input type="checkbox" name="consent" value="yes" required class="mt-1 size-4 accent-[#2c6b44]" />
           <span>I agree that Mahela Group may use these details to respond to my enquiry, in line with the <a href="/legal" class="underline decoration-sage underline-offset-4">privacy notice (POPIA)</a>.</span>
         </label>
@@ -53,23 +57,33 @@ const label = 'text-xs font-semibold uppercase tracking-[0.16em] text-ivory/75';
     </div>
 
     <aside class="space-y-5 lg:col-span-5" aria-label="Contact details">
-      <div class="glass rounded-[32px] p-7 md:p-9" data-reveal data-glare>
-        <h2 class="cond text-sm font-semibold uppercase tracking-[0.18em] text-sage">Head office</h2>
+      <div class="ct-glass rounded-[32px] p-7 text-white md:p-9" data-reveal data-glare>
+        <h2 class="cond text-sm font-semibold uppercase tracking-[0.18em] text-white/80">Head office</h2>
         <address class="mt-5 space-y-4 not-italic">
-          <a href={mapUrl} target="_blank" rel="noopener" class="flex gap-3 hover:text-white"><Icon name="pin" class="mt-0.5 size-5 shrink-0 text-sage" /><span>{site.address.street}<br />{site.address.locality}, {site.address.region}, {site.address.postalCode}<br /><span class="text-ivory/60">{site.address.postal}</span></span></a>
-          <a href={site.phoneHref} class="flex gap-3 hover:text-white"><Icon name="phone" class="size-5 shrink-0 text-sage" />Tel {site.phone}</a>
-          <p class="flex gap-3 text-ivory/75"><Icon name="phone" class="size-5 shrink-0 text-sage/60" />Fax {site.fax}</p>
-          <a href={`mailto:${site.email}`} class="flex gap-3 hover:text-white"><Icon name="mail" class="size-5 shrink-0 text-sage" />{site.email}</a>
-          <p class="flex gap-3 text-ivory/75"><Icon name="clock" class="size-5 shrink-0 text-sage" />{site.hours}</p>
+          <a href={mapUrl} target="_blank" rel="noopener" class="flex gap-3 hover:text-white"><Icon name="pin" class="mt-0.5 size-5 shrink-0 text-[#74c365]" /><span>{site.address.street}<br />{site.address.locality}, {site.address.region}, {site.address.postalCode}<br /><span class="text-white/65">{site.address.postal}</span></span></a>
+          <a href={site.phoneHref} class="flex gap-3 hover:text-white"><Icon name="phone" class="size-5 shrink-0 text-[#74c365]" />Tel {site.phone}</a>
+          <p class="flex gap-3 text-white/80"><Icon name="phone" class="size-5 shrink-0 text-[#74c365]/70" />Fax {site.fax}</p>
+          <a href={`mailto:${site.email}`} class="flex gap-3 hover:text-white"><Icon name="mail" class="size-5 shrink-0 text-[#74c365]" />{site.email}</a>
+          <p class="flex gap-3 text-white/80"><Icon name="clock" class="size-5 shrink-0 text-[#74c365]" />{site.hours}</p>
         </address>
       </div>
-      <a href={mapUrl} target="_blank" rel="noopener" class="glass-blue group relative block overflow-hidden rounded-[32px] p-7 md:p-9" data-reveal data-glare>
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-ivory/70">Find us</span>
-        <span class="cond mt-2 block text-3xl font-medium uppercase">The Junction, Letsitele</span>
-        <span class="mt-2 block text-sm text-ivory/75">23.88° S, 30.39° E · on the R71 in the Mopani district, Limpopo</span>
-        <span class="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em]">Open in Google Maps <Icon name="external" class="size-4" /></span>
-      </a>
+      <figure class="ct-photo overflow-hidden rounded-[32px]" data-reveal>
+        <Image src={media('farms/mahela-gate-105567.jpg')} alt="The Mahela farm gate and sign on the red-soil road" widths={[480, 720, 960]} sizes="(min-width: 1024px) 34vw, 92vw" class="aspect-[16/10] w-full object-cover" />
+      </figure>
     </aside>
+   </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-[#0b1626] pb-10 pt-20 md:pt-24" aria-labelledby="find-title">
+    <div class="mx-auto grid max-w-[84rem] items-center gap-6 px-4 md:px-6 lg:grid-cols-12">
+      <div class="relative z-10 lg:col-span-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Find us</p>
+        <h2 id="find-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">The Junction, Letsitele</h2>
+        <p class="mt-4 text-white/80">23.88° S, 30.39° E · on the R71 in the Mopani district, Limpopo. Spin the map to see the packhouse, orchards and dams around our head office.</p>
+        <a href={mapUrl} target="_blank" rel="noopener" class="ct-glass mt-7 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-white" data-magnetic>Open in Google Maps <Icon name="external" class="size-4" /></a>
+      </div>
+      <PackhouseMap3D class="aspect-[5/4] w-full lg:col-span-8 lg:aspect-auto lg:h-[40rem]" />
+    </div>
   </section>
 </Base>
 
@@ -116,3 +130,19 @@ const label = 'text-xs font-semibold uppercase tracking-[0.16em] text-ivory/75';
     }
   });
 </script>
+
+
+<style>
+  .ct-glass {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.34);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.32), 0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  .ct-photo {
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+    outline: 1px solid rgb(225 238 255 / 0.3);
+    outline-offset: -1px;
+  }
+</style>

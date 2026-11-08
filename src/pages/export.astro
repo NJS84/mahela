@@ -1,13 +1,14 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/site/PageHero.astro';
-import Backdrop from '../components/site/Backdrop.astro';
+import ExportHero from '../components/site/ExportHero.astro';
+import ExportCarton from '../components/site/ExportCarton.astro';
+import ColdChain from '../components/site/ColdChain.astro';
 import SectionTitle from '../components/site/SectionTitle.astro';
 import ExportGlobe from '../components/site/ExportGlobe.astro';
 import FactList from '../components/site/FactList.astro';
+import GlassCards from '../components/site/GlassCards.astro';
+import PhotoMosaic from '../components/site/PhotoMosaic.astro';
 import CtaBand from '../components/site/CtaBand.astro';
-import Icon from '../components/site/Icon.astro';
 import { media } from '../lib/media';
 import { exportPage } from '../data/pages';
 import { compliance } from '../data/site';
@@ -28,84 +29,72 @@ const jsonLd = [
     areaServed: exportPage.markets.map((m) => m.name),
   },
 ];
-const certs = ['certifications/globalgap.png', 'certifications/siza.png', 'certifications/nsf-registered.png'];
+const hero = media('packhouse/dispatch-2022-105211.jpg');
+/** Approved compliance copy (2026 EU-exporter draft and the packhouse page). Cold chain now has its own scene. */
+const tones: [string, string][] = [['#2e7d5b', '#0b2219'], ['#3a6fb0', '#0d1a2c'], ['#c98a12', '#3a2604'], ['#d46a1c', '#3a1604']];
+const cards = [
+  { short: 'GlobalGAP', title: compliance.pillars[0]!.title, text: compliance.pillars[0]!.text, stat: '2003', statLabel: 'GlobalGAP certified since', icon: { line: 'shield' as const }, photo: 'produce/farm/citrus-orchard-103584.jpg', name: 'GlobalGAP', sub: 'Certified since 2003' },
+  { short: 'SIZA', title: compliance.pillars[1]!.title, text: compliance.pillars[1]!.text, icon: { line: 'people' as const }, photo: 'people/team-2025-103316.jpg', name: 'SIZA', sub: 'Ethical trade accredited' },
+  { short: 'Quality', title: compliance.pillars[2]!.title, text: compliance.pillars[2]!.text, stat: 'PPECB', statLabel: 'inspectors full-time in season', icon: { line: 'flask' as const }, photo: 'packhouse/pack-2025-103494.jpg', name: 'Tested on site', sub: 'Multiple tests per batch' },
+  { short: 'Volume', title: compliance.pillars[3]!.title, text: compliance.pillars[3]!.text, stat: '1 200', statLabel: 'tons a day in season', icon: { line: 'box' as const }, photo: 'packhouse/dispatch-2022-105201.jpg', name: '1 200 t', sub: 'Daily, double shifts' },
+].map((c, i) => ({ ...c, tone: tones[i]! }));
+const tiles = [
+  { src: 'packhouse/dispatch-2022-105210.jpg', alt: 'A forklift loading pallets of Mahela fruit onto a truck bound for the port', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'people/export-world-map-105283.jpg', alt: 'A Mahela manager in front of a world map of export markets', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'packhouse/pack-2025-103511.jpg', alt: 'Cartons of Tango mandarins packed for export', cls: 'lg:col-span-2' },
+  { src: 'packhouse/dispatch-2022-105200.jpg', alt: 'Pallets of Mahela cartons stacked in the dispatch hall', cls: 'lg:col-span-2' },
+  { src: 'packhouse/dispatch-2022-105209.jpg', alt: 'A forklift moving export pallets out of the dispatch hall', cls: 'sm:col-span-2 lg:col-span-2' },
+];
 ---
 
-<Base title="EU-compliant citrus exporters, South Africa" description={description} breadcrumbs={[{ name: 'Export', href: '/export' }]} jsonLd={jsonLd} ogImage={media('farms/export-port-generated.jpg')}>
-  <PageHero image={media('farms/export-port-generated.jpg')} eyebrow="Export" title={exportPage.title} lead={exportPage.lead} crumbs={[{ name: 'Export', href: '/export' }]} />
+<Base title="EU-compliant citrus exporters, South Africa" description={description} breadcrumbs={[{ name: 'Export', href: '/export' }]} jsonLd={jsonLd} ogImage={hero}>
+  <ExportHero image={hero} eyebrow="Export" title={exportPage.title} lead={exportPage.lead} />
 
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32">
-    <ExportGlobe />
+  <section class="overflow-x-clip bg-[radial-gradient(70%_80%_at_70%_40%,#1f4a80,#0b1626_78%)]"><div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32">
+    <ExportGlobe compact />
+  </div></section>
+
+  <ExportCarton eyebrow={compliance.eyebrow} title={compliance.title} lead={compliance.lead} />
+
+  <GlassCards id="compliance" eyebrow="Standards and cold chain" title="What importers can count on" tag="Export" cards={cards} align="top" />
+
+  <ColdChain />
+
+  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="dispatch-title">
+    <SectionTitle eyebrow="Dispatch" title="From our packhouses to the world" id="dispatch-title" />
+    <div class="mt-12"><PhotoMosaic tiles={tiles} /></div>
   </section>
 
-  <Backdrop image={media('packhouse/dsc-1871.jpg')} dim={0.7}>
-    <div class="grid gap-12 lg:grid-cols-12">
-      <div class="lg:col-span-6">
-        <SectionTitle eyebrow={compliance.eyebrow} title={compliance.title} lead={compliance.lead} id="compliance-title" />
-        <ul class="mt-8 flex flex-wrap items-center gap-6" aria-label="Certifications">
-          {certs.map((c) => <li class="glass-soft rounded-2xl px-5 py-4"><Image src={media(c)} alt={c.split('/')[1]!.replace('.png', '').replace('-', ' ')} height={48} class="h-10 w-auto brightness-0 invert" /></li>)}
-        </ul>
-      </div>
-      <ul class="grid gap-4 sm:grid-cols-2 lg:col-span-6">
-        {
-          compliance.pillars.map((p) => (
-            <li class="glass rounded-[24px] p-6" data-reveal data-glare>
-              <Icon name="check" class="size-6 text-sage" />
-              <h3 class="cond mt-4 text-xl font-semibold uppercase tracking-[0.06em]">{p.title}</h3>
-              <p class="mt-2 text-[0.95rem] leading-relaxed text-ivory/80">{p.text}</p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </Backdrop>
-
-  <Backdrop image={media('generated/reefer-interior.jpg')} dim={0.55}>
-    <section class="grid items-center gap-10 lg:grid-cols-12" aria-labelledby="cold-title">
-      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
-        <SectionTitle eyebrow="Cold chain" title="Fresh from the packhouse to the port" id="cold-title" />
-        <p class="mt-6 text-lg leading-relaxed text-ivory/85">Strict temperature and handling protocols protect freshness through the supply chain. From the packhouses, the pallets of fruit are transported per truck to local ports, where the fruit is once again inspected before it leaves for its export destination.</p>
-        <ul class="mt-8 grid gap-3 sm:grid-cols-3">
-          {['PPECB inspected', 'Inspected again at port', 'Temperature controlled'].map((t) => <li class="glass-soft flex items-center gap-2 rounded-2xl px-4 py-3 text-sm"><Icon name="check" class="size-4 shrink-0 text-sage" />{t}</li>)}
-        </ul>
-      </div>
-      <div class="lg:col-span-5" data-reveal>
-        <div class="glass-soft mx-auto max-w-sm overflow-hidden rounded-[28px] p-1.5" data-tilt>
-          <Image src={media('generated/reefer-ship.jpg')} alt="A refrigerated container ship at sea carrying fruit to export markets" widths={[480, 720, 896]} sizes="(min-width: 1024px) 24rem, 90vw" class="aspect-[3/4] w-full rounded-[22px] object-cover" />
-        </div>
-      </div>
-    </section>
-  </Backdrop>
-
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="brands-title">
-    <div class="grid items-center gap-12 lg:grid-cols-12">
-      <div class="lg:col-span-6">
-        <SectionTitle eyebrow="Our brands" title="Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus" id="brands-title" />
-        <div class="mt-8"><FactList facts={[{ label: 'Brands', value: exportPage.brands.join(', ') }, { label: 'Origin', value: 'Letsitele and Ohrigstad, Limpopo, South Africa' }, { label: 'Season', value: 'End of March to end of September' }, { label: 'Capacity', value: 'Up to 1 200 tons a day' }, { label: 'Markets', value: exportPage.markets.map((m) => m.name).join(', ') }]} /></div>
-      </div>
-      <div class="lg:col-span-6" data-reveal>
-        <div class="rounded-[28px] bg-ivory p-8" data-tilt>
-          <Image src={media('brand/brands-mahela-makulu-malamala.png')} alt="Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brand marks" widths={[480, 800]} sizes="(min-width: 1024px) 40vw, 90vw" class="h-auto w-full" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mx-auto max-w-[60rem] px-4 pb-24 md:px-6 md:pb-32" aria-labelledby="faq-title">
+  <section class="relative overflow-hidden py-24 md:py-32" aria-labelledby="faq-title">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_50%_20%,#2f5a8f,#0d1a2c_75%)]"></div>
+    <div class="mx-auto max-w-[60rem] px-4 md:px-6">
     <SectionTitle eyebrow="Importer FAQ" title="Questions buyers ask us" align="center" id="faq-title" />
+    <div class="mt-12"><FactList variant="blue" facts={[{ label: 'Brands', value: exportPage.brands.join(', ') }, { label: 'Origin', value: 'Letsitele and Ohrigstad, Limpopo, South Africa' }, { label: 'Season', value: 'End of March to end of September' }, { label: 'Capacity', value: 'Up to 1 200 tons a day' }, { label: 'Markets', value: exportPage.markets.map((m) => m.name).join(', ') }]} /></div>
     <div class="mt-12 space-y-3">
       {
         exportPage.faq.map((f, i) => (
-          <details class="glass group rounded-[22px] px-6 py-5 open:pb-6" open={i === 0} data-reveal>
+          <details class="ex-faq group rounded-[22px] px-6 py-5 open:pb-6" open={i === 0} data-reveal>
             <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
               {f.q}
               <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-ivory/25 transition-transform group-open:rotate-45">+</span>
             </summary>
-            <p class="mt-3 leading-relaxed text-ivory/80">{f.a}</p>
+            <p class="mt-3 leading-relaxed text-white/85">{f.a}</p>
           </details>
         ))
       }
     </div>
     <div class="mt-20"><CtaBand /></div>
+    </div>
   </section>
 </Base>
+
+<style>
+  .ex-faq {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.32);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    color: #fff;
+  }
+</style>

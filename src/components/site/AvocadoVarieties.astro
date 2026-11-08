@@ -1,0 +1,382 @@
+---
+/**
+ * Avocado varieties, weights and harvest calendar in one section (same pattern as the citrus page).
+ * Left: the variety's fruit, name and ripe skin colour, then a glass panel with its weight range on a
+ * gram scale and the harvest calendar. Right: the five varieties as square blue-tinted glass cards,
+ * one in view at a time (arrows, click or swipe), with the five variety icons in a row below.
+ * The section fades to each variety's colour: greens for green-skinned fruit, plum for the dark ones.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+import { avocadoVarieties, avocadoScale as sc, avocadoHarvest as hv, avocadoFuture as fu } from '../../data/avocado';
+
+const vs = avocadoVarieties.map((v, i) => ({ ...v, i, big: media(v.art.big), icon: media(v.art.icon) }));
+const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
+const pct = (g: number) => ((g - sc.min) / (sc.max - sc.min)) * 100;
+const ticks = [100, 200, 300, 400];
+const n = vs.length;
+---
+
+<section id="varieties" class="av relative isolate scroll-mt-20 overflow-hidden bg-[#0c1c15]" aria-labelledby="av-title" data-av>
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    {vs.map((v) => <div class="absolute inset-0" style={`${v.i === 0 ? 'opacity:1' : 'opacity:0'};background:radial-gradient(70% 80% at 70% 50%, ${v.tone[0]}, ${v.tone[1]} 70%, #0b0f0c 120%)`} data-av-bg={v.i}></div>)}
+    <div class="absolute inset-0 bg-[radial-gradient(40%_50%_at_70%_50%,rgb(255_255_255/0.12),transparent_70%)]"></div>
+  </div>
+
+  <div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-28">
+    <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Varieties, sizes and harvest</span>
+    <h2 id="av-title" class="cond mt-3 max-w-3xl text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">Five avocado varieties</h2>
+
+    <div class="mt-8 grid items-end gap-12 lg:mt-6 lg:grid-cols-12 lg:gap-8">
+      <!-- Left: the variety's fruit, name, skin, weight range and the harvest calendar. -->
+      <div class="lg:col-span-5">
+        <div class="min-w-0 text-center lg:text-left">
+          <div class="relative mx-auto mb-4 aspect-square w-[min(72vw,24rem)] lg:-ml-6" style="perspective:1000px" data-av-stage-art aria-hidden="true">
+            <div class="absolute inset-[8%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
+            <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-av-orbit></div>
+            {vs.map((v) => (
+              <div class="absolute inset-0 flex items-center justify-center" style={hidden(v.i)} data-av-art={v.i}>
+                <Image src={v.big} alt="" widths={[480, 720].filter((w) => w <= v.big.width)} sizes="24rem" class="h-auto w-[86%] drop-shadow-[0_30px_36px_rgba(0,0,0,0.45)]" />
+              </div>
+            ))}
+          </div>
+          <div class="grid">
+            {vs.map((v) => (
+              <div class="col-start-1 row-start-1" style={hidden(v.i)} data-av-name={v.i} aria-hidden={v.i === 0 ? 'false' : 'true'}>
+                <p class="cond text-[clamp(2.4rem,1.8rem+2vw,3.6rem)] font-medium uppercase leading-[0.92] text-white">{v.name}</p>
+                <p class="mt-2 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-white/80 lg:justify-start">
+                  <span class:list={['inline-block size-3 rounded-full ring-1 ring-white/50', v.skin === 'dark' ? 'bg-[#2a1726]' : 'bg-[#6f9a2c]']}></span>{v.skinLabel}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div class="av-glass mx-auto mt-7 max-w-[30rem] rounded-[24px] px-5 pb-4 pt-4 text-left lg:mx-0">
+            <!-- Weight range on a gram scale. -->
+            <div class="mb-3 grid">
+              {vs.map((v) => (
+                <p class="col-start-1 row-start-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white" style={hidden(v.i)} data-av-wl={v.i}>Fruit weight: {v.grams[0]} to {v.grams[1]} g</p>
+              ))}
+            </div>
+            <div class="relative h-3 rounded-full bg-black/20 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)]">
+              <span class="av-wbar absolute top-0 h-3 rounded-full" style={`left:${pct(vs[0]!.grams[0])}%;width:${pct(vs[0]!.grams[1]) - pct(vs[0]!.grams[0])}%`} data-av-wbar aria-hidden="true"></span>
+            </div>
+            <ol class="relative mt-2 h-4 text-[0.62rem] font-semibold text-white/70" aria-hidden="true">
+              {ticks.map((t) => <li class="absolute -translate-x-1/2" style={`left:${pct(t)}%`}>{t} g</li>)}
+            </ol>
+
+            <!-- Harvest calendar. -->
+            <p class="mb-3 mt-4 border-t border-white/15 pt-4 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white">{hv.label}</p>
+            <div class="relative">
+              <span class="av-hbar absolute top-0 h-3 rounded-full" style={`left:${(hv.from / 12) * 100}%;width:${((hv.to - hv.from) / 12) * 100}%`} data-av-hbar aria-hidden="true"></span>
+              <span class="av-fbar absolute top-0 h-3 rounded-full" style={`left:${(fu.from / 12) * 100}%;width:${((fu.to - fu.from) / 12) * 100}%`} aria-hidden="true"></span>
+              <ol class="grid grid-cols-12 gap-1" aria-label="Months of the year">
+                {months.map((m) => (
+                  <li class="flex flex-col items-center gap-2">
+                    <span class="h-3 w-full rounded-full bg-black/20 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)]"></span>
+                    <span class="text-[0.62rem] font-semibold text-white/75">{m}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <p class="mt-3 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/70"><span class="av-fkey inline-block h-1.5 w-5 shrink-0 rounded-full"></span>{fu.label}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: one square card in view at a time, variety icons below. -->
+      <div class="lg:col-span-7">
+        <div class="av-stage relative mx-auto w-full touch-pan-y select-none" data-av-stage>
+          <ul>
+            {vs.map((v) => (
+              <li class="av-slot absolute left-1/2 top-0 w-[min(84vw,26rem)] [margin-left:calc(min(84vw,26rem)/-2)]" data-av-card={v.i} aria-label={`${v.name}, ${v.i + 1} of ${n}`}>
+                <article class="av-glass relative flex aspect-square w-full flex-col rounded-[30px] p-6 text-white md:p-7" style={`--accent:${v.tone[0]}`} data-av-article>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="rounded-lg px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-white" style={`background: color-mix(in srgb, ${v.tone[0]} 75%, #1e4a30)`}>Avocado</span>
+                    <span class="cond text-sm font-semibold tracking-[0.12em] text-white/75">{String(v.i + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}</span>
+                  </div>
+                  <h3 class="cond mt-4 text-[clamp(1.9rem,1.5rem+1.2vw,2.5rem)] font-medium uppercase leading-[0.95] text-white">{v.name}</h3>
+                  <p class="mt-3 border-t border-white/20 pt-3 text-[0.92rem] leading-relaxed text-white/90">{v.text}</p>
+                  <p class="mt-auto flex items-center gap-2 pt-4 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/70"><span class="inline-block h-1.5 w-5 shrink-0 rounded-full bg-white"></span>{v.grams[0]} to {v.grams[1]} g · {v.skin === 'dark' ? 'Dark skin when ripe' : 'Green skin when ripe'}</p>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="mt-4 flex items-center justify-center gap-4">
+          <button type="button" class="av-arrow flex size-11 items-center justify-center rounded-full" aria-label="Previous variety" data-av-prev><Icon name="arrow" class="size-5 rotate-180" /></button>
+          <ol class="flex items-center gap-2" aria-hidden="true">
+            {vs.map((v) => <li class:list={['av-dot h-1.5 rounded-full', v.i === 0 && 'is-on']} data-av-dot={v.i}></li>)}
+          </ol>
+          <button type="button" class="av-arrow flex size-11 items-center justify-center rounded-full" aria-label="Next variety" data-av-next><Icon name="arrow" class="size-5" /></button>
+        </div>
+        <div class="av-rail mx-auto mt-8 flex w-full max-w-[30rem] justify-between gap-1 rounded-full p-1.5 sm:p-2" role="tablist" aria-label="Choose an avocado variety">
+          {vs.map((v) => (
+            <button type="button" role="tab" aria-selected={v.i === 0 ? 'true' : 'false'} tabindex={v.i === 0 ? 0 : -1} class="av-pick group flex flex-col items-center gap-1 rounded-[20px] px-1 py-1.5 sm:px-2" style={`--accent:${v.tone[0]}`} data-av-pick={v.i}>
+              <span class="av-pick-dot flex size-12 items-center justify-center rounded-full sm:size-14">
+                <Image src={v.icon} alt="" widths={[160]} sizes="56px" class="h-[74%] w-auto object-contain transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" />
+              </span>
+              <span class="text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-white/80 sm:text-[0.6rem]">{v.short}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .av-rail,
+  .av-arrow {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.32);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .av-arrow {
+    color: #fff;
+    transition: background-color 0.3s, opacity 0.3s;
+  }
+  .av-arrow:hover {
+    background: rgb(255 255 255 / 0.22);
+  }
+  .av-arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  /* Same cue as the citrus page: the next arrow breathes twice in warm green (outline and arrow only). */
+  .av-arrow.is-breathe {
+    animation: av-breathe 1.3s ease-in-out 2;
+  }
+  @keyframes av-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      color: #fff;
+      border-color: rgb(225 238 255 / 0.32);
+    }
+    50% {
+      transform: scale(1.12);
+      color: #74c365;
+      border-color: #74c365;
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 0 0 1px #74c365, 0 0 16px rgb(116 195 101 / 0.45);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .av-arrow.is-breathe {
+      animation: none;
+    }
+  }
+  .av-dot {
+    width: 0.75rem;
+    background: rgb(255 255 255 / 0.3);
+    transition: width 0.4s, background-color 0.4s;
+  }
+  .av-dot.is-on {
+    width: 1.75rem;
+    background: #fff;
+  }
+  .av-pick-dot {
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    transition: background-color 0.4s, border-color 0.4s, box-shadow 0.4s;
+  }
+  .av-pick[aria-selected='true'] .av-pick-dot {
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+    border-color: rgb(255 255 255 / 0.7);
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 0.12), 0 12px 30px -10px var(--accent);
+  }
+  .av-pick[aria-selected='true'] span:last-child {
+    color: #fff;
+  }
+  .av-pick:focus-visible,
+  .av-arrow:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .av-glass {
+    background:
+      radial-gradient(90% 60% at 85% 0%, color-mix(in srgb, var(--accent, transparent) 20%, transparent), transparent 70%),
+      linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  .av-slot {
+    will-change: transform;
+  }
+  .av-wbar,
+  .av-hbar {
+    background: #fff;
+    box-shadow: 0 0 14px rgb(255 255 255 / 0.45);
+    z-index: 1;
+  }
+  .av-fbar,
+  .av-fkey {
+    /* Future availability from the new orchards: a dashed, softer bar. */
+    background: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.55) 0 6px, transparent 6px 10px);
+    z-index: 1;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { avocadoScale as sc, avocadoVarieties } from '../../data/avocado';
+
+  document.querySelectorAll<HTMLElement>('[data-av]').forEach((root) => {
+    const q = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
+    const cards = q('[data-av-card]');
+    const dots = q('[data-av-dot]');
+    const picks = q('[data-av-pick]') as HTMLButtonElement[];
+    const names = q('[data-av-name]');
+    const wls = q('[data-av-wl]');
+    const bgs = q('[data-av-bg]');
+    const arts = q('[data-av-art]');
+    const wbar = root.querySelector<HTMLElement>('[data-av-wbar]')!;
+    const hbar = root.querySelector<HTMLElement>('[data-av-hbar]')!;
+    const prev = root.querySelector<HTMLButtonElement>('[data-av-prev]')!;
+    const next = root.querySelector<HTMLButtonElement>('[data-av-next]')!;
+    const artStage = root.querySelector<HTMLElement>('[data-av-stage-art]')!;
+    const stage = root.querySelector<HTMLElement>('[data-av-stage]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const d = reduce ? 0 : 1;
+    const pct = (g: number) => ((g - sc.min) / (sc.max - sc.min)) * 100;
+    const state = { pos: 0 };
+    let at = 0;
+
+    // Active card centred, neighbours smaller and tucked behind (phones: a stacked deck).
+    const place = (pos: number) => {
+      const w = cards[0]!.offsetWidth || 340;
+      const deck = window.innerWidth < 768;
+      const stageW = stage.offsetWidth || w * 2.4;
+      const side = Math.min(w * 0.7, Math.max(0, (stageW - w * 0.78) / 2));
+      cards.forEach((card, i) => {
+        const dd = i - pos;
+        const t = Math.abs(dd);
+        const s = Math.sign(dd);
+        gsap.set(card, {
+          x: deck ? s * Math.min(t, 1.5) * w * 0.07 : s * Math.min(t, 1.6) * side,
+          y: deck ? Math.min(t, 1.5) * -14 : 0,
+          rotation: deck ? s * Math.min(t, 1.5) * 4 : 0,
+          scale: 1 - Math.min(t, 1.5) * (deck ? 0.07 : 0.22),
+          rotationY: deck ? 0 : -s * Math.min(t, 1) * 18,
+          transformPerspective: 1100,
+          zIndex: 50 - Math.round(t * 10),
+          opacity: t > 1.4 ? Math.max(0, 1 - (t - 1.4) * 3) : 1,
+          filter: `brightness(${1 - Math.min(t, 1) * 0.3})`,
+          pointerEvents: t < 1.5 ? 'auto' : 'none',
+        });
+        card.setAttribute('aria-hidden', t < 0.5 ? 'false' : 'true');
+        gsap.set(card.querySelectorAll('h3, p, span'), { opacity: Math.max(0, 1 - t * 1.6) });
+      });
+    };
+
+    const breathe = () => {
+      if (next.disabled) return;
+      next.classList.remove('is-breathe');
+      void next.offsetWidth;
+      next.classList.add('is-breathe');
+      next.addEventListener('animationend', () => next.classList.remove('is-breathe'), { once: true });
+    };
+
+    function go(i: number, first = false) {
+      const to = Math.max(0, Math.min(cards.length - 1, i));
+      const from = at;
+      at = to;
+      gsap.to(state, { pos: to, duration: 0.7 * d, ease: 'power3.out', overwrite: true, onUpdate: () => place(state.pos) });
+      if (!d) place(to);
+      dots.forEach((dot, di) => dot.classList.toggle('is-on', di === to));
+      prev.disabled = to === 0;
+      next.disabled = to === cards.length - 1;
+      picks.forEach((p, pi) => {
+        p.setAttribute('aria-selected', pi === to ? 'true' : 'false');
+        p.tabIndex = pi === to ? 0 : -1;
+      });
+      names.forEach((nm, ni) => nm.setAttribute('aria-hidden', ni === to ? 'false' : 'true'));
+      // Weight bar slides to the new range.
+      const g = avocadoVarieties[to]!.grams;
+      gsap.to(wbar, { left: `${pct(g[0])}%`, width: `${pct(g[1]) - pct(g[0])}%`, duration: 0.8 * d, ease: 'power3.out' });
+      if (first || from === to) return;
+
+      const dir = to > from ? 1 : -1;
+      gsap.killTweensOf([...names, ...wls, ...bgs, ...arts]);
+      arts.forEach((el, ai) => ai !== from && ai !== to && gsap.set(el, { autoAlpha: 0 }));
+      gsap.to(arts[from]!, { autoAlpha: 0, rotationY: -70 * dir, xPercent: -30 * dir, scale: 0.6, duration: 0.45 * d, ease: 'power3.in' });
+      gsap.fromTo(arts[to]!, { autoAlpha: 0, rotationY: 80 * dir, xPercent: 35 * dir, scale: 0.5 }, { autoAlpha: 1, rotationY: 0, xPercent: 0, scale: 1, duration: 1 * d, ease: 'back.out(1.4)', delay: 0.15 * d });
+      [names, wls].forEach((grp) => grp.forEach((el, k) => k !== to && gsap.set(el, { autoAlpha: 0 })));
+      gsap.fromTo(names[to]!, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.5 * d, ease: 'power3.out' });
+      gsap.set(wls[to]!, { autoAlpha: 1 });
+      bgs.forEach((el, k) => k !== from && k !== to && gsap.set(el, { opacity: 0 }));
+      gsap.to(bgs[from]!, { opacity: 0, duration: 0.7 * d });
+      gsap.to(bgs[to]!, { opacity: 1, duration: 0.7 * d });
+    }
+
+    prev.addEventListener('click', () => go(at - 1));
+    next.addEventListener('click', () => go(at + 1));
+    cards.forEach((c, i) => c.addEventListener('click', () => i !== at && go(i)));
+    picks.forEach((p, i) => {
+      p.addEventListener('click', () => go(i));
+      p.addEventListener('keydown', (e) => {
+        if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+        e.preventDefault();
+        const k = (i + (e.key === 'ArrowRight' ? 1 : picks.length - 1)) % picks.length;
+        picks[k]!.focus();
+        go(k);
+      });
+    });
+    let x0: number | null = null;
+    stage.addEventListener('pointerdown', (e) => (x0 = e.clientX));
+    stage.addEventListener('pointerup', (e) => {
+      if (x0 === null) return;
+      const dx = e.clientX - x0;
+      if (Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1));
+      x0 = null;
+    });
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') go(at + 1);
+      if (e.key === 'ArrowLeft') go(at - 1);
+    });
+
+    // Every card is square, or taller only if the longest description needs it; all share that size.
+    const articles = q('[data-av-article]');
+    const size = () => {
+      articles.forEach((a) => (a.style.height = ''));
+      const h = Math.max(...articles.map((a) => a.offsetHeight));
+      articles.forEach((a) => (a.style.height = `${h}px`));
+      stage.style.height = `${h + 24}px`;
+      place(state.pos);
+    };
+    go(0, true);
+    size();
+    window.addEventListener('resize', size);
+    document.fonts?.ready.then(size);
+
+    if (!reduce) {
+      gsap.to(root.querySelector('[data-av-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+      arts.forEach((a) => gsap.to(a.firstElementChild, { y: -12, rotate: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+      if (window.matchMedia('(hover: hover)').matches) {
+        const rx = gsap.quickTo(artStage, 'rotationX', { duration: 0.8, ease: 'power3' });
+        const ry = gsap.quickTo(artStage, 'rotationY', { duration: 0.8, ease: 'power3' });
+        root.addEventListener('pointermove', (e) => {
+          const r = artStage.getBoundingClientRect();
+          ry(((e.clientX - (r.left + r.width / 2)) / window.innerWidth) * 30);
+          rx((-(e.clientY - (r.top + r.height / 2)) / window.innerHeight) * 24);
+        });
+        root.addEventListener('pointerleave', () => (rx(0), ry(0)));
+      }
+      gsap.set([wbar, hbar], { scaleX: 0, transformOrigin: 'left center' });
+      new IntersectionObserver(([e], o) => {
+        if (!e!.isIntersecting) return;
+        gsap.to([hbar, wbar], { scaleX: 1, duration: 1.1, stagger: 0.15, ease: 'power3.out' });
+        window.setTimeout(breathe, 600);
+        o.disconnect();
+      }, { threshold: 0.5 }).observe(hbar);
+    }
+  });
+</script>

@@ -1,0 +1,151 @@
+---
+/**
+ * Macadamias scroll scene: "One harvest, two markets". A cluster of macadamias in their green husks
+ * sits in the middle of the screen. As the visitor scrolls, the husk gives way to the dry nut in
+ * shell, which then cracks open to show the kernel, while the light turns from leaf green to shell
+ * brown to kernel cream. A three-stop track (husk, in shell, kernel) follows along, and the three
+ * steps from the approved copy arrive: harvested May to July, nuts in shell to China, kernel to the
+ * USA and EU. Without motion it shows the cracked nut and every step.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+import { macadamiaRoute } from '../../data/macadamia';
+
+const husk = media('produce/renders/macadamia.webp');
+const shell = media('produce/cutouts/macadamia-nuts-leaves.webp');
+const kernel = media('produce/cutouts/macadamia-cracked.webp');
+const stops = ['In the husk', 'Nut in shell', 'Kernel'];
+---
+
+<section class="mr relative" aria-labelledby="mr-title" data-mr>
+  <div class="mr-stage sticky top-0 flex min-h-[100svh] flex-col overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#5d7f26,#141f08_75%)]"></div>
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#8a5a33,#22130a_75%)]" data-mr-bg="1"></div>
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_35%_55%,#c39a5c,#2e200c_75%)]" data-mr-bg="2"></div>
+
+    <div class="mx-auto grid w-full max-w-[84rem] flex-1 items-center gap-6 px-4 pb-16 pt-20 md:px-6 md:pt-24 lg:grid-cols-12 lg:gap-10">
+      <!-- The nut: husk, then shell, then cracked to the kernel. -->
+      <div class="relative lg:col-span-6" aria-hidden="true">
+        <div class="relative mx-auto aspect-square w-[min(62vw,16rem)] md:w-[min(42vw,26rem)] lg:w-[min(38vw,30rem)]" data-mr-nut>
+          <div class="absolute inset-[10%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
+          <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-mr-orbit></div>
+          <div class="absolute inset-0 flex items-center justify-center" data-mr-art="0">
+            <Image src={husk} alt="" widths={[480, 720, 960]} sizes="30rem" class="h-auto w-[92%] drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]" />
+          </div>
+          <div class="absolute inset-0 flex items-center justify-center" data-mr-art="1">
+            <Image src={shell} alt="" widths={[480, 720, 960]} sizes="30rem" class="h-auto w-[84%] drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]" />
+          </div>
+          <div class="absolute inset-0 flex items-center justify-center" data-mr-art="2">
+            <Image src={kernel} alt="" widths={[480, 720, 960]} sizes="30rem" class="h-auto w-[86%] drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]" />
+          </div>
+        </div>
+        <!-- Three-stop track. -->
+        <div class="mx-auto mt-4 w-[min(80vw,22rem)] md:mt-8">
+          <div class="relative h-2.5 rounded-full bg-[linear-gradient(90deg,#7fa23a,#9a6b43,#e8d6a8)] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.25)]">
+            {stops.map((_, i) => <span class="absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70" style={`left:${i * 50}%`}></span>)}
+            <span class="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-white/30 shadow-[0_0_14px_rgb(255_255_255/0.6)] [backdrop-filter:blur(4px)]" style="left:100%" data-mr-knob></span>
+          </div>
+          <div class="mt-2 flex justify-between text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">
+            {stops.map((s) => <span>{s}</span>)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Heading and the steps. -->
+      <div class="lg:col-span-6">
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">From the orchard to the world</span>
+        <h2 id="mr-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">One harvest. Two markets.</h2>
+        <ol class="mr-list mt-6 grid gap-2.5 md:mt-8 md:gap-3">
+          {
+            macadamiaRoute.map((r, i) => (
+              <li class="mr-chip flex items-start gap-4 rounded-[22px] p-3.5 text-left text-white md:p-5" data-mr-chip={i}>
+                <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30"><Icon name={r.icon} class="size-5" /></span>
+                <span>
+                  <span class="cond block text-lg font-semibold uppercase tracking-[0.06em]">{r.title}</span>
+                  <span class="mt-1 block text-[0.9rem] leading-relaxed text-white/85">{r.text}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+    <div class="absolute inset-x-0 bottom-8 mx-auto h-[3px] w-28 overflow-hidden rounded-full bg-white/15" aria-hidden="true"><span class="block h-full w-full origin-left scale-x-0 bg-white/70" data-mr-bar></span></div>
+  </div>
+</section>
+
+<style>
+  :global(html.js-motion) .mr {
+    height: 300svh;
+  }
+  .mr-chip {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 30px 60px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  /* No motion: only the cracked nut, cream light. */
+  :global(html:not(.js-motion)) [data-mr-art='0'],
+  :global(html:not(.js-motion)) [data-mr-art='1'] {
+    opacity: 0;
+  }
+  /* Phones: the steps take turns in one place so the scene fits one screen. */
+  @media (max-width: 767px) {
+    :global(html.js-motion) .mr-list {
+      grid-template-areas: 'one';
+    }
+    :global(html.js-motion) .mr-list > li {
+      grid-area: one;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-mr]').forEach((root) => {
+    if (!document.documentElement.classList.contains('js-motion')) return;
+    const q = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
+    const arts = q('[data-mr-art]');
+    const bgs = q('[data-mr-bg]');
+    const knob = root.querySelector<HTMLElement>('[data-mr-knob]')!;
+    const chips = q('[data-mr-chip]');
+    const phone = () => window.innerWidth < 768;
+
+    gsap.set(arts.slice(1), { autoAlpha: 0, scale: 0.85 });
+    gsap.set(bgs, { opacity: 0 });
+    gsap.set(knob, { left: '0%' });
+    gsap.set(chips, { autoAlpha: 0, y: 40, scale: 0.94 });
+    gsap.to(root.querySelector('[data-mr-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true } });
+    tl.to(root.querySelector('[data-mr-bar]'), { scaleX: 1, duration: 3.4 }, 0);
+
+    // Husk -> in shell: the husk shrinks and fades as the dry nuts swell into place.
+    tl.to(arts[0]!, { autoAlpha: 0, scale: 1.15, rotation: -12, duration: 0.5, ease: 'power2.in' }, 1.0)
+      .to(arts[1]!, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, 1.15)
+      .to(bgs[0]!, { opacity: 1, duration: 0.6 }, 1.0)
+      .to(knob, { left: '50%', duration: 0.6, ease: 'power1.inOut' }, 1.0);
+
+    // In shell -> kernel: a quick shake, the shell "cracks" and the open nut and kernel pop forward.
+    tl.to(arts[1]!, { keyframes: [{ x: -6, rotation: -3 }, { x: 6, rotation: 3 }, { x: -4, rotation: -2 }, { x: 0, rotation: 0 }], duration: 0.3 }, 2.0)
+      .to(arts[1]!, { autoAlpha: 0, scale: 0.9, duration: 0.3, ease: 'power2.in' }, 2.3)
+      .fromTo(arts[2]!, { autoAlpha: 0, scale: 0.7, rotation: 8 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.45, ease: 'back.out(2)' }, 2.35)
+      .to(bgs[1]!, { opacity: 1, duration: 0.6 }, 2.2)
+      .to(knob, { left: '100%', duration: 0.6, ease: 'power1.inOut' }, 2.2);
+
+    // The steps arrive one after another (on phones each replaces the last).
+    chips.forEach((c, i) => {
+      const t = 0.2 + i * 1.05;
+      tl.to(c, { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: 'power2.out' }, t);
+      if (i > 0) tl.to(chips[i - 1]!, { autoAlpha: () => (phone() ? 0 : 1), y: () => (phone() ? -30 : 0), duration: 0.3 }, t - 0.05);
+    });
+    tl.to({}, { duration: 0.4 });
+  });
+</script>

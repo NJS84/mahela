@@ -1,0 +1,154 @@
+---
+/**
+ * Golden kiwi scroll scene: from blossom to golden fruit. Photos from the Mahela kiwi vines open one
+ * after another in a round glass window (blossom, fruit set, young fruit), then the window gives way
+ * to a cut golden kiwi with its four differences from green kiwis around it. Approved copy only.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const stages = [
+  { photo: 'produce/farm/kiwi-vine-105537.jpg', alt: 'A golden kiwi blossom on a Mahela vine', title: 'Vines in Magoebaskloof', text: 'Our kiwi vines are situated in Magoebaskloof, a location that has an exceptional climate for kiwi production.' },
+  { photo: 'produce/farm/kiwi-vine-105545.jpg', alt: 'Kiwi fruit setting as the blossom petals fall', title: 'High and cold', text: 'The high altitude and cold climate deter virtually all pests and fungi.' },
+  { photo: 'produce/farm/kiwi-vine-105548.jpg', alt: 'Young golden kiwis hanging on the vine', title: 'Harvested in February', text: 'Our Sorelli kiwis are harvested in February for the EU, the East and the local market.' },
+];
+const traits = ['Smaller seeds', 'Sweeter tasting', 'Thin skin', 'Shorter, fewer hairs'];
+const kiwi = media('produce/renders/kiwi.webp');
+const n = stages.length + 1;
+---
+
+<section class="kv relative isolate" style="height:440svh" aria-labelledby="kv-title" data-kv>
+  <div class="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="absolute inset-0 bg-[radial-gradient(70%_70%_at_30%_45%,#6b8a1e,#16200a_75%)]"></div>
+      <div class="absolute inset-0 opacity-0 bg-[radial-gradient(60%_60%_at_30%_45%,#e8b81a,#3a2a04_75%)]" data-kv-gold></div>
+    </div>
+    <div class="mx-auto grid w-full max-w-[84rem] items-center gap-6 px-4 md:grid-cols-12 md:gap-10 md:px-6">
+      <div class="md:col-span-6">
+        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Blossom to fruit</span>
+        <h2 id="kv-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Gold on the vine</h2>
+        <div class="relative mx-auto mt-5 aspect-square w-[min(66vw,19rem)] md:mt-8 md:w-[min(36vw,28rem)]">
+          <div class="absolute inset-0 rounded-full border border-dashed border-white/20" aria-hidden="true" data-kv-orbit></div>
+          {stages.map((s, i) => (
+            <figure class="kv-win absolute inset-[6%] overflow-hidden rounded-full" style={i === 0 ? '' : 'clip-path:circle(0% at 50% 50%)'} data-kv-photo={i}>
+              <Image src={media(s.photo)} alt={s.alt} widths={[480, 720]} sizes="28rem" class="h-full w-full object-cover" />
+            </figure>
+          ))}
+          <div class="absolute inset-0 flex items-center justify-center opacity-0" data-kv-kiwi aria-hidden="true">
+            <Image src={kiwi} alt="" widths={[480, 720]} sizes="28rem" class="w-[92%] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]" />
+          </div>
+          <ul class="pointer-events-none absolute inset-0" aria-label="How golden kiwis differ from green kiwis">
+            {traits.map((t, i) => (
+              <li class="kv-trait absolute whitespace-nowrap rounded-full px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white md:text-[0.7rem]" style={['left:-4%;top:6%', 'right:-6%;top:14%', 'left:-6%;bottom:12%', 'right:-4%;bottom:4%'][i]} data-kv-trait>{t}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <ol class="space-y-2.5 md:col-span-6 md:space-y-3">
+        {stages.map((s, i) => (
+          <li class="kv-step rounded-[22px] p-4 md:p-5" data-kv-step={i}>
+            <span class="cond block text-lg font-medium uppercase leading-tight text-white md:text-2xl">{s.title}</span>
+            <span class="kv-text block text-[0.85rem] leading-snug text-white/85 md:text-[0.95rem]">{s.text}</span>
+          </li>
+        ))}
+        <li class="kv-step rounded-[22px] p-4 md:p-5" data-kv-step={stages.length}>
+          <span class="cond block text-lg font-medium uppercase leading-tight text-white md:text-2xl">Golden inside</span>
+          <span class="kv-text block text-[0.85rem] leading-snug text-white/85 md:text-[0.95rem]">Golden kiwis have smaller seeds and are sweeter tasting than green kiwis. They have a thin skin, and the hairs are shorter and fewer than those of green kiwis.</span>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .kv-win {
+    border: 1px solid rgb(235 244 255 / 0.55);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 40px 70px -30px rgb(0 0 0 / 0.6);
+  }
+  .kv-trait,
+  .kv-step {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.32);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .kv-trait {
+    opacity: 0;
+  }
+  .kv-step {
+    opacity: 0.45;
+    transition: opacity 0.5s, transform 0.5s, border-color 0.5s;
+  }
+  .kv-text {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s, margin-top 0.5s;
+  }
+  .kv-step.is-on {
+    opacity: 1;
+    transform: translateX(6px);
+    border-color: rgb(235 244 255 / 0.65);
+  }
+  .kv-step.is-on .kv-text {
+    max-height: 7rem;
+    margin-top: 0.35rem;
+  }
+  .kv-step.is-past {
+    opacity: 0.78;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-kv]').forEach((root) => {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-kv-step]')];
+    const photos = [...root.querySelectorAll<HTMLElement>('[data-kv-photo]')];
+    const kiwi = root.querySelector<HTMLElement>('[data-kv-kiwi]')!;
+    const traits = [...root.querySelectorAll<HTMLElement>('[data-kv-trait]')];
+    const gold = root.querySelector<HTMLElement>('[data-kv-gold]')!;
+    const n = steps.length;
+    let at = -1;
+    const show = (i: number) => {
+      if (i === at) return;
+      at = i;
+      steps.forEach((s, k) => {
+        s.classList.toggle('is-on', k === i);
+        s.classList.toggle('is-past', k < i);
+      });
+    };
+    show(0);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.to(root.querySelector('[data-kv-orbit]'), { rotate: 360, duration: 60, ease: 'none', repeat: -1 });
+
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (st) => {
+        const p = st.progress;
+        const f = p * n;
+        show(Math.min(n - 1, Math.floor(f * 0.999)));
+        // Each later photo opens as a circle over the one before it.
+        photos.forEach((ph, k) => {
+          if (k === 0) return;
+          const t = Math.max(0, Math.min(1, (f - k + 0.25) / 0.5));
+          ph.style.clipPath = `circle(${t * 72}% at 50% 50%)`;
+          gsap.set(ph.firstElementChild, { scale: 1.2 - t * 0.2 });
+        });
+        // Last stage: the photo window shrinks away and the cut golden kiwi turns in.
+        const k = Math.max(0, Math.min(1, (f - (n - 1) + 0.2) / 0.45));
+        photos.forEach((ph) => gsap.set(ph, { scale: 1 - k * 0.6, opacity: 1 - k }));
+        gsap.set(kiwi, { opacity: k, scale: 0.6 + k * 0.4, rotation: -30 + k * 30 });
+        gsap.set(gold, { opacity: k });
+        traits.forEach((t, i) => {
+          const tt = Math.max(0, Math.min(1, (f - (n - 1) - 0.15 - i * 0.1) / 0.2));
+          gsap.set(t, { opacity: tt, y: (1 - tt) * 14 });
+        });
+      },
+    });
+  });
+</script>

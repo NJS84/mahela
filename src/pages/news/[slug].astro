@@ -34,13 +34,15 @@ const jsonLd = [
 ---
 
 <Base title={p.title} description={p.excerpt} breadcrumbs={crumbs} jsonLd={jsonLd} ogImage={image} type="article">
+  <div class="relative isolate">
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_70%_0%,#2f5a8f,#0d1a2c_75%)]"></div>
   <article class="mx-auto max-w-[60rem] px-4 pb-24 pt-36 md:px-6 md:pt-44">
     <nav aria-label="Breadcrumb" class="mb-6 text-xs uppercase tracking-[0.16em] text-ivory/70">
       <a href="/news" class="inline-flex items-center gap-2 hover:text-white"><Icon name="arrow" class="size-4 rotate-180" />All news</a>
     </nav>
-    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sage"><time datetime={p.date}>{fmt(p.date)}</time>{p.source && ` · ${p.source}`}</p>
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/75"><time datetime={p.date}>{fmt(p.date)}</time>{p.source && ` · ${p.source}`}</p>
     <h1 class="cond mt-4 text-[clamp(2.4rem,1.6rem+3.4vw,4.75rem)] font-medium uppercase leading-[0.95]" lang={p.lang === 'af' ? 'af' : undefined} data-split>{p.title}</h1>
-    <div class="glass-soft mt-10 overflow-hidden rounded-[28px] p-1.5" data-reveal>
+    <div class="bl-glass mt-10 overflow-hidden rounded-[28px] p-1.5" data-reveal>
       <Image src={image} alt="" widths={[640, 960, 1280]} sizes="(min-width: 960px) 60rem, 100vw" class="max-h-[70svh] w-full rounded-[22px] object-cover" loading="eager" />
     </div>
     <div class="prose-glass mt-10 text-lg leading-relaxed text-ivory/85">
@@ -53,10 +55,23 @@ const jsonLd = [
         </a>
       )
     }
-    <h2 class="cond mt-24 text-sm font-semibold uppercase tracking-[0.18em] text-sage">More news</h2>
+    <h2 class="cond mt-24 text-sm font-semibold uppercase tracking-[0.18em] text-white/80">More news</h2>
     <ul class="mt-5 grid gap-4 sm:grid-cols-3">
-      {others.map((o) => <li><a href={`/news/${o.slug}`} class="glass block h-full rounded-[22px] p-5 text-[0.95rem] font-medium leading-snug transition-transform hover:-translate-y-1" data-glare>{o.title}</a></li>)}
+      {others.map((o) => <li><a href={`/news/${o.slug}`} class="bl-glass block h-full rounded-[22px] p-5 text-[0.95rem] font-medium leading-snug transition-transform hover:-translate-y-1" data-glare>{o.title}</a></li>)}
     </ul>
     <div class="mt-20"><CtaBand /></div>
   </article>
+  </div>
 </Base>
+
+<style>
+  .bl-glass {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.34);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.32), 0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+    color: #fff;
+  }
+</style>
+

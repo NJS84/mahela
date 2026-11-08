@@ -156,7 +156,7 @@ export const produceDetail: Record<
         ],
       },
     ],
-    hero: 'produce/photos/mahela-aug19.jpg',
+    hero: 'produce/farm/avocado-pickers-105249.jpg',
     gallery: ['produce/photos/mahela-aug12.jpg', 'produce/styled/2026-whole-and-cut-avocados-with-green-leaves-on-white.jpg'],
     accent: '#6f8f2e',
   },
@@ -176,7 +176,8 @@ export const produceDetail: Record<
       'Bananas are packed on-farm, thereby ensuring minimum bruising due to handling. The packed bananas are transported directly from farm to ripening facilities at all major markets in South Africa. Some are distributed to Botswana and Namibia.',
       'Bananas are marketed under the well-known Mala-Mala brand. This brand was founded in the 1960s by the late BJ Vorster.',
     ],
-    hero: 'produce/photos/mahela-aug18.jpg',
+    // Mahela fotos 2022, Piesangs: banana rows with a bunch and its flower.
+    hero: 'produce/farm/banana-plantation-road-105227.jpg',
     gallery: ['produce/photos/mahela-aug33.jpg'],
     accent: '#d9b13b',
   },
@@ -193,7 +194,7 @@ export const produceDetail: Record<
       { label: 'Markets', value: 'Nuts in shell to China; kernel to the USA and EU' },
     ],
     body: [],
-    hero: 'produce/photos/mahela-aug28.jpg',
+    hero: 'produce/farm/macadamia-nuts-dark-slate.jpg',
     gallery: ['produce/photos/img-9307.jpg'],
     accent: '#9a6b43',
   },
@@ -214,7 +215,7 @@ export const produceDetail: Record<
       'The litchis produced on our farms are Mauritius litchis. Our litchis are harvested in December and early January. They are exported to the EU and Middle East. The marketing is done through Westfalia Marketing.',
       'We don’t let any of our fruit go to waste. Any fruit that doesn’t meet export standards is juiced.',
     ],
-    hero: 'produce/photos/mahela-lichis-14.jpg',
+    hero: 'produce/farm/litchi-hero.jpg',
     gallery: ['produce/photos/mahela-lichis-2.jpg', 'produce/photos/mahela-lichis-15.jpg'],
     accent: '#b8344f',
   },
@@ -274,6 +275,26 @@ export const exportPage = {
     { name: 'Far East', text: 'Broader global distribution network.', lat: 1.3, lon: 103.8 },
   ],
   origin: { name: 'Letsitele, Limpopo', lat: -23.88, lon: 30.39 },
+  /**
+   * Globe routes per produce line, from the produce pages: citrus to every export
+   * market; avocados mostly exported (via Westfalia, shown to Europe); bananas to
+   * Botswana and Namibia; macadamias to China, the USA and the EU; litchis to the
+   * EU and Middle East; golden kiwis to the EU and the East.
+   */
+  produceRoutes: [
+    { produce: 'Citrus', color: '#ff9a1f', to: ['Europe', 'Russia', 'Middle East', 'Asia', 'Japan', 'Far East'] },
+    { produce: 'Avocados', color: '#3ecf6e', to: ['Europe'] },
+    { produce: 'Bananas', color: '#ffe14d', to: ['Botswana', 'Namibia'] },
+    { produce: 'Macadamias', color: '#d39a62', to: ['China', 'USA', 'Europe'] },
+    { produce: 'Litchis', color: '#ff4f7b', to: ['Europe', 'Middle East'] },
+    { produce: 'Golden kiwis', color: '#b5f23d', to: ['Europe', 'Far East'] },
+  ],
+  extraDestinations: {
+    Botswana: { lat: -24.65, lon: 25.91 },
+    Namibia: { lat: -22.56, lon: 17.08 },
+    China: { lat: 31.2, lon: 121.5 },
+    USA: { lat: 40.7, lon: -74 },
+  } as Record<string, { lat: number; lon: number }>,
   faq: [
     { q: 'Is Mahela Group GlobalGAP certified?', a: 'Yes. Mahela Group has been fully GlobalGAP certified since 2003 and is SIZA accredited.' },
     { q: 'Which citrus does Mahela export?', a: 'Grapefruit (Star Ruby, Shaddock / pomelo), Valencia oranges (Valencia, Turkey, Midknight, Delta), Cara Cara navels, soft citrus (Nules Clementine, Samba, Gold Nugget, Tango) and lemons (Genoa, Eureka).' },

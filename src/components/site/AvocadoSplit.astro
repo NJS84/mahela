@@ -1,0 +1,117 @@
+---
+/**
+ * Avocado page scroll scene: "Where our avocados go". A closed avocado sits in the middle; as the
+ * visitor scrolls, the two halves open apart and, in the space between them, the three routes from
+ * the approved copy appear one after another: export via Westfalia, South African supermarkets,
+ * and guacamole and avocado oil for the rest. Without motion it shows the opened state.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { media } from '../../lib/media';
+
+const seed = media('produce/cutouts/avocado-half-seed.webp');
+const open = media('produce/cutouts/avocado-half-open.webp');
+const routes = [
+  { icon: 'globe', title: 'Export', text: 'Most of our avocados are exported. They are marketed and distributed by Westfalia Marketing.' },
+  { icon: 'box', title: 'South African supermarkets', text: 'Some of the crop is sold to supermarkets in South Africa.' },
+  { icon: 'drop', title: 'Guacamole and avocado oil', text: 'Fruit not suitable for export or the supermarket is used for producing guacamole or avocado oil.' },
+] as const;
+---
+
+<section class="as relative" aria-labelledby="as-title" data-as>
+  <div class="as-stage sticky top-0 flex min-h-[100svh] flex-col overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-[#0f2118]"></div>
+    <div class="as-glow absolute inset-0 -z-10" data-as-glow></div>
+
+    <div class="mx-auto w-full max-w-[84rem] px-4 pt-20 text-center md:px-6 md:pt-28">
+      <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">From orchard to market</span>
+      <h2 id="as-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Where our avocados go</h2>
+    </div>
+
+    <div class="relative mx-auto flex w-full max-w-[84rem] flex-1 items-end justify-center px-4 pb-14 md:items-center md:pb-16 md:px-6">
+      <!-- The two halves. -->
+      <div class="as-half pointer-events-none absolute left-1/2 top-[14%] w-[min(27vw,19rem)] -translate-x-1/2 -translate-y-1/2 md:top-1/2 md:w-[min(30vw,24rem)]" data-as-open aria-hidden="true">
+        <Image src={open} alt="" widths={[400, 640]} sizes="24rem" class="h-auto w-full drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]" />
+      </div>
+      <div class="as-half pointer-events-none absolute left-1/2 top-[14%] w-[min(31vw,22rem)] -translate-x-1/2 -translate-y-1/2 md:top-1/2 md:w-[min(34vw,27rem)]" data-as-seed aria-hidden="true">
+        <Image src={seed} alt="" widths={[400, 640, 800]} sizes="27rem" class="h-auto w-full drop-shadow-[0_40px_40px_rgba(0,0,0,0.5)]" />
+      </div>
+
+      <!-- The three routes, between the halves. -->
+      <ol class="relative z-10 grid w-full max-w-[24rem] gap-2.5 md:mt-0 md:gap-3 md:max-w-[22rem] lg:max-w-[24rem]">
+        {
+          routes.map((r, i) => (
+            <li class="as-chip flex items-start gap-4 rounded-[22px] p-3.5 text-left text-white md:p-5" data-as-chip={i}>
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30"><Icon name={r.icon} class="size-5" /></span>
+              <span>
+                <span class="cond block text-lg font-semibold uppercase tracking-[0.06em]">{r.title}</span>
+                <span class="mt-1 block text-[0.9rem] leading-relaxed text-white/85">{r.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <div class="absolute inset-x-0 bottom-8 mx-auto h-[3px] w-28 overflow-hidden rounded-full bg-white/15" aria-hidden="true"><span class="block h-full w-full origin-left scale-x-0 bg-white/70" data-as-bar></span></div>
+  </div>
+</section>
+
+<style>
+  :global(html.js-motion) .as {
+    height: 240svh;
+  }
+  .as-glow {
+    background: radial-gradient(45% 55% at 50% 55%, rgb(142 178 62 / 0.4), transparent 70%);
+  }
+  .as-chip {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 30px 60px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  /* No motion: show the halves already apart (desktop) and every route. */
+  @media (min-width: 768px) {
+    :global(html:not(.js-motion)) [data-as-seed] {
+      margin-left: -30%;
+    }
+    :global(html:not(.js-motion)) [data-as-open] {
+      margin-left: 30%;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-as]').forEach((root) => {
+    if (!document.documentElement.classList.contains('js-motion')) return;
+    const seed = root.querySelector<HTMLElement>('[data-as-seed]')!;
+    const open = root.querySelector<HTMLElement>('[data-as-open]')!;
+    const chips = [...root.querySelectorAll<HTMLElement>('[data-as-chip]')];
+    const wide = () => window.innerWidth >= 768;
+    // How far each half travels: on wide screens far enough to clear the route cards, on phones a gentle split.
+    const spread = () => (wide() ? Math.min(window.innerWidth * 0.3, 470) : Math.min(window.innerWidth * 0.24, 120));
+
+    // Closed: the open half tucked behind the seed half, as one fruit.
+    gsap.set(seed, { x: 0, rotation: 0, scale: 0.9 });
+    gsap.set(open, { x: 0, rotation: 0, scale: 0.84, autoAlpha: 0.9 });
+    gsap.set(chips, { autoAlpha: 0, y: 40, scale: 0.94 });
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true } });
+    tl.to(root.querySelector('[data-as-bar]'), { scaleX: 1, duration: 3 }, 0);
+    // 1. A small wobble, as if the knife has gone round.
+    tl.to(seed, { rotation: -4, duration: 0.2 }, 0).to(seed, { rotation: 2, duration: 0.2 }, 0.2);
+    // 2. The halves open apart and turn outwards.
+    tl.to(seed, { x: () => -spread(), rotation: -10, scale: 1, duration: 1, ease: 'power2.inOut' }, 0.4)
+      .to(open, { x: () => spread(), rotation: 10, scale: 1, autoAlpha: 1, duration: 1, ease: 'power2.inOut' }, 0.4)
+      .to(root.querySelector('[data-as-glow]'), { opacity: 0.6, duration: 1 }, 0.4);
+    // 3. The three routes rise in, one after another.
+    chips.forEach((c, i) => tl.to(c, { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: 'power2.out' }, 1.2 + i * 0.45));
+    tl.to({}, { duration: 0.4 });
+  });
+</script>

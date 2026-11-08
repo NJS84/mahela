@@ -1,0 +1,60 @@
+---
+/**
+ * Free-floating 3D map of the Mahela packhouse at The Junction, Letsitele: extruded
+ * buildings, orchards, dams and roads over a ridgeline ground, in the colours and line
+ * style of LimpopoMap3D on the Packhouses page. Drag to turn.
+ * Map data: OpenStreetMap contributors (ODbL); elevation: AWS Terrain Tiles; buildings traced from aerial imagery.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div
+  class:list={['junction-map relative select-none', className]}
+  data-junction-map
+  role="img"
+  aria-label="3D map of the Mahela packhouse at The Junction, Letsitele, with its buildings, the surrounding citrus orchards, farm dams and the R71/R529 road"
+>
+  <div class="jm-fallback absolute inset-[12%] rounded-[40%] bg-[radial-gradient(circle,rgb(111_155_224/0.18),transparent_65%)]"></div>
+
+  <div data-jm-label class="jm-tag pointer-events-none absolute left-0 top-0 z-10">
+    <span class="absolute bottom-3 left-0 -translate-x-1/2 whitespace-nowrap rounded-2xl border border-white/25 bg-[#0b2347]/60 px-3.5 py-2 text-center shadow-[0_10px_40px_rgb(0_0_0/0.35)] backdrop-blur-md">
+      <span class="block text-[0.55rem] font-semibold uppercase tracking-[0.22em] text-[#ffd29a] md:text-[0.6rem]">The Junction · Letsitele</span>
+      <span class="cond block text-sm font-medium uppercase tracking-[0.05em] text-white md:text-lg">Mahela packhouse</span>
+      <span class="hidden text-[0.62rem] text-white/75 sm:block">Farmed since 1942</span>
+    </span>
+  </div>
+  <div data-jm-road class="jm-tag pointer-events-none absolute left-0 top-0 z-10">
+    <span class="absolute left-0 top-0 hidden -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-[#f59a23] sm:block px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-[#2a1503]">R71 · R529</span>
+  </div>
+
+  <p class="jm-hint pointer-events-none absolute bottom-[1%] left-1/2 -translate-x-1/2 whitespace-nowrap text-center text-[0.62rem] uppercase tracking-[0.2em] text-white/45">
+    Drag to turn · <span class="pointer-events-auto">Map data © <a class="underline-offset-2 hover:underline" href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a></span>
+  </p>
+</div>
+
+<style>
+  .junction-map .jm-tag { opacity: 0; transition: opacity 0.8s ease 1.6s; }
+  .junction-map:global(.is-live) .jm-tag { opacity: 1; }
+  .junction-map:global([data-mounted]) .jm-fallback { display: none; }
+  .junction-map:not([data-mounted]) .jm-tag { display: none; }
+</style>
+
+<script>
+  const els = document.querySelectorAll<HTMLElement>('[data-junction-map]');
+  if (els.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          io.unobserve(e.target);
+          import('../../scripts/junction3d').then(({ mountJunctionMap }) => mountJunctionMap(e.target as HTMLElement));
+        });
+      },
+      { rootMargin: '400px 0px' },
+    );
+    els.forEach((el) => io.observe(el));
+  }
+</script>

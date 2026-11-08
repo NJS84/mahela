@@ -1,0 +1,80 @@
+---
+/**
+ * Export page hero. The dispatch photo sits to the right so the dispatcher
+ * stands beside the heading, not behind it. A slow push-in and a cold haze
+ * drifting out of the reefer truck give it life. On phones the photo sits on
+ * top with his face clear of the text.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+
+interface Props {
+  image: ImageMetadata;
+  eyebrow: string;
+  title: string;
+  lead: string;
+}
+const { image, eyebrow, title, lead } = Astro.props;
+---
+
+<section class="xh relative isolate overflow-hidden bg-[#0c1a16]" aria-labelledby="page-title">
+  <div class="xh-photo absolute inset-x-0 top-0 -z-10 h-[56svh] overflow-hidden md:inset-y-0 md:left-[26%] md:h-auto" aria-hidden="true">
+    <Image src={image} alt="" widths={[768, 1280, 1444]} sizes="(min-width: 768px) 74vw, 100vw" loading="eager" fetchpriority="high" class="xh-img h-full w-full object-cover" />
+    <div class="xh-haze" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.35)_0%,transparent_30%,transparent_55%,#0c1a16_100%)] md:bg-[linear-gradient(90deg,#0c1a16_0%,rgb(12_26_22/0.55)_16%,transparent_42%),linear-gradient(180deg,rgb(12_26_22/0.45)_0%,transparent_22%,transparent_78%,rgb(12_26_22/0.7)_100%)]"></div>
+  </div>
+
+  <div class="relative z-[1] mx-auto flex min-h-[100svh] w-full max-w-[84rem] flex-col justify-end px-4 pb-14 pt-[46svh] md:justify-center md:px-6 md:pb-20 md:pt-36">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-ivory/70">
+        <li><a href="/" class="hover:text-white">Home</a></li>
+        <li class="flex items-center gap-1.5"><Icon name="chevron" class="size-3" /><span aria-current="page" class="text-ivory">{eyebrow}</span></li>
+      </ol>
+    </nav>
+    <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-sage">{eyebrow}</p>
+    <h1 id="page-title" class="cond max-w-[34rem] text-[clamp(2.6rem,1.4rem+4.2vw,5.4rem)] font-medium uppercase leading-[0.92] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.45)] lg:max-w-[38rem]" data-split>{title}</h1>
+    <p class="mt-7 max-w-[34rem] text-base leading-relaxed text-ivory/85 md:text-lg" data-reveal>{lead}</p>
+  </div>
+</section>
+
+<style>
+  /* Photo framed so the dispatcher stands right of the heading. */
+  .xh-img {
+    object-position: 56% 30%;
+    transform-origin: 56% 35%;
+    animation: xh-push 16s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+  }
+  @media (min-width: 768px) {
+    .xh-img { object-position: 62% 40%; }
+  }
+  @keyframes xh-push {
+    from { transform: scale(1.02); }
+    to { transform: scale(1.1); }
+  }
+  /* Cold air rolling out of the open reefer (right of frame) towards the dock. */
+  .xh-haze { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
+  .xh-haze span {
+    position: absolute;
+    right: -10%;
+    width: 60%;
+    aspect-ratio: 2.2;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(220 236 255 / 0.22), rgb(220 236 255 / 0.08) 55%, transparent);
+    filter: blur(14px);
+    opacity: 0;
+    animation: xh-drift 13s linear infinite;
+  }
+  .xh-haze span:nth-child(1) { top: 52%; }
+  .xh-haze span:nth-child(2) { top: 66%; width: 70%; animation-delay: -4.5s; animation-duration: 15s; }
+  .xh-haze span:nth-child(3) { top: 40%; width: 50%; animation-delay: -9s; animation-duration: 17s; }
+  @keyframes xh-drift {
+    0% { transform: translate3d(0, 0, 0) scale(0.8); opacity: 0; }
+    15% { opacity: 1; }
+    80% { opacity: 0.7; }
+    100% { transform: translate3d(-75%, -12%, 0) scale(1.35); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .xh-img, .xh-haze span { animation: none; }
+  }
+</style>

@@ -1,16 +1,13 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/site/PageHero.astro';
-import Backdrop from '../components/site/Backdrop.astro';
 import SectionTitle from '../components/site/SectionTitle.astro';
-import Journey from '../components/site/Journey.astro';
-import Figures from '../components/site/Figures.astro';
-import FactList from '../components/site/FactList.astro';
-import Gallery from '../components/site/Gallery.astro';
+import GlassCards from '../components/site/GlassCards.astro';
+import PackhouseFlow from '../components/site/PackhouseFlow.astro';
+import PhotoMosaic from '../components/site/PhotoMosaic.astro';
+import LimpopoMap3D from '../components/site/LimpopoMap3D.astro';
+import GradingScan from '../components/site/GradingScan.astro';
 import CtaBand from '../components/site/CtaBand.astro';
-import Icon from '../components/site/Icon.astro';
-import type { IconName } from '../lib/icons';
 import { media } from '../lib/media';
 import { packhouses } from '../data/pages';
 
@@ -23,53 +20,83 @@ const jsonLd = packhouses.sites.map((s) => ({
   address: { '@type': 'PostalAddress', addressLocality: s.place.split(',')[0], addressRegion: 'Limpopo', addressCountry: 'ZA' },
   containedInPlace: { '@type': 'AdministrativeArea', name: 'Limpopo, South Africa' },
 }));
+const hero = media('packhouse/pack-2025-103478-hd.jpg');
+
+/** Every line is approved packhouse copy from mahela.co.za. */
+const cards = [
+  { short: 'Junction', title: 'The Junction', text: 'Near Letsitele, Limpopo. The Junction packhouse packs lemons, pomelos and oranges.', stat: '3', statLabel: 'fruit types: lemons, pomelos, oranges', icon: { img: 'produce/renders/lemon.webp' }, tone: ['#c98a12', '#3a2604'] as [string, string], art: 'produce/renders/orange.webp', name: 'The Junction', sub: 'Near Letsitele' },
+  { short: 'Ohrigstad', title: 'Ohrigstad', text: 'At Ohrigstad, Limpopo. The Ohrigstad packhouse packs soft citrus, Cara Cara navels and lemons.', stat: '3', statLabel: 'soft citrus, Cara Cara navels, lemons', icon: { img: 'produce/cutouts/naartjie.webp' }, tone: ['#d46a1c', '#3a1604'] as [string, string], art: 'produce/cutouts/naartjie.webp', name: 'Ohrigstad', sub: 'Ohrigstad, Limpopo' },
+  { short: 'Area', title: 'Combined packhouse area', text: 'These two packhouses provide a combined packhouse area of 20 000 m².', stat: '20 000', statLabel: 'm² under one standard', icon: { line: 'box' as const }, tone: ['#2f5a8f', '#0d1a2c'] as [string, string], photo: 'packhouse/pack-2025-103506.jpg', name: '20 000 m²', sub: 'Two packhouses' },
+  { short: 'Capacity', title: 'Up to 1 200 tons a day', text: 'During the season, up to 1 200 tons of fruit can be handled daily during double shifts at both packhouses.', stat: '1 200', statLabel: 'tons a day, double shifts', icon: { line: 'truck' as const }, tone: ['#e07b12', '#3a1c04'] as [string, string], photo: 'packhouse/pack-2025-103480.jpg', name: '1 200 t', sub: 'Handled daily in season' },
+  { short: 'Testing', title: 'Tested on site', text: 'All our fruit undergo multiple tests at Mahela’s on-site testing laboratories, and PPECB inspectors are on-site full-time during the packing season.', stat: 'PPECB', statLabel: 'inspectors on-site full-time', icon: { line: 'flask' as const }, tone: ['#2e7d5b', '#0b2219'] as [string, string], photo: 'packhouse/pack-2025-103491.jpg', name: 'On-site labs', sub: 'PPECB inspected' },
+  { short: 'Grading', title: 'Optical grading', text: 'Simultaneous packing for several clients can be done using the latest optical grading and sorting technology.', stat: 'Multi', statLabel: 'client packing at once', icon: { line: 'sun' as const }, tone: ['#3a6fb0', '#0d1a2c'] as [string, string], photo: 'packhouse/pack-2025-103488.jpg', name: 'Optical grading', sub: 'Latest sorting technology' },
+];
+
+const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+const flow = [
+  { ...packhouses.journey[0]!, photo: 'produce/farm/citrus-orchard-103337.jpg', alt: 'Rows of citrus trees in a Mahela orchard' },
+  { ...packhouses.journey[1]!, photo: 'packhouse/pack-2025-103491.jpg', alt: 'A Mahela packhouse manager checking oranges at the start of the line' },
+  { ...packhouses.journey[2]!, photo: 'packhouse/pack-2025-103483.jpg', alt: 'Oranges moving along the blue optical grading and sorting lines' },
+  { ...packhouses.journey[3]!, photo: 'packhouse/dispatch-2022-105206.jpg', alt: 'Pallets of packed Mahela cartons in the dispatch area' },
+  { ...packhouses.journey[4]!, photo: 'packhouse/dispatch-2022-105210.jpg', alt: 'A forklift loading pallets of fruit onto a truck for the port' },
+  { ...packhouses.journey[5]!, photo: 'generated/reefer-ship.jpg', alt: 'A refrigerated container ship carrying fruit to export markets' },
+];
+
+const tiles = [
+  { src: 'packhouse/pack-2025-103499.jpg', alt: 'A smiling Mahela packhouse worker on the platform above the packing lines', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2' },
+  { src: 'packhouse/pack-2025-103502.jpg', alt: 'A packer filling a Mahela carton with oranges', cls: 'lg:col-span-2 lg:row-span-2' },
+  { src: 'packhouse/pack-2025-103509.jpg', alt: 'Cartons of Tango mandarins packed for export', cls: 'lg:col-span-2' },
+  { src: 'packhouse/pack-2025-103507.jpg', alt: 'A packer checking fruit at a Makulu carton station', cls: 'lg:col-span-2' },
+  { src: 'packhouse/pack-2025-103503.jpg', alt: 'A packhouse worker holding a full carton of Mahela oranges', cls: 'sm:col-span-2 lg:col-span-2' },
+  { src: 'packhouse/pack-2025-103497.jpg', alt: 'Looking along the packhouse floor over the grading lines and cartons', cls: 'sm:col-span-2 lg:col-span-6' },
+];
 ---
 
-<Base title="Citrus packhouses in Limpopo" description={description} breadcrumbs={[{ name: 'Packhouses', href: '/packhouses' }]} jsonLd={jsonLd} ogImage={media('farms/dsc-1802.jpg')}>
-  <PageHero image={media('farms/dsc-1802.jpg')} eyebrow="Packhouses" title="Selected, packed and shipped at the source" lead={packhouses.lead} crumbs={[{ name: 'Packhouses', href: '/packhouses' }]} />
+<Base title="Citrus packhouses in Limpopo" description={description} breadcrumbs={[{ name: 'Packhouses', href: '/packhouses' }]} jsonLd={jsonLd} ogImage={hero}>
+  <PageHero image={hero} eyebrow="Packhouses" title="Selected, packed and shipped at the source" lead={packhouses.lead} crumbs={[{ name: 'Packhouses', href: '/packhouses' }]} position="62% 50%" tall />
 
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="sites-title">
-    <div class="grid gap-12 lg:grid-cols-12">
-      <div class="lg:col-span-7">
+  <section class="relative overflow-hidden py-24 md:py-32" aria-labelledby="sites-title">
+    <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 30%, rgb(224 123 18 / 0.3), transparent 70%), #10201a"></div>
+    <div class="relative mx-auto grid max-w-[84rem] items-center gap-6 px-4 md:px-6 lg:grid-cols-12">
+      <div class="relative z-[1] lg:col-span-5">
         <SectionTitle eyebrow="Two packhouses" title="The Junction and Ohrigstad" id="sites-title" />
-        {packhouses.body.map((b) => <p class="mt-5 leading-relaxed text-ivory/80" data-reveal>{b}</p>)}
+        {packhouses.body.map((b, i) => <p class:list={['mt-5 leading-relaxed', i === 0 ? 'text-xl text-ivory/90' : 'text-ivory/75']} data-reveal>{b}</p>)}
       </div>
-      <div class="space-y-5 lg:col-span-5">
-        {
-          packhouses.sites.map((s) => (
-            <div class="glass rounded-[26px] p-7" data-reveal data-glare>
-              <span class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-sage"><Icon name="pin" class="size-4" />{s.place}</span>
-              <h3 class="cond mt-3 text-3xl font-medium uppercase">{s.name}</h3>
-              <p class="mt-2 text-ivory/75">Packs {s.packs.toLowerCase()}.</p>
-            </div>
-          ))
-        }
-        <FactList facts={[{ label: 'Combined area', value: '20 000 m²' }, { label: 'Season', value: 'End of March to end of September' }, { label: 'Daily capacity', value: 'Up to 1 200 tons (double shifts)' }, { label: 'Inspection', value: 'PPECB inspectors on-site full-time in season' }]} />
-      </div>
+      <LimpopoMap3D class="-mx-4 h-[30rem] sm:h-[36rem] md:-mx-6 lg:col-span-7 lg:-mr-24 lg:ml-0 lg:h-[46rem]" />
     </div>
   </section>
 
-  <Backdrop image={media('packhouse/dscf0525.jpg')} dim={0.68}>
-    <SectionTitle eyebrow="Orchard to port" title="Follow the fruit" lead="Scroll to follow a carton from the orchard, through testing and optical grading, along the cold chain to the port." align="center" id="journey-title" />
-    <div class="mt-16"><Journey steps={packhouses.journey.map((s) => ({ ...s, icon: s.icon as IconName }))} /></div>
-  </Backdrop>
+  <GlassCards id="packhouses" eyebrow="Sites, capacity and standards" title="Two packhouses, one standard" tag="Packhouses" cards={cards}>
+    <div slot="panel">
+      <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white">Packing season: end of March to end of September</p>
+      <ol class="grid grid-cols-12 gap-1" aria-hidden="true">
+        {months.map((m, i) => <li class:list={['h-3 rounded-full', i >= 2 && i <= 8 ? 'ph-on' : 'ph-off']} data-ph-bar></li>)}
+      </ol>
+      <ol class="mt-2 grid grid-cols-12 gap-1 text-center text-[0.6rem] font-semibold uppercase text-white/70" aria-hidden="true">
+        {months.map((m) => <li>{m}</li>)}
+      </ol>
+    </div>
+  </GlassCards>
 
-  <Backdrop image={media('packhouse/dscf0555.jpg')} dim={0.6}>
-    <section class="glass-dark rounded-[32px] p-8 md:p-12" aria-label="Packhouse figures" data-reveal data-glare>
-      <Figures items={[{ value: 2, label: 'State-of-the-art packhouses' }, { value: 20000, suffix: ' m²', label: 'Combined packhouse area' }, { value: 1200, prefix: 'Up to ', suffix: ' t', label: 'Fruit handled daily in season' }]} />
-    </section>
-  </Backdrop>
+  <GradingScan />
+
+  <PackhouseFlow steps={flow} />
 
   <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-labelledby="inside-title">
     <SectionTitle eyebrow="Inside the packhouse" title="Optical grading, testing and people who care" id="inside-title" />
-    <div class="mt-12 pb-10">
-      <Gallery images={[
-        { src: 'packhouse/dscf0510.jpg', alt: 'Packhouse team grading oranges on the line at a Mahela packhouse' },
-        { src: 'packhouse/dscf0525.jpg', alt: 'Workers inspecting oranges on the sorting line' },
-        { src: 'conservation/dsc-0378.jpg', alt: 'Packed cartons of Mahela oranges ready for export' },
-        { src: 'packhouse/dscf0555.jpg', alt: 'Packhouse staff holding freshly packed citrus' },
-      ]} />
-    </div>
+    <div class="mt-12 pb-10"><PhotoMosaic tiles={tiles} /></div>
     <div class="mt-16"><CtaBand /></div>
   </section>
 </Base>
+
+<style>
+  .ph-on {
+    background: #fff;
+    box-shadow: 0 0 12px rgb(255 255 255 / 0.45);
+  }
+  .ph-off {
+    background: rgb(255 255 255 / 0.14);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+</style>

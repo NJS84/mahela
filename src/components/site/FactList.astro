@@ -3,20 +3,33 @@
 interface Props {
   facts: { label: string; value: string }[];
   title?: string;
+  /** 'blue' = blue-tinted frosted glass with white text (Citrus page). */
+  variant?: 'default' | 'blue';
 }
-const { facts, title = 'At a glance' } = Astro.props;
+const { facts, title = 'At a glance', variant = 'default' } = Astro.props;
+const blue = variant === 'blue';
 ---
 
-<div class="glass rounded-[28px] p-7 md:p-8" data-reveal data-glare>
-  <h2 class="cond text-sm font-semibold uppercase tracking-[0.18em] text-sage">{title}</h2>
-  <dl class="mt-5 divide-y divide-ivory/12">
+<div class:list={[blue ? 'fact-blue' : 'glass', 'rounded-[28px] p-7 md:p-8']} data-reveal data-glare>
+  <h2 class:list={['cond text-sm font-semibold uppercase tracking-[0.18em]', blue ? 'text-white/80' : 'text-sage']}>{title}</h2>
+  <dl class:list={['mt-5 divide-y', blue ? 'divide-white/15' : 'divide-ivory/12']}>
     {
       facts.map((f) => (
         <div class="grid grid-cols-[8.5rem_1fr] gap-4 py-3 text-sm md:text-[0.95rem]">
-          <dt class="text-ivory/60">{f.label}</dt>
-          <dd class="text-ivory">{f.value}</dd>
+          <dt class={blue ? 'text-white/70' : 'text-ivory/60'}>{f.label}</dt>
+          <dd class={blue ? 'text-white' : 'text-ivory'}>{f.value}</dd>
         </div>
       ))
     }
   </dl>
 </div>
+
+<style>
+  .fact-blue {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.34);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.32), 0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+</style>

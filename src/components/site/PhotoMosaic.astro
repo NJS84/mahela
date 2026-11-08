@@ -1,0 +1,44 @@
+---
+/**
+ * Photo mosaic for produce pages (same look as the citrus orchard mosaic): each photo opens from a
+ * rounded window as it scrolls in and drifts inside its frame for depth. Crisp edges, no blur.
+ * `cls` sets each tile's span on the 6-column desktop grid.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+interface Props {
+  tiles: { src: string; alt: string; cls?: string; pos?: string }[];
+}
+const { tiles } = Astro.props;
+---
+
+<ul class="grid auto-rows-[15rem] gap-4 sm:grid-cols-2 md:auto-rows-[17rem] lg:grid-cols-6">
+  {
+    tiles.map((t) => (
+      <li class:list={['pm-tile relative overflow-hidden rounded-[24px]', t.cls]} data-pm-tile>
+        <Image src={media(t.src)} alt={t.alt} widths={[640, 960, 1440]} sizes="(min-width: 1024px) 60vw, (min-width: 640px) 50vw, 100vw" class="absolute inset-x-0 top-[-8%] h-[116%] w-full object-cover" style={t.pos ? `object-position:${t.pos}` : undefined} data-pm-img />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .pm-tile {
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+    outline: 1px solid rgb(225 238 255 / 0.25);
+    outline-offset: -1px;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  if (document.documentElement.classList.contains('js-motion')) {
+    document.querySelectorAll<HTMLElement>('[data-pm-tile]').forEach((tile) => {
+      gsap.fromTo(tile, { clipPath: 'inset(14% 10% 14% 10% round 40px)' }, { clipPath: 'inset(0% 0% 0% 0% round 24px)', ease: 'none', scrollTrigger: { trigger: tile, start: 'top 95%', end: 'top 45%', scrub: true } });
+      gsap.fromTo(tile.querySelector('[data-pm-img]'), { yPercent: -5, scale: 1.12 }, { yPercent: 5, scale: 1, ease: 'none', scrollTrigger: { trigger: tile, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+  }
+</script>

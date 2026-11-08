@@ -1,0 +1,73 @@
+---
+/**
+ * Free-floating 3D relief of the Limpopo Lowveld and escarpment with Mahela's two packhouses
+ * pinned and truck routes to the ports. Drag to turn. Elevation: AWS Terrain Tiles (SRTM and others).
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const sites = [
+  { place: 'Near Letsitele', name: 'The Junction', packs: 'Lemons · pomelos · oranges' },
+  { place: 'Ohrigstad', name: 'Ohrigstad', packs: 'Soft citrus · Cara Cara · lemons' },
+];
+---
+
+<div
+  class:list={['limpopo-map relative select-none', className]}
+  data-limpopo-map
+  role="img"
+  aria-label="3D relief map of the Limpopo Lowveld showing Mahela's two packhouses, The Junction near Letsitele and Ohrigstad below the escarpment, with truck routes towards the ports"
+>
+  <div class="lm-fallback absolute inset-[12%] rounded-[40%] bg-[radial-gradient(circle,rgb(111_155_224/0.18),transparent_65%)]"></div>
+
+  {sites.map((s, i) => (
+    <div data-lm-site={i} class="lm-tag pointer-events-none absolute left-0 top-0 z-10">
+      <span class:list={['absolute whitespace-nowrap rounded-2xl border border-white/25 bg-[#0b2347]/60 px-3.5 py-2 text-center shadow-[0_10px_40px_rgb(0_0_0/0.35)] backdrop-blur-md', i === 1 ? 'right-4 top-0 -translate-y-1/2' : 'bottom-3 left-0 -translate-x-1/2']}>
+        <span class="block text-[0.55rem] font-semibold uppercase tracking-[0.22em] text-[#ffd29a] md:text-[0.6rem]">{s.place}</span>
+        <span class="cond block text-sm font-medium uppercase tracking-[0.05em] text-white md:text-lg">{s.name}</span>
+        <span class="hidden text-[0.62rem] text-white/75 sm:block">{s.packs}</span>
+      </span>
+    </div>
+  ))}
+
+  {['Tzaneen', 'Hoedspruit'].map((t) => (
+    <div data-lm-town={t} class="lm-tag pointer-events-none absolute left-0 top-0 z-[5]">
+      <span class="absolute left-0 top-0 -translate-x-[3px] -translate-y-1/2 whitespace-nowrap text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/70">
+        <span class="mr-1 inline-block size-1.5 rounded-full bg-white/80 align-middle"></span>{t}
+      </span>
+    </div>
+  ))}
+
+  <div data-lm-route class="lm-tag pointer-events-none absolute left-0 top-0 z-10">
+    <span class="absolute left-0 top-0 -translate-x-full translate-y-2 whitespace-nowrap rounded-full bg-[#f59a23] px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-[#2a1503]">By truck to local ports →</span>
+  </div>
+
+  <p class="lm-hint pointer-events-none absolute bottom-[1%] left-1/2 -translate-x-1/2 whitespace-nowrap text-center text-[0.62rem] uppercase tracking-[0.2em] text-white/45">
+    Drag to turn · Elevation data: AWS Terrain Tiles
+  </p>
+</div>
+
+<style>
+  .limpopo-map .lm-tag { opacity: 0; transition: opacity 0.8s ease 1.6s; }
+  .limpopo-map:global(.is-live) .lm-tag { opacity: 1; }
+  .limpopo-map:global([data-mounted]) .lm-fallback { display: none; }
+  .limpopo-map:not([data-mounted]) .lm-tag { display: none; }
+</style>
+
+<script>
+  const els = document.querySelectorAll<HTMLElement>('[data-limpopo-map]');
+  if (els.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          io.unobserve(e.target);
+          import('../../scripts/limpopo3d').then(({ mountLimpopoMap }) => mountLimpopoMap(e.target as HTMLElement));
+        });
+      },
+      { rootMargin: '400px 0px' },
+    );
+    els.forEach((el) => io.observe(el));
+  }
+</script>

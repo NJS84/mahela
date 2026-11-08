@@ -9,14 +9,13 @@ import Icon from '../components/site/Icon.astro';
 import SectionTitle from '../components/site/SectionTitle.astro';
 import Backdrop from '../components/site/Backdrop.astro';
 import Figures from '../components/site/Figures.astro';
-import ProduceCard from '../components/site/ProduceCard.astro';
+import ProduceGlassCard from '../components/site/ProduceGlassCard.astro';
 import Journey from '../components/site/Journey.astro';
 import ExportGlobe from '../components/site/ExportGlobe.astro';
 import Heritage from '../components/site/Heritage.astro';
 import CtaBand from '../components/site/CtaBand.astro';
 import Leaves from '../components/site/Leaves.astro';
 import { site, hero, intro, produce, process, compliance, people } from '../data/site';
-import { posts } from '../data/pages';
 import { produceArt, produceIcon } from '../data/produce-art';
 import { media } from '../lib/media';
 import heroImage from '../assets/media/video/hero-poster.jpg';
@@ -42,6 +41,18 @@ const badges = [
 
 const citrusGroups = ['Grapefruit', 'Valencia oranges', 'Navels', 'Soft citrus', 'Lemons'];
 
+/** Falling orange-blossom petals: x (%), size, duration, delay, sway, rotation, blur, opacity. */
+const petals = [
+  { x: 8, s: 18, d: 17, delay: -2, sway: 40, r: 20, b: 0, o: 0.9 },
+  { x: 22, s: 34, d: 13, delay: -9, sway: 70, r: -40, b: 3, o: 0.75 },
+  { x: 37, s: 14, d: 21, delay: -14, sway: 30, r: 60, b: 0, o: 0.8 },
+  { x: 51, s: 22, d: 16, delay: -5, sway: 55, r: 10, b: 1, o: 0.9 },
+  { x: 63, s: 46, d: 12, delay: -3, sway: 90, r: -70, b: 5, o: 0.6 },
+  { x: 74, s: 16, d: 19, delay: -11, sway: 35, r: 45, b: 0, o: 0.85 },
+  { x: 86, s: 26, d: 15, delay: -7, sway: 60, r: -15, b: 1.5, o: 0.85 },
+  { x: 94, s: 12, d: 23, delay: -17, sway: 25, r: 80, b: 0, o: 0.7 },
+];
+
 const figures = [
   { value: 1942, label: 'Founded', note: 'The Junction, Letsitele', format: 'year' as const },
   { value: 700, label: 'Full-time jobs', note: 'Plus 1 100 non-permanent' },
@@ -51,13 +62,11 @@ const figures = [
 
 const pillarIcons = ['leaf', 'people', 'flask', 'box'] as const;
 const certs = ['certifications/globalgap-colour.png', 'certifications/siza-colour.png', 'certifications/nsf-registered-colour.png'];
-const latest = posts.slice(0, 3);
-const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: 'numeric', month: 'long' });
 ---
 
 <Base jsonLd={[website]} description="Mahela Group is a 4th generation, GlobalGAP-certified grower and exporter of premium citrus, avocados, bananas, macadamias, litchis and golden kiwis from Letsitele in Limpopo, South Africa.">
   <!-- Hero -->
-  <section class="relative isolate flex min-h-[100svh] items-end overflow-hidden" aria-labelledby="g-hero">
+  <section class="relative isolate flex min-h-[100svh] items-center overflow-hidden" aria-labelledby="g-hero">
     <div class="absolute inset-0 -z-10" aria-hidden="true">
       <div class="absolute inset-0" data-hero-media>
         <Image src={heroImage} alt="" widths={[768, 1280]} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover" />
@@ -68,7 +77,8 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
       </div>
       <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(12_26_22/0.45)_0%,rgb(12_26_22/0.15)_35%,rgb(12_26_22/0.75)_100%)]"></div>
     </div>
-    <div class="mx-auto w-full max-w-[84rem] px-4 pb-14 pt-32 md:px-6 md:pb-20">
+    <div class="mx-auto w-full max-w-[84rem] px-4 py-28 md:px-6">
+      <p class="cond mb-3 text-[clamp(1.5rem,1.1rem+1.4vw,2.4rem)] font-semibold uppercase leading-none tracking-[0.42em] text-ivory drop-shadow-[0_2px_16px_rgba(0,0,0,0.35)]">Mahela</p>
       <p class="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-ivory/80">{hero.eyebrow}</p>
       <h1 id="g-hero" class="cond max-w-4xl text-[clamp(3.4rem,2rem+6.5vw,7.25rem)] font-medium uppercase leading-[0.9] tracking-[0.01em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)]" data-split>
         Premium citrus.<br />Ready for<br /><span class="text-sage">the world.</span>
@@ -105,33 +115,74 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
     </span>
   </section>
 
-  <!-- Intro + 3D orange -->
-  <section class="relative isolate overflow-hidden" aria-labelledby="g-intro">
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
+  <!-- Intro: the orange breaks out of the glass, blossoms drift past -->
+  <section class="intro relative isolate overflow-hidden" aria-labelledby="g-intro" data-intro>
+    <div class="absolute inset-0 -z-10 bg-[#0c1c15]" aria-hidden="true">
       <Image src={media('farms/dsc-7988.jpg')} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="h-full w-full object-cover object-[50%_60%]" />
-      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(12_26_22/0.86)_0%,rgb(12_26_22/0.5)_60%,rgb(12_26_22/0.4)_100%)]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgb(12_26_22/0.86)_0%,rgb(12_26_22/0.55)_60%,rgb(12_26_22/0.45)_100%)]"></div>
     </div>
-    <Leaves spots={[{ x: '46%', y: '8%', size: 80, r: -20 }, { x: '92%', y: '70%', size: 120, r: 60, blur: true }, { x: '3%', y: '86%', size: 70, r: 140 }]} />
-    <div class="relative z-10 mx-auto grid min-h-[100svh] max-w-[84rem] items-center gap-10 px-4 py-24 md:px-6 lg:grid-cols-12">
-      <div class="glass rounded-[28px] p-7 md:p-10 lg:col-span-6" data-reveal data-glare>
+
+    <!-- Petals at two depths: small sharp ones fall behind the glass card, large soft-focus ones in front of it. -->
+    {
+      [false, true].map((front) => (
+        <div class:list={['petals pointer-events-none absolute inset-0', front ? 'z-20' : 'z-[5]']} aria-hidden="true">
+          {petals.filter((p) => (p.b >= 1.5) === front).map((p) => (
+            <span class="petal" style={`--x:${p.x}%;--s:${p.s}px;--d:${p.d}s;--delay:${p.delay}s;--sway:${p.sway}px;--r:${p.r}deg;--b:${p.b}px;--o:${p.o}`}>
+              <svg viewBox="0 0 40 40"><use href="#mahela-blossom" /></svg>
+            </span>
+          ))}
+        </div>
+      ))
+    }
+    <svg width="0" height="0" class="absolute" aria-hidden="true">
+      <defs>
+        <radialGradient id="petal-fill" cx="50%" cy="85%" r="90%">
+          <stop offset="0" stop-color="#f3ead0" />
+          <stop offset="0.45" stop-color="#fffdf6" />
+          <stop offset="1" stop-color="#ffffff" />
+        </radialGradient>
+        <g id="mahela-blossom">
+          {[0, 72, 144, 216, 288].map((r) => <ellipse cx="20" cy="10.5" rx="5.6" ry="9.5" fill="url(#petal-fill)" transform={`rotate(${r} 20 20)`} />)}
+          <circle cx="20" cy="20" r="3.2" fill="#e7c95a" />
+          {[0, 60, 120, 180, 240, 300].map((r) => <circle cx="20" cy="15.6" r="0.9" fill="#d9a92a" transform={`rotate(${r} 20 20)`} />)}
+        </g>
+      </defs>
+    </svg>
+
+    <div class="mx-auto grid min-h-[100svh] max-w-[84rem] items-center px-4 py-24 md:px-6 lg:grid-cols-12">
+      <!-- The orange floats centred in the right half. -->
+      <div class="relative order-2 -mt-28 lg:order-none lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mt-0" aria-hidden="true" data-orange-stage>
+        <div class="stage relative mx-auto aspect-square w-[92%] max-w-[620px] lg:w-full">
+          <div class="absolute inset-[16%] rounded-full bg-[radial-gradient(circle,rgb(240_125_20/0.35),transparent_68%)] blur-2xl" data-orange-glow></div>
+          <div class="absolute -left-[4%] bottom-[2%] w-[38%]" data-depth="0.35">
+            <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={360} class="h-auto w-full -rotate-[28deg] drop-shadow-[0_16px_20px_rgba(0,0,0,0.35)]" />
+          </div>
+          <div class="absolute inset-[8%_14%_6%_14%] flex items-center" data-orange-roll>
+            <div class="w-full" data-float-big>
+              <Image src={media('produce/renders/orange.webp')} alt="" widths={[420, 640, 860]} sizes="(min-width: 1024px) 460px, 70vw" loading="eager" class="h-auto w-full drop-shadow-[0_40px_50px_rgba(0,0,0,0.5)]" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass relative z-10 order-1 rounded-[28px] p-7 md:p-10 lg:order-none lg:col-span-6 lg:col-start-1 lg:row-start-1" data-reveal data-glare>
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">{intro.eyebrow}</p>
         <h2 id="g-intro" class="cond mt-4 text-[clamp(2rem,1.4rem+2vw,3.1rem)] font-medium uppercase leading-[1] tracking-[0.02em]">Four generations on the same Lowveld soil</h2>
         <div class="leaf-rule my-6 max-w-[12rem]"><Icon name="leaf" class="size-4" /></div>
         <p class="text-lg leading-relaxed text-ivory/90">{hero.lead}</p>
         <p class="mt-4 leading-relaxed text-ivory/75">{intro.support}</p>
+        <ul class="mt-7 flex flex-wrap gap-2" aria-label="Mahela citrus groups">
+          {citrusGroups.map((g) => <li class="glass-soft rounded-full px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-ivory/85">{g}</li>)}
+        </ul>
         <div class="mt-8 flex flex-wrap gap-3">
           <a href="/about-us" class="glass-soft inline-flex rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">About Mahela</a>
           <a href="/produce/citrus" class="inline-flex items-center gap-2 rounded-full px-2 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-sage">Our citrus <Icon name="arrow" class="size-4" /></a>
         </div>
       </div>
-      <div class="relative lg:col-span-6">
-        <div class="relative mx-auto aspect-square w-full max-w-[560px]" data-orange3d>
-          <Image src={media(produceArt.citrus!)} alt="A Mahela orange with leaves" widths={[360, 540]} sizes="(min-width: 1024px) 480px, 80vw" class="orange-fallback absolute inset-[10%] h-[80%] w-[80%] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.45)]" />
-          <ul class="orange-labels pointer-events-none absolute inset-0" aria-label="Mahela citrus groups">
-            {citrusGroups.map((g, i) => <li class="orange-label cond glass-soft absolute rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={`--i:${i}`}>{g}</li>)}
-          </ul>
-        </div>
-        <p class="hint mt-2 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.18em] text-ivory/60"><Icon name="sun" class="size-4" />Drag to turn · scroll to open</p>
+
+      <!-- A sharp blossom sprig in front of everything, crossing the card's edge. -->
+      <div class="pointer-events-none absolute right-[4%] top-[9%] z-20 hidden w-[17%] max-w-[230px] lg:block" aria-hidden="true" data-depth="1">
+        <Image src={media('produce/renders/citrus-blossom.webp')} alt="" width={460} class="h-auto w-full rotate-[18deg] drop-shadow-[0_20px_24px_rgba(0,0,0,0.4)]" />
       </div>
     </div>
   </section>
@@ -150,21 +201,27 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
     </section>
   </Backdrop>
 
-  <!-- Produce rail -->
-  <section class="relative overflow-hidden" aria-labelledby="g-produce" data-rail>
-    <div class="absolute inset-0 -z-10 bg-[#1e4a30] transition-colors" data-rail-tint></div>
-    <div class="absolute inset-0 -z-10 bg-[radial-gradient(80%_60%_at_70%_40%,rgb(255_255_255/0.14),transparent_70%)]"></div>
-    <Leaves spots={[{ x: '84%', y: '10%', size: 110, r: 30, blur: true }, { x: '40%', y: '86%', size: 70, r: -60 }]} />
-    <div class="flex min-h-[100svh] flex-col justify-center py-24 lg:py-16">
-      <div class="mx-auto w-full max-w-[84rem] px-4 md:px-6">
-        <SectionTitle eyebrow="Mahela produce" title="A diversified fruit portfolio. Citrus at the core." lead="Tried-and-tested orchard management and the Lowveld’s warm days and cool nights support fruit with balanced sugar and acidity, good fibre and moisture, and the consistency international buyers expect." id="g-produce" />
+  <!-- Produce: coverflow of landscape glass cards, driven by scroll on desktop -->
+  <section class="relative isolate overflow-hidden bg-[#0c1c15]" aria-labelledby="g-produce" data-flow>
+    <!-- One gradient per fruit; the one whose card is in the centre fades in. -->
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      {produce.map((p, i) => <div class="absolute inset-0" style={`opacity:${i === 0 ? 1 : 0};background:radial-gradient(70% 70% at 60% 55%, ${p.tone[0]}, ${p.tone[1]} 70%, #0b0f0c 120%)`} data-flow-bg={i}></div>)}
+      <div class="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_60%,rgb(255_255_255/0.08),transparent_70%)]"></div>
+    </div>
+    <Leaves spots={[{ x: '86%', y: '12%', size: 100, r: 30, blur: true }, { x: '6%', y: '78%', size: 70, r: -60 }]} />
+    <div class="flex min-h-[100svh] flex-col justify-center py-24 lg:pb-[12svh] lg:pt-32">
+      <div class="mx-auto flex w-full max-w-[84rem] flex-wrap items-end justify-between gap-8 px-4 md:px-6">
+        <div class="max-w-3xl">
+  <SectionTitle eyebrow="Mahela produce" title="A diversified fruit portfolio. Citrus at the core." lead="Tried-and-tested orchard management and the Lowveld’s warm days and cool nights support fruit with balanced sugar and acidity, good fibre and moisture, and the consistency international buyers expect." id="g-produce" />
+        </div>
       </div>
-      <div class="mt-12 snap-x snap-mandatory overflow-x-auto pb-6 lg:overflow-visible lg:pb-0">
-        <ul class="flex w-max gap-8 px-4 md:px-[max(1.5rem,calc((100vw-84rem)/2+1.5rem))] lg:gap-14" data-rail-track>
+      <div class="mt-14 lg:mt-16" data-flow-pin>
+      <div class="flow-stage relative" data-flow-stage>
+        <ul class="flow-track flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 pt-14 lg:block lg:overflow-visible lg:p-0" data-flow-track>
           {
             produce.map((p) => (
-              <li class="w-[82vw] max-w-[26rem] shrink-0 snap-center lg:w-[26rem]" data-rail-card data-tone={p.tone[1]}>
-                <ProduceCard
+              <li class="flow-item w-[86vw] max-w-[34rem] shrink-0 snap-center" data-flow-card>
+                <ProduceGlassCard
                   tag={p.tag}
                   title={p.name}
                   href={`/produce/${p.slug}`}
@@ -172,14 +229,19 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
                   icon={produceIcon[p.slug]}
                   points={p.facts.slice(0, 3)}
                   accent={p.tone[0]}
+                  fruitSize={p.slug === 'avocados' || p.slug === 'bananas' ? 60 : 50}
                 />
               </li>
             ))
           }
-          <li class="flex w-[60vw] max-w-[18rem] shrink-0 items-center lg:w-[18rem]">
-            <a href="/produce" class="btn-forest rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">All produce</a>
-          </li>
         </ul>
+      </div>
+      <div class="mt-8 flex items-center justify-center gap-5 lg:mt-10">
+        <ol class="hidden items-center gap-2 lg:flex" aria-hidden="true">
+          {produce.map((_, i) => <li class="flow-dot h-1.5 w-6 rounded-full bg-ivory/25 transition-all duration-500" data-flow-dot={i}></li>)}
+        </ol>
+        <a href="/produce" class="btn-forest rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]">All produce</a>
+      </div>
       </div>
     </div>
   </section>
@@ -197,8 +259,8 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
     <section aria-labelledby="g-compliance">
       <div class="grid gap-10 lg:grid-cols-12 lg:items-end">
         <div class="lg:col-span-7"><SectionTitle eyebrow={compliance.eyebrow} title={compliance.title} lead={compliance.lead} id="g-compliance" /></div>
-        <ul class="flex flex-wrap items-center gap-3 lg:col-span-5 lg:justify-end" aria-label="Certifications" data-reveal>
-          {certs.map((c) => <li class="rounded-2xl bg-ivory/90 px-4 py-3"><Image src={media(c)} alt={c.includes('globalgap') ? 'GlobalGAP' : c.includes('siza') ? 'SIZA' : 'NSF Registered'} height={44} class="h-10 w-auto" /></li>)}
+        <ul class="flex flex-wrap items-center gap-3 lg:col-span-5 lg:flex-nowrap lg:justify-end lg:gap-2.5" aria-label="Certifications" data-reveal>
+          {certs.map((c) => <li class="flex h-16 shrink-0 items-center rounded-2xl bg-ivory/90 px-4 lg:h-[3.75rem] lg:px-3.5"><Image src={media(c)} alt={c.includes('globalgap') ? 'GlobalGAP' : c.includes('siza') ? 'SIZA' : 'NSF Registered'} height={64} class="h-10 w-auto lg:h-9" /></li>)}
         </ul>
       </div>
       <ul class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -222,7 +284,7 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
 
   <!-- Heritage -->
   <div class="relative">
-    <div class="sticky top-0 -z-10 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden="true">
+    <div class="sticky top-0 -z-10 -mb-[100svh] h-[100svh] overflow-hidden bg-[#0c1c15]" aria-hidden="true">
       <Image src={media('farms/dsc-1689.jpg')} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="h-full w-full object-cover" />
       <div class="absolute inset-0 bg-[rgb(12_26_22/0.68)]"></div>
     </div>
@@ -230,44 +292,23 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
   </div>
 
   <!-- People + news + CTA -->
-  <Backdrop image={media('people/dhk-9884.jpg')} dim={0.64}>
-    <section class="grid gap-8 lg:grid-cols-12 lg:items-stretch" aria-labelledby="g-people">
-      <div class="glass rounded-[32px] p-8 md:p-12 lg:col-span-7" data-reveal data-glare>
+  <Backdrop image={media('generated/orchard-bokeh.jpg')} dim={0.55}>
+    <section class="grid gap-6 lg:grid-cols-12 lg:items-stretch" aria-labelledby="g-people">
+      <div class="glass flex flex-col justify-center rounded-[32px] p-8 md:p-12 lg:col-span-5" data-reveal data-glare>
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sage">{people.eyebrow}</p>
         <h2 id="g-people" class="cond mt-3 text-[clamp(2rem,1.3rem+2.4vw,3.4rem)] font-medium uppercase leading-[0.98]">{people.title}</h2>
         <p class="mt-5 text-lg leading-relaxed text-ivory/85">{people.text}</p>
-        <a href={people.cta.href} class="btn-forest mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>{people.cta.label}<Icon name="arrow" class="size-4" /></a>
+        <a href={people.cta.href} class="btn-forest mt-8 inline-flex items-center gap-2 self-start rounded-full px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em]" data-magnetic>{people.cta.label}<Icon name="arrow" class="size-4" /></a>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
-        <div class="glass-dark flex flex-col justify-center rounded-[28px] p-7" data-reveal><span class="cond text-5xl font-semibold tabular" data-count="700">700</span><span class="mt-2 text-sm uppercase tracking-[0.14em] text-ivory/70">Full-time employees</span></div>
-        <div class="glass-dark flex flex-col justify-center rounded-[28px] p-7" data-reveal><span class="cond text-5xl font-semibold tabular" data-count="1100">1 100</span><span class="mt-2 text-sm uppercase tracking-[0.14em] text-ivory/70">Additional non-permanent jobs</span></div>
-      </div>
-    </section>
-
-    <section class="mt-24" aria-labelledby="g-news">
-      <div class="flex flex-wrap items-end justify-between gap-6">
-        <SectionTitle eyebrow="In the news" title="Mahela in the press" id="g-news" />
-        <a href="/news" class="glass-soft rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em]">All news</a>
-      </div>
-      <ul class="mt-10 grid gap-5 md:grid-cols-3">
-        {
-          latest.map((p) => (
-            <li class="glass group overflow-hidden rounded-[26px]" data-reveal data-glare>
-              <a href={`/news/${p.slug}`} class="flex h-full flex-col">
-                {p.image && (
-                  <span class="block aspect-[16/10] overflow-hidden">
-                    <Image src={media(p.image)} alt="" widths={[480, 720]} sizes="(min-width: 768px) 30vw, 90vw" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  </span>
-                )}
-                <span class="flex flex-1 flex-col p-6">
-                  <span class="text-xs uppercase tracking-[0.16em] text-ivory/60">{fmtDate(p.date)}{p.source && ` · ${p.source}`}</span>
-                  <span class="cond mt-3 text-xl font-medium leading-snug">{p.title}</span>
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <!-- The team photo sits in its own clear frame, so the glass never blurs anyone's face. -->
+      <figure class="relative overflow-hidden rounded-[32px] border border-ivory/25 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.6)] lg:col-span-7" data-reveal>
+        <Image src={media('people/dhk-9884.jpg')} alt="Members of the Mahela team walking through an orchard" widths={[640, 960, 1280]} sizes="(min-width: 1024px) 56vw, 92vw" class="aspect-[3/2] h-full w-full object-cover object-[50%_45%]" />
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(0deg,rgb(12_26_22/0.55),transparent)]"></div>
+        <div class="absolute inset-x-4 bottom-4 flex flex-wrap gap-3 md:inset-x-6 md:bottom-6">
+          <div class="glass-dark rounded-2xl px-5 py-3"><span class="cond block text-3xl font-semibold tabular md:text-4xl" data-count="700">700</span><span class="text-[0.7rem] uppercase tracking-[0.14em] text-ivory/75">Full-time employees</span></div>
+          <div class="glass-dark rounded-2xl px-5 py-3"><span class="cond block text-3xl font-semibold tabular md:text-4xl" data-count="1100">1 100</span><span class="text-[0.7rem] uppercase tracking-[0.14em] text-ivory/75">Additional non-permanent jobs</span></div>
+        </div>
+      </figure>
     </section>
 
     <div class="mt-24"><CtaBand /></div>
@@ -275,30 +316,53 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
 </Base>
 
 <style>
-  /* 3D orange: labels fan out around the segments as it splits (--split 0..1). */
-  [data-orange3d] {
-    --split: 0;
-    container-type: inline-size;
+  /* Petals fall the height of the section, swaying and turning. */
+  .petal {
+    position: absolute;
+    top: -8%;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    opacity: var(--o);
+    filter: blur(var(--b)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+    animation: petal-fall var(--d) linear var(--delay) infinite;
   }
-  .orange-label {
-    left: 50%;
-    top: 50%;
-    opacity: 0;
-    transform: translate(-50%, -50%);
-    white-space: nowrap;
+  .petal svg {
+    width: 100%;
+    height: 100%;
+    animation: petal-sway calc(var(--d) / 3) ease-in-out var(--delay) infinite alternate;
   }
-  [data-orange3d]:global(.is-3d) .orange-fallback {
-    display: none;
+  @keyframes petal-fall {
+    0% { transform: translateY(0) rotate(var(--r)); opacity: 0; }
+    8% { opacity: var(--o); }
+    88% { opacity: var(--o); }
+    100% { transform: translateY(118svh) rotate(calc(var(--r) + 300deg)); opacity: 0; }
   }
-  [data-orange3d]:global(.is-3d) .orange-label {
-    opacity: calc(var(--split) * 1.4 - 0.4);
-    transform: translate(-50%, -50%) translate(calc(cos(var(--i) * 72deg - 90deg) * var(--split) * 34cqw), calc(sin(var(--i) * 72deg - 90deg) * var(--split) * 38cqw));
+  @keyframes petal-sway {
+    from { transform: translateX(calc(var(--sway) * -1)) rotateX(0deg); }
+    to { transform: translateX(var(--sway)) rotateX(55deg); }
   }
-  .hint {
-    visibility: hidden;
+  @media (prefers-reduced-motion: reduce) {
+    .petals { display: none; }
   }
-  :global(.js-motion) .hint {
-    visibility: visible;
+  /* Coverflow (desktop): every card is stacked in the centre and placed by script. */
+  @media (min-width: 1024px) {
+    .flow-stage {
+      height: min(32rem, 56svh);
+    }
+    .flow-item {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(46rem, 48vw);
+      max-width: none;
+      translate: -50% -50%;
+      will-change: transform, opacity;
+    }
+    .flow-dot:global(.is-on) {
+      width: 2.75rem;
+      background: var(--color-sage, #b9d1a6);
+    }
   }
 </style>
 
@@ -308,5 +372,34 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-ZA', { year: '
   if (video && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     video.removeAttribute('autoplay');
     video.pause();
+  }
+
+  // Intro: the orange, blossoms and petals move at different depths on scroll and pointer.
+  const intro = document.querySelector<HTMLElement>('[data-intro]');
+  if (intro && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layers = [...intro.querySelectorAll<HTMLElement>('[data-depth]')];
+    let px = 0;
+    let py = 0;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const r = intro.getBoundingClientRect();
+      const p = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight; // -1..1 through the section
+      layers.forEach((l) => {
+        const d = Number(l.dataset.depth);
+        l.style.translate = `${px * d * 18}px ${p * d * 90 + py * d * 14}px`;
+        l.style.rotate = `${p * d * -6}deg`;
+      });
+    };
+    const queue = () => (raf ||= requestAnimationFrame(apply));
+    window.addEventListener('scroll', queue, { passive: true });
+    if (window.matchMedia('(hover: hover)').matches) {
+      intro.addEventListener('pointermove', (e) => {
+        px = e.clientX / window.innerWidth - 0.5;
+        py = e.clientY / window.innerHeight - 0.5;
+        queue();
+      });
+    }
+    apply();
   }
 </script>

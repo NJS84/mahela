@@ -1,0 +1,314 @@
+---
+/**
+ * Optical grading scene. Oranges roll along a belt, pass under a scanner arch that reads size,
+ * colour and skin, and are sorted into three lanes: export, local markets and juicing. Plays on
+ * its own while in view. The scene lies horizontally on wide screens and runs top to bottom on
+ * phones. Copy is approved packhouse text.
+ */
+import { getImage } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const orange = await getImage({ src: media('produce/renders/orange.webp'), width: 128, format: 'webp' });
+const lanes = [
+  { key: 'export', label: 'Export', sub: 'Packed for clients worldwide' },
+  { key: 'local', label: 'Local markets', sub: 'Not export grade' },
+  { key: 'juice', label: 'Juicing', sub: 'Sent to a factory' },
+];
+---
+
+<section class="gs relative isolate overflow-hidden py-24 md:py-32" aria-labelledby="gs-title" data-gs data-orange={orange.src}>
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    <div class="absolute inset-0 bg-[radial-gradient(55%_60%_at_40%_55%,#1d4a86,#0a1626_72%)]"></div>
+    <div class="gs-grid absolute inset-0 opacity-40"></div>
+  </div>
+
+  <div class="mx-auto max-w-[84rem] px-4 md:px-6">
+    <div class="grid items-end gap-8 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Optical grading and sorting</p>
+        <h2 id="gs-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Every fruit is read before it is packed</h2>
+        <p class="mt-5 max-w-2xl leading-relaxed text-white/80">Simultaneous packing for several clients can be done using the latest optical grading and sorting technology. Fruit that doesn’t adhere to Mahela’s strict export standards is sent to local markets or to a factory for juicing.</p>
+      </div>
+      <!-- Live scanner readout -->
+      <div class="lg:col-span-5">
+        <div class="gs-glass rounded-[24px] p-5" aria-hidden="true">
+          <div class="flex items-center justify-between">
+            <p class="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-white">Scanner reading</p>
+            <span class="flex items-center gap-1.5 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[#9fe08f]"><span class="gs-live size-1.5 rounded-full bg-[#74c365]"></span>Live</span>
+          </div>
+          <ul class="mt-4 grid grid-cols-3 gap-2">
+            {['Size', 'Colour', 'Skin'].map((c) => (
+              <li class="gs-check rounded-2xl px-3 py-2.5" data-gs-check={c.toLowerCase()}>
+                <span class="block text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-white/70">{c}</span>
+                <span class="gs-mark cond mt-0.5 block text-xl font-medium uppercase text-white" data-gs-mark>—</span>
+              </li>
+            ))}
+          </ul>
+          <p class="mt-4 flex items-center justify-between rounded-2xl bg-white/[0.06] px-3 py-2.5 text-sm text-white/80">
+            <span class="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-white/65">Sent to</span>
+            <span class="cond text-lg font-medium uppercase tracking-[0.04em] text-white" data-gs-dest>—</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative mt-10 md:mt-14">
+      <svg class="gs-svg mx-auto block w-full" data-gs-svg role="img" aria-label="Animation: oranges pass under an optical scanner and are sorted into export, local market and juicing lanes"></svg>
+    </div>
+  </div>
+
+  <template data-gs-lanes>{JSON.stringify(lanes)}</template>
+</section>
+
+<style>
+  .gs-grid {
+    background-image: linear-gradient(rgb(143 180 240 / 0.08) 1px, transparent 1px), linear-gradient(90deg, rgb(143 180 240 / 0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(60% 60% at 50% 60%, #000, transparent);
+  }
+  .gs-glass,
+  .gs-check {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.3);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .gs-check {
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .gs-check.is-pass {
+    border-color: rgb(159 224 143 / 0.7);
+    background-color: rgb(116 195 101 / 0.18);
+  }
+  .gs-check.is-fail {
+    border-color: rgb(245 154 35 / 0.8);
+    background-color: rgb(245 154 35 / 0.2);
+  }
+  .gs-live {
+    animation: gs-blink 1.4s ease-in-out infinite;
+  }
+  @keyframes gs-blink {
+    50% {
+      opacity: 0.25;
+    }
+  }
+  .gs-svg :global(text) {
+    font-family: inherit;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  type Lane = { key: string; label: string; sub: string };
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = <K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string | number> = {}, parent?: Element) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    parent?.appendChild(n);
+    return n;
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-gs]').forEach((root) => {
+    const svg = root.querySelector<SVGSVGElement>('[data-gs-svg]')!;
+    const lanes: Lane[] = JSON.parse(root.querySelector('template')!.innerHTML);
+    const orangeSrc = root.dataset.orange!;
+    const checks = [...root.querySelectorAll<HTMLElement>('[data-gs-check]')];
+    const dest = root.querySelector<HTMLElement>('[data-gs-dest]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Flow space: u runs along the belt (0..1200), v across it (-250..250).
+    const LANE_V = [-165, 0, 165];
+    const SCAN_U = 470;
+    const SPLIT_U = 640;
+    const END_U = 990;
+    let vertical = false;
+    const P = (u: number, v: number) => (vertical ? [v * 0.78 + 200, u] : [u, v + 250]) as [number, number];
+    const pathD = (pts: [number, number][]) => pts.map(([u, v], i) => `${i ? 'L' : 'M'}${P(u, v).join(' ')}`).join(' ');
+    /** Cubic curve from the split to a lane, then straight on. */
+    const lanePoint = (lane: number, t: number): [number, number] => {
+      const v1 = LANE_V[lane]!;
+      const u0 = SPLIT_U;
+      const u1 = SPLIT_U + 220;
+      if (t < 0.55) {
+        const s = t / 0.55;
+        const e = s * s * (3 - 2 * s);
+        return [u0 + (u1 - u0) * s, v1 * e];
+      }
+      const s = (t - 0.55) / 0.45;
+      return [u1 + (END_U - u1) * s, v1];
+    };
+
+    let fruitLayer: SVGGElement;
+    let beam: SVGRectElement;
+    let sweep: SVGLineElement;
+    const bins: SVGGElement[] = [];
+
+    function build() {
+      svg.innerHTML = '';
+      bins.length = 0;
+      svg.setAttribute('viewBox', vertical ? '0 0 400 1200' : '0 0 1200 500');
+      const defs = mk('defs', {}, svg);
+      const lg = mk('linearGradient', { id: 'gs-beam', x1: 0, y1: 0, x2: vertical ? 1 : 0, y2: vertical ? 0 : 1 }, defs);
+      mk('stop', { offset: '0', 'stop-color': '#8fd3ff', 'stop-opacity': 0.0 }, lg);
+      mk('stop', { offset: '0.5', 'stop-color': '#8fd3ff', 'stop-opacity': 0.55 }, lg);
+      mk('stop', { offset: '1', 'stop-color': '#8fd3ff', 'stop-opacity': 0.0 }, lg);
+      const belt = mk('g', {}, svg);
+
+      // Main belt with rollers.
+      const W = 64;
+      const [bx, by] = P(-20, -W / 2);
+      const [bx2, by2] = P(SPLIT_U, W / 2);
+      mk('rect', { x: Math.min(bx, bx2), y: Math.min(by, by2), width: Math.abs(bx2 - bx), height: Math.abs(by2 - by), rx: 14, fill: 'rgb(26 92 170 / 0.55)', stroke: 'rgb(225 238 255 / 0.35)' }, belt);
+      for (let u = 0; u < SPLIT_U; u += 22) mk('path', { d: pathD([[u, -W / 2 + 6], [u, W / 2 - 6]]), stroke: 'rgb(255 255 255 / 0.14)', 'stroke-width': 2, class: 'gs-roller' }, belt);
+
+      // Lanes.
+      lanes.forEach((_, i) => {
+        const pts: [number, number][] = [];
+        for (let k = 0; k <= 40; k++) pts.push(lanePoint(i, k / 40));
+        mk('path', { d: pathD(pts), fill: 'none', stroke: 'rgb(26 92 170 / 0.55)', 'stroke-width': 56, 'stroke-linecap': 'round' }, belt);
+        mk('path', { d: pathD(pts), fill: 'none', stroke: 'rgb(225 238 255 / 0.25)', 'stroke-width': 1.5, 'stroke-dasharray': '6 10' }, belt);
+      });
+
+      // Bins with labels.
+      lanes.forEach((l, i) => {
+        const g = mk('g', {}, svg);
+        const [cx, cy] = P(END_U + (vertical ? 60 : 90), LANE_V[i]!);
+        const bw = vertical ? 118 : 190;
+        const bh = vertical ? 80 : 96;
+        mk('rect', { x: cx - bw / 2, y: cy - bh / 2, width: bw, height: bh, rx: 20, fill: 'rgb(214 230 250 / 0.12)', stroke: i === 0 ? 'rgb(159 224 143 / 0.8)' : 'rgb(245 154 35 / 0.75)', 'stroke-width': 1.5, class: 'gs-bin' }, g);
+        const t1 = mk('text', { x: cx, y: cy - 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': vertical ? 15 : 17, 'font-weight': 700, 'letter-spacing': 1.5 }, g);
+        t1.textContent = l.label.toUpperCase();
+        const t2 = mk('text', { x: cx, y: cy + 18, 'text-anchor': 'middle', fill: 'rgb(255 255 255 / 0.7)', 'font-size': vertical ? 10 : 11.5 }, g);
+        t2.textContent = l.sub;
+        bins.push(g);
+      });
+
+      // Scanner arch.
+      const arch = mk('g', {}, svg);
+      const [ax1, ay1] = P(SCAN_U - 34, -78);
+      const [ax2, ay2] = P(SCAN_U + 34, 78);
+      beam = mk('rect', { x: Math.min(ax1, ax2), y: Math.min(ay1, ay2), width: Math.abs(ax2 - ax1), height: Math.abs(ay2 - ay1), fill: 'url(#gs-beam)', opacity: 0.35 }, arch);
+      const [hx1, hy1] = P(SCAN_U - 46, -96);
+      const [hx2, hy2] = P(SCAN_U + 46, -70);
+      mk('rect', { x: Math.min(hx1, hx2), y: Math.min(hy1, hy2), width: Math.abs(hx2 - hx1), height: Math.abs(hy2 - hy1), rx: 10, fill: 'rgb(214 230 250 / 0.22)', stroke: 'rgb(235 244 255 / 0.6)' }, arch);
+      const [fx1, fy1] = P(SCAN_U - 46, 70);
+      const [fx2, fy2] = P(SCAN_U + 46, 96);
+      mk('rect', { x: Math.min(fx1, fx2), y: Math.min(fy1, fy2), width: Math.abs(fx2 - fx1), height: Math.abs(fy2 - fy1), rx: 10, fill: 'rgb(214 230 250 / 0.22)', stroke: 'rgb(235 244 255 / 0.6)' }, arch);
+      for (const du of [-24, 0, 24]) {
+        const [cx, cy] = P(SCAN_U + du, -83);
+        mk('circle', { cx, cy, r: 4, fill: '#8fd3ff' }, arch);
+      }
+      const [lx, ly] = P(SCAN_U, -118);
+      const lbl = mk('text', { x: lx, y: ly, 'text-anchor': 'middle', fill: 'rgb(255 255 255 / 0.8)', 'font-size': 11, 'font-weight': 700, 'letter-spacing': 2 }, arch);
+      lbl.textContent = 'OPTICAL SCANNER';
+      if (vertical) {
+        lbl.setAttribute('x', String(lx - 8));
+        lbl.setAttribute('y', String(ly + 4));
+        lbl.setAttribute('text-anchor', 'end');
+        lbl.textContent = 'SCANNER';
+      }
+      const [s1x, s1y] = P(SCAN_U, -70);
+      const [s2x, s2y] = P(SCAN_U, 70);
+      sweep = mk('line', { x1: s1x, y1: s1y, x2: s2x, y2: s2y, stroke: '#bfe6ff', 'stroke-width': 2, opacity: 0.6 }, arch);
+
+      fruitLayer = mk('g', {}, svg);
+      svg.insertBefore(fruitLayer, arch.nextSibling);
+    }
+
+    // Fruit grading pattern: most go to export.
+    const pattern = [0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 0, 2, 0];
+    let seq = 0;
+
+    function spawn() {
+      const lane = pattern[seq++ % pattern.length]!;
+      const g = mk('g', {}, fruitLayer);
+      const size = lane === 1 ? 30 : 40;
+      mk('image', { href: orangeSrc, x: -size / 2, y: -size / 2, width: size, height: size }, g);
+      if (lane === 1) g.setAttribute('filter', 'saturate(0.7)');
+      if (lane === 2) {
+        mk('circle', { cx: -5, cy: 4, r: 4.5, fill: 'rgb(90 60 20 / 0.6)' }, g);
+        mk('circle', { cx: 7, cy: -6, r: 3, fill: 'rgb(90 60 20 / 0.5)' }, g);
+      }
+      const state = { u: -30, t: 0, rot: 0 };
+      const setPos = () => {
+        const [u, v] = state.t > 0 ? lanePoint(lane, state.t) : [state.u, 0];
+        const [x, y] = P(u, v);
+        g.setAttribute('transform', `translate(${x} ${y}) rotate(${state.rot})`);
+      };
+      setPos();
+      const speed = 160; // flow units per second
+      const tl = gsap.timeline({ onUpdate: setPos, onComplete: () => g.remove() });
+      tl.to(state, { u: SCAN_U, rot: 260, duration: (SCAN_U + 30) / speed, ease: 'none' })
+        .add(() => read(lane))
+        .to(state, { u: SPLIT_U, rot: 360, duration: (SPLIT_U - SCAN_U) / speed, ease: 'none' })
+        .to(state, { t: 1, rot: 720, duration: (END_U - SPLIT_U) / speed, ease: 'none' })
+        .add(() => {
+          const b = bins[lane];
+          if (b) gsap.fromTo(b, { opacity: 0.6 }, { opacity: 1, duration: 0.5, ease: 'power2.out' });
+        })
+        .to(g, { opacity: 0, scale: 0.6, duration: 0.25, transformOrigin: 'center' });
+    }
+
+    function read(lane: number) {
+      gsap.fromTo(beam, { opacity: 0.95 }, { opacity: 0.35, duration: 0.6, ease: 'power2.out' });
+      const res = [true, lane !== 1, lane !== 2];
+      if (lane === 1) res[0] = false;
+      checks.forEach((c, i) => {
+        c.classList.toggle('is-pass', res[i]!);
+        c.classList.toggle('is-fail', !res[i]);
+        c.querySelector('[data-gs-mark]')!.textContent = res[i] ? 'Pass' : 'Out';
+      });
+      dest.textContent = lanes[lane]!.label;
+    }
+
+    const mq = window.matchMedia('(max-width: 767px)');
+    const setup = () => {
+      vertical = mq.matches;
+      build();
+    };
+    setup();
+    mq.addEventListener('change', setup);
+
+    let timer: number | undefined;
+    const io = new IntersectionObserver(([e]) => {
+      if (e?.isIntersecting) {
+        if (reduce) {
+          read(0);
+          return;
+        }
+        if (timer === undefined) {
+          spawn();
+          timer = window.setInterval(spawn, 900);
+        }
+      } else if (timer !== undefined) {
+        window.clearInterval(timer);
+        timer = undefined;
+      }
+    });
+    io.observe(root);
+
+    // Scanner sweep line oscillates across the arch.
+    if (!reduce) {
+      const s = { k: 0 };
+      gsap.to(s, {
+        k: 1,
+        duration: 1.1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        onUpdate: () => {
+          if (!sweep) return;
+          const du = -30 + 60 * s.k;
+          const [x1, y1] = P(SCAN_U + du, -70);
+          const [x2, y2] = P(SCAN_U + du, 70);
+          sweep.setAttribute('x1', String(x1));
+          sweep.setAttribute('y1', String(y1));
+          sweep.setAttribute('x2', String(x2));
+          sweep.setAttribute('y2', String(y2));
+        },
+      });
+    }
+  });
+</script>

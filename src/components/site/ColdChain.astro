@@ -1,0 +1,159 @@
+---
+/**
+ * "Packhouse to port to sea" cold-chain scene. Pinned full screen: as you
+ * scroll, a reefer container travels a route line from the Letsitele packhouse
+ * to the port and out to sea. Each stop opens its photo out of the container's
+ * position, the cold-chain monitor's trace stays flat the whole way, and the
+ * two inspections tick off at the packhouse and again at the port.
+ * Copy is the approved packhouse/export text.
+ */
+import { Image } from 'astro:assets';
+import { media } from '../../lib/media';
+
+const stops = [
+  { key: 'Packhouse', title: 'Tested at the packhouse', text: 'Fruit undergoes multiple tests, with PPECB inspectors present full-time during packing season.', photo: 'packhouse/pack-2025-103494.jpg', alt: 'Citrus being packed and checked in the Mahela packhouse', pos: '50% 50%' },
+  { key: 'Cold store', title: 'Cooled and palletised', text: 'Strict temperature and handling protocols protect freshness through the supply chain.', photo: 'generated/reefer-interior.jpg', alt: 'Pallets of cartons inside a refrigerated container', pos: '50% 55%' },
+  { key: 'By road', title: 'By truck to local ports', text: 'From the packhouses, the pallets of fruit are transported per truck to local ports.', photo: 'packhouse/dispatch-2022-105210.jpg', alt: 'A forklift loading Mahela pallets onto a truck bound for the port', pos: '55% 50%' },
+  { key: 'Port', title: 'Inspected again at the port', text: 'At the port the fruit is once again inspected before it leaves for its export destination.', photo: 'generated/port.jpg', alt: 'Refrigerated containers on the quay of a container port at dusk', pos: '45% 55%' },
+  { key: 'At sea', title: 'On its way to the world', text: 'Europe, Russia, the Middle East, Asia, Japan and the Far East, under the Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus brands.', photo: 'generated/reefer-ship.jpg', alt: 'A container ship carrying refrigerated containers out to sea', pos: '50% 62%' },
+];
+// A long, almost flat temperature trace: held steady the whole way.
+const trace = Array.from({ length: 61 }, (_, i) => `${i ? 'L' : 'M'}${(i * 400) / 60} ${30 + Math.sin(i * 1.7) * 1.2 + Math.sin(i * 0.43) * 0.8}`).join(' ');
+---
+
+<section class="cc relative overflow-hidden bg-[radial-gradient(70%_70%_at_70%_30%,#21497c,#0b1626_75%)] text-white" aria-labelledby="cc-title" data-cc>
+  <div class="cc-pin mx-auto flex min-h-[100svh] max-w-[84rem] flex-col px-4 pb-6 pt-24 md:px-6 md:pb-10 md:pt-28">
+    <div class="grid flex-1 items-center gap-5 lg:grid-cols-12 lg:gap-12">
+      <div class="order-2 lg:order-1 lg:col-span-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#9cc3f5]">Cold chain</p>
+        <h2 id="cc-title" class="cond mt-3 text-[clamp(2rem,1.2rem+2.6vw,3.6rem)] font-medium uppercase leading-[0.95]">From the packhouse to the port</h2>
+
+        <div class="relative mt-5 min-h-[8.5rem] md:mt-8 md:min-h-[9.5rem]">
+          {stops.map((s, i) => (
+            <div class="cc-step absolute inset-x-0 top-0" data-cc-step={i} style={i ? 'opacity:0' : ''}>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{String(i + 1).padStart(2, '0')} / {String(stops.length).padStart(2, '0')}</p>
+              <h3 class="cond mt-2 text-2xl font-semibold uppercase tracking-[0.04em] md:text-3xl">{s.title}</h3>
+              <p class="mt-2 max-w-md leading-relaxed text-white/80">{s.text}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- Cold-chain monitor -->
+        <div class="cc-glass mt-4 rounded-[22px] p-4 md:mt-6 md:p-5" aria-hidden="true">
+          <div class="flex items-center justify-between gap-3">
+            <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]"><span class="cc-live size-2 rounded-full bg-[#7ee0ff]"></span>Temperature</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#b9e08f]">Held steady</p>
+          </div>
+          <svg viewBox="0 0 400 60" class="mt-3 hidden h-12 w-full md:block" preserveAspectRatio="none">
+            <line x1="0" y1="30" x2="400" y2="30" stroke="rgb(255 255 255 / 0.12)" stroke-dasharray="4 6" />
+            <path d={trace} fill="none" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round" pathLength="1" class="cc-trace" data-cc-trace />
+          </svg>
+          <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            <li class="cc-check flex items-center gap-2" data-cc-check="0"><span class="cc-tick">✓</span>Inspected at the packhouse</li>
+            <li class="cc-check flex items-center gap-2" data-cc-check="3"><span class="cc-tick">✓</span>Inspected again at the port</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="relative order-1 h-[30svh] lg:order-2 lg:col-span-7 lg:h-[62svh]">
+        {stops.map((s, i) => (
+          <div class="cc-photo absolute inset-0 overflow-hidden rounded-[28px]" data-cc-photo={i} style={i ? 'clip-path:circle(0% at 50% 100%)' : ''}>
+            <Image src={media(s.photo)} alt={s.alt} widths={[640, 960, 1376]} sizes="(min-width: 1024px) 52vw, 92vw" class="h-full w-full object-cover" style={`object-position:${s.pos}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Route -->
+    <div class="relative mt-6 md:mt-8" aria-hidden="true">
+      <div class="relative mx-3 h-[3px] rounded-full bg-white/15">
+        <div class="absolute inset-y-0 left-0 w-full origin-left scale-x-0 rounded-full bg-[linear-gradient(90deg,#7ee0ff,#b9e08f)]" data-cc-fill></div>
+        <div class="cc-reefer absolute top-1/2 left-0" data-cc-reefer>
+          <svg viewBox="0 0 64 30" class="h-6 w-auto md:h-7"><rect x="1" y="3" width="62" height="24" rx="3" fill="#eef4fb" stroke="#274486" stroke-width="2" />{[10, 18, 26, 34, 42].map((x) => <line x1={x} y1="7" x2={x} y2="23" stroke="#9fb6d6" stroke-width="1.5" />)}<rect x="48" y="7" width="11" height="16" rx="2" fill="#274486" /><circle cx="53.5" cy="15" r="3.2" fill="#7ee0ff" /></svg>
+        </div>
+      </div>
+      <ol class="mt-4 flex justify-between text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/50 md:text-xs md:tracking-[0.18em]">
+        {stops.map((s, i) => <li class="cc-stop flex flex-col items-center gap-2 first:items-start last:items-end" data-cc-stop={i}><span class="hidden sm:inline">{s.key}</span></li>)}
+      </ol>
+      <div class="pointer-events-none absolute inset-x-3 top-0 flex justify-between">
+        {stops.map((_, i) => <span class="cc-dot -mt-[5px] size-[13px] rounded-full border-2 border-white/40 bg-[#0b1626]" data-cc-dot={i}></span>)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-cc]').forEach((root) => {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-cc-step]')];
+    const photos = [...root.querySelectorAll<HTMLElement>('[data-cc-photo]')];
+    const dots = [...root.querySelectorAll<HTMLElement>('[data-cc-dot]')];
+    const stopsEl = [...root.querySelectorAll<HTMLElement>('[data-cc-stop]')];
+    const checks = [...root.querySelectorAll<HTMLElement>('[data-cc-check]')];
+    const reefer = root.querySelector<HTMLElement>('[data-cc-reefer]')!;
+    const fill = root.querySelector<HTMLElement>('[data-cc-fill]')!;
+    const trace = root.querySelector<SVGPathElement>('[data-cc-trace]');
+    const n = steps.length;
+    let current = 0;
+
+    const show = (k: number) => {
+      if (k === current) return;
+      steps.forEach((s, i) => gsap.to(s, { opacity: i === k ? 1 : 0, y: i === k ? 0 : i < k ? -16 : 16, duration: 0.45, overwrite: true }));
+      current = k;
+    };
+
+    // p runs 0..1 over the pinned scroll.
+    const render = (p: number) => {
+      const pos = p * (n - 1); // 0..4 along the route
+      const k = Math.min(n - 1, Math.round(pos));
+      show(k);
+      reefer.style.left = `${(pos / (n - 1)) * 100}%`;
+      fill.style.transform = `scaleX(${pos / (n - 1)})`;
+      if (trace) trace.style.strokeDashoffset = String(1 - Math.min(1, p * 1.02));
+      // Each photo opens out of the container's spot on the route line.
+      photos.forEach((ph, i) => {
+        if (i === 0) return;
+        const t = gsap.utils.clamp(0, 1, (pos - (i - 0.5)) / 0.5);
+        ph.style.clipPath = t >= 1 ? 'none' : `circle(${t * 125}% at ${(i / (n - 1)) * 100}% 100%)`;
+      });
+      dots.forEach((d, i) => d.classList.toggle('is-on', pos >= i - 0.02));
+      stopsEl.forEach((d, i) => d.classList.toggle('is-on', k === i));
+      checks.forEach((c) => c.classList.toggle('is-on', pos >= Number(c.dataset.ccCheck) - 0.02));
+    };
+    render(0);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Still steps through the stops, just without the pinned scrub smoothing.
+      ScrollTrigger.create({ trigger: root, start: 'top top', end: '+=300%', pin: root.querySelector('.cc-pin'), onUpdate: (st) => render(st.progress) });
+      return;
+    }
+    ScrollTrigger.create({ trigger: root, start: 'top top', end: '+=380%', pin: root.querySelector('.cc-pin'), scrub: 0.6, onUpdate: (st) => render(st.progress) });
+  });
+</script>
+
+<style>
+  .cc-glass {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.18), rgb(150 182 222 / 0.07));
+    border: 1px solid rgb(225 238 255 / 0.3);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .cc-photo { box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.7); border: 1px solid rgb(225 238 255 / 0.25); }
+  .cc-trace { stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 6px #7ee0ff); }
+  .cc-live { box-shadow: 0 0 10px #7ee0ff; animation: cc-blink 1.6s ease-in-out infinite; }
+  @keyframes cc-blink { 50% { opacity: 0.35; } }
+  .cc-reefer { transform: translate(-50%, -50%); filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.5)); }
+  .cc-dot { transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; }
+  .cc-dot:global(.is-on) { background: #b9e08f; border-color: #b9e08f; box-shadow: 0 0 12px #b9e08f; }
+  .cc-stop { transition: color 0.3s; }
+  .cc-stop:global(.is-on) { color: #fff; }
+  .cc-check { color: rgb(255 255 255 / 0.45); transition: color 0.4s; }
+  .cc-tick { display: inline-flex; width: 1.25rem; height: 1.25rem; align-items: center; justify-content: center; border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.3); font-size: 0.7rem; transition: background-color 0.4s, border-color 0.4s, color 0.4s; }
+  .cc-check:global(.is-on) { color: #fff; }
+  .cc-check:global(.is-on) .cc-tick { background: #b9e08f; border-color: #b9e08f; color: #10201a; }
+  @media (prefers-reduced-motion: reduce) { .cc-live { animation: none; } }
+</style>

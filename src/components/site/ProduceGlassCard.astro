@@ -1,0 +1,76 @@
+---
+/**
+ * Landscape light-glass produce card. The fruit sits sharp in the top-right
+ * corner, in front of the glass and breaking out of the panel.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { IconName } from '../../lib/icons';
+
+interface Props {
+  tag: string;
+  title: string;
+  href: string;
+  image: ImageMetadata;
+  icon?: IconName;
+  points: string[];
+  accent?: string;
+  /** Fruit width as a % of the card; squat fruit needs more than tall fruit to look the same size. */
+  fruitSize?: number;
+}
+const { tag, title, href, image, icon = 'leaf', points, accent = '#2c6b44', fruitSize = 50 } = Astro.props;
+const widths = [320, 480, 640].filter((w) => w <= image.width);
+---
+
+<article class="pg-card group relative" style={`--accent:${accent}`}>
+  <a href={href} class="pg-glass relative flex h-full flex-col overflow-hidden rounded-[30px] p-7 text-ivory md:p-9">
+    <span class="self-start rounded-lg px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-ivory" style="background: color-mix(in srgb, var(--accent) 80%, #1e4a30)">{tag}</span>
+    <h3 class="cond mt-4 max-w-[58%] text-[clamp(2.2rem,1.6rem+1.6vw,3.2rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.25)]">{title}</h3>
+    <div class="mt-auto grid max-w-[64%] gap-5 pt-6">
+      <div class="flex items-center gap-3">
+        <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]"><Icon name={icon} class="size-5 text-white" /></span>
+        <span class="text-xs font-semibold uppercase tracking-[0.16em] text-white/75">At a glance</span>
+      </div>
+      <ul class="space-y-1.5 text-[0.95rem] leading-snug text-white/90">
+        {points.map((p) => <li class="flex gap-2.5"><span class="mt-[0.45rem] size-1.5 shrink-0 rounded-full" style="background: color-mix(in srgb, var(--accent) 55%, #fff)"></span>{p}</li>)}
+      </ul>
+      <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white">Explore {title.toLowerCase()} <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+    </div>
+  </a>
+  <div class="pg-fruit pointer-events-none absolute -right-[7%] -top-[16%]" style={`width:${fruitSize}%`} aria-hidden="true" data-pg-fruit>
+    <Image src={image} alt="" widths={widths} sizes="(min-width: 1024px) 360px, 45vw" class="pg-fruit-img relative h-auto w-full" />
+  </div>
+</article>
+
+<style>
+  .pg-card {
+    aspect-ratio: 1.66;
+  }
+  .pg-glass > * {
+    opacity: var(--content, 1);
+  }
+  .pg-glass {
+    /* Same frosted glass as the rest of the site, with a slight blue tint. */
+    background: linear-gradient(135deg, rgb(214 230 250 / 0.22), rgb(160 190 225 / 0.1));
+    border: 1px solid rgb(225 238 255 / 0.38);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      inset 0 0 0 3px rgb(200 220 245 / 0.08),
+      0 40px 80px -30px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  .pg-fruit {
+    z-index: 2;
+  }
+  .pg-fruit-img {
+    filter: drop-shadow(0 24px 30px rgb(0 0 0 / 0.3));
+  }
+  @media (max-width: 639px) {
+    .pg-card {
+      aspect-ratio: auto;
+      min-height: 25rem;
+    }
+  }
+</style>

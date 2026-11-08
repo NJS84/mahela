@@ -1,0 +1,229 @@
+---
+/**
+ * Compliance + brands scene. A 3D export carton: as you scroll, the GlobalGAP,
+ * SIZA and NSF seals stamp onto its lid one by one (the matching logo in the
+ * row lights up), then the carton tips and turns to show each brand side:
+ * Mahela Boerdery, Makulu Citrus, Mala-Mala Citrus and the origin end panel.
+ * Pinned on desktop; on phones it scrubs as it passes. CSS 3D, no WebGL.
+ */
+import { Image } from 'astro:assets';
+import SectionTitle from './SectionTitle.astro';
+import { media } from '../../lib/media';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead: string;
+}
+const { eyebrow, title, lead } = Astro.props;
+const certs = [
+  { src: 'certifications/globalgap-colour.png', alt: 'GlobalGAP', cls: 'xc-seal-wide' },
+  { src: 'certifications/siza-colour.png', alt: 'SIZA', cls: '' },
+  { src: 'certifications/nsf-registered-colour.png', alt: 'NSF Registered', cls: '' },
+];
+const faces = [
+  { name: 'Mahela Boerdery', sub: 'Brand', label: 'brand/label-mahela-boerdery.png' },
+  { name: 'Makulu Citrus', sub: 'Brand', label: 'brand/label-makulu-citrus.png' },
+  { name: 'Mala-Mala Citrus', sub: 'Brand', label: 'brand/label-mala-mala-citrus.png' },
+  { name: 'Packed in Letsitele', sub: 'Origin', label: '' },
+];
+---
+
+<section class="xc relative overflow-hidden bg-[#10201a]" aria-labelledby="compliance-title" data-xc>
+  <div class="xc-pin mx-auto grid min-h-[100svh] max-w-[84rem] items-center gap-10 px-4 py-20 md:px-6 lg:grid-cols-12 lg:py-16">
+    <div class="relative z-10 min-w-0 lg:col-span-6">
+      <SectionTitle eyebrow={eyebrow} title={title} lead={lead} id="compliance-title" />
+      <ul class="mt-10 flex flex-nowrap items-center gap-3 sm:gap-4" aria-label="Certifications">
+        {certs.map((c, i) => <li class="xc-logo flex h-16 flex-1 items-center justify-center rounded-2xl px-3 sm:h-20 sm:flex-none sm:px-6" data-xc-logo={i}><Image src={media(c.src)} alt={c.alt} height={96} class="h-9 w-auto max-w-full object-contain sm:h-11" /></li>)}
+      </ul>
+      <div class="mt-10 border-t border-white/12 pt-6">
+        <h3 class="text-xs font-semibold uppercase tracking-[0.22em] text-sage">Our brands</h3>
+        <p class="mt-2 text-ivory/80">Makulu Citrus, Mahela Boerdery and Mala-Mala Citrus.</p>
+        <p class="cond mt-5 h-[2.6rem] overflow-hidden text-[2.2rem] font-medium uppercase leading-[1.15] tracking-[0.02em] text-white" aria-hidden="true">
+          <span class="xc-caption block" data-xc-caption>{faces.map((f) => <span class="block">{f.name}</span>)}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="relative h-[min(78vw,30rem)] min-w-0 lg:col-span-6 lg:h-[36rem]" aria-hidden="true">
+      <div class="xc-floor"></div>
+      <div class="xc-stage">
+        <div class="xc-box" data-xc-box>
+          {[0, 2].map((k) => (
+            <div class:list={['xc-face xc-long', k === 0 ? 'xc-front' : 'xc-back']}>
+              <Image src={media(faces[k]!.label)} alt="" widths={[400, 720]} sizes="360px" class="xc-label" />
+            </div>
+          ))}
+          <div class="xc-face xc-short xc-right">
+            <Image src={media(faces[1]!.label)} alt="" widths={[300, 600]} sizes="260px" class="xc-label" />
+            <span class="xc-print">Produce of South Africa</span>
+          </div>
+          <div class="xc-face xc-short xc-left">
+            <Image src={media('brand/mahela-emblem-hires.png')} alt="" width={160} class="xc-emblem" />
+            <span class="xc-print xc-print-lg">Produce of South Africa</span>
+            <span class="xc-print">Letsitele · Limpopo</span>
+            <span class="xc-print">Packed by Mahela Group</span>
+          </div>
+          <div class="xc-face xc-top">
+            <div class="xc-lid-slot"></div>
+            {certs.map((c, i) => (
+              <div class:list={['xc-seal', c.cls]} data-xc-seal={i}>
+                <Image src={media(c.src)} alt="" height={80} class="h-full w-auto object-contain" />
+                <span class="xc-ring"></span>
+              </div>
+            ))}
+          </div>
+          <div class="xc-face xc-bottom"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-xc]').forEach((root) => {
+    const box = root.querySelector<HTMLElement>('[data-xc-box]')!;
+    const seals = [...root.querySelectorAll<HTMLElement>('[data-xc-seal]')];
+    const logos = [...root.querySelectorAll<HTMLElement>('[data-xc-logo]')];
+    const caption = root.querySelector<HTMLElement>('[data-xc-caption]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Start: looking down onto the lid. Then tip forward and turn through the four sides.
+    const state = { rx: -58, ry: 28 };
+    const apply = () => {
+      box.style.transform = `rotateX(${state.rx}deg) rotateY(${state.ry}deg)`;
+      const face = Math.max(0, Math.min(3, Math.round((28 - state.ry) / 90)));
+      caption.style.transform = `translateY(${-face * 100 / 4}%)`;
+    };
+    apply();
+
+    if (reduce) {
+      seals.forEach((s) => gsap.set(s, { opacity: 1 }));
+      logos.forEach((l) => l.classList.add('is-on'));
+      return;
+    }
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, onUpdate: () => {
+      apply();
+      // A logo lights the moment its seal lands (and goes out again when scrolling back).
+      logos.forEach((l, k) => l.classList.toggle('is-on', tl.time() >= k * 0.5 + 0.4));
+    } });
+    seals.forEach((s, i) => {
+      const at = i * 0.5;
+      tl.fromTo(s, { opacity: 0, z: 260, scale: 1.35 }, { opacity: 1, z: 2, scale: 1, duration: 0.4, ease: 'power3.in' }, at);
+      tl.fromTo(s.querySelector('.xc-ring'), { opacity: 0, scale: 0.6 }, { opacity: 0.9, scale: 1, duration: 0.05 }, at + 0.4);
+      tl.to(s.querySelector('.xc-ring'), { opacity: 0, scale: 1.6, duration: 0.3 }, at + 0.45);
+    });
+    tl.to(state, { rx: -16, duration: 0.6, ease: 'power2.inOut' }, 1.6);
+    tl.to(state, { ry: 28 - 270, duration: 2.4, ease: 'power1.inOut' }, 1.8);
+    tl.to({}, { duration: 0.3 });
+
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1024px)', () => {
+      ScrollTrigger.create({ trigger: root, start: 'top top', end: '+=180%', pin: root.querySelector('.xc-pin'), scrub: 0.6, animation: tl });
+    });
+    mm.add('(max-width: 1023px)', () => {
+      ScrollTrigger.create({ trigger: root, start: 'top 70%', end: 'bottom 30%', scrub: 0.6, animation: tl });
+    });
+  });
+</script>
+
+<style>
+  .xc-logo {
+    background: linear-gradient(160deg, rgb(234 242 252 / 0.92), rgb(206 222 242 / 0.82));
+    border: 1px solid rgb(235 244 255 / 0.7);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 24px 50px -24px rgb(0 0 0 / 0.55);
+    opacity: 0.45;
+    filter: saturate(0.4);
+    transition: opacity 0.4s, filter 0.4s, transform 0.4s, box-shadow 0.4s;
+  }
+  .xc-logo:global(.is-on) {
+    opacity: 1;
+    filter: none;
+    transform: translateY(-3px);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 2px rgb(185 224 143 / 0.55), 0 24px 50px -20px rgb(0 0 0 / 0.6);
+  }
+  .xc-caption { transition: transform 0.5s cubic-bezier(0.3, 0.8, 0.3, 1); }
+
+  /* --- The carton --- */
+  .xc-stage {
+    --w: 380px; --d: 280px; --h: 230px;
+    perspective: 1400px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--w);
+    height: var(--h);
+    transform: translate(-50%, -50%) scale(var(--k, 1));
+  }
+  @media (max-width: 1023px) { .xc-stage { --k: 0.82; } }
+  @media (max-width: 480px) { .xc-stage { --k: 0.66; } }
+  .xc-box { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; will-change: transform; }
+  .xc-face {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    backface-visibility: hidden;
+    border-radius: 6px;
+    /* White corrugated board with a faint flute texture. */
+    background:
+      repeating-linear-gradient(90deg, rgb(0 0 0 / 0.018) 0 2px, transparent 2px 6px),
+      linear-gradient(180deg, #f7f8fa, #e6e9ee);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08), inset 0 -18px 30px -18px rgb(0 0 0 / 0.18);
+  }
+  .xc-long { width: var(--w); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2); padding: 12px; }
+  .xc-short { width: var(--d); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--d) / -2); padding: 12px; }
+  .xc-top, .xc-bottom { width: var(--w); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--w) / -2); }
+  .xc-front { transform: translateZ(calc(var(--d) / 2)); }
+  .xc-back { transform: rotateY(180deg) translateZ(calc(var(--d) / 2)); filter: brightness(0.92); }
+  .xc-right { transform: rotateY(90deg) translateZ(calc(var(--w) / 2)); filter: brightness(0.95); }
+  .xc-left { transform: rotateY(-90deg) translateZ(calc(var(--w) / 2)); filter: brightness(0.9); }
+  .xc-top { transform: rotateX(90deg) translateZ(calc(var(--h) / 2)); justify-content: center; gap: 12px; padding: 18px; flex-wrap: wrap; flex-direction: row; transform-style: preserve-3d; backface-visibility: visible; }
+  .xc-bottom { transform: rotateX(-90deg) translateZ(calc(var(--h) / 2)); background: #cfd5dd; }
+  .xc-label { width: 100%; height: 100%; object-fit: contain; border-radius: 3px; }
+  .xc-short .xc-label { height: auto; }
+  .xc-emblem { width: 64px; height: auto; }
+  .xc-print { font: 600 10px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: #274486; }
+  .xc-print-lg { font-size: 13px; letter-spacing: 0.14em; }
+  .xc-lid-slot { position: absolute; inset: 50% 8px auto; height: 2px; background: rgb(0 0 0 / 0.12); }
+
+  .xc-seal {
+    position: relative;
+    height: 58px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08), 0 6px 14px -6px rgb(0 0 0 / 0.35);
+    opacity: 0;
+    transform-style: preserve-3d;
+  }
+  .xc-seal-wide { height: 64px; flex-basis: 100%; display: flex; justify-content: center; max-width: 320px; }
+  .xc-ring {
+    position: absolute;
+    inset: -10px;
+    border-radius: 18px;
+    border: 2px solid rgb(185 224 143 / 0.9);
+    box-shadow: 0 0 18px rgb(185 224 143 / 0.6);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .xc-floor {
+    position: absolute;
+    left: 50%;
+    bottom: 12%;
+    width: 70%;
+    height: 60px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent);
+  }
+</style>

@@ -1,0 +1,9 @@
+{
+  // Static Astro site served from Cloudflare (Workers static assets). _redirects and _headers in dist/ are honoured.
+  "name": "mahela-preview",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

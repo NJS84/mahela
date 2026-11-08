@@ -11,6 +11,7 @@ const sorted = [...posts].sort((a, b) => b.date.localeCompare(a.date));
 const [first, ...rest] = sorted;
 const fmt = (d: string) => new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
 const img = (p: (typeof posts)[number]) => (p.image && hasMedia(p.image) ? media(p.image) : media('farms/dsc-1739.jpg'));
+const years = [...new Set(rest.map((p) => p.date.slice(0, 4)))];
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -24,34 +25,39 @@ const jsonLd = [
 <Base title="News" description="News and press coverage of Mahela Group, the Letsitele citrus producer and exporter: farming, community, conservation and awards." breadcrumbs={[{ name: 'News', href: '/news' }]} jsonLd={jsonLd}>
   <PageHero image={media('generated/orchard-bokeh.jpg')} eyebrow="News" title="Mahela in the news" lead="Press coverage and stories from our farms, packhouses and community." crumbs={[{ name: 'News', href: '/news' }]} />
 
-  <section class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32" aria-label="Articles">
+  <section class="relative overflow-hidden" aria-label="Articles">
+   <div class="absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_70%_10%,#2f5a8f,#0d1a2c_75%)]"></div>
+   <div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-32">
     {
       first && (
-        <a href={`/news/${first.slug}`} class="glass group grid overflow-hidden rounded-[32px] p-1.5 lg:grid-cols-2" data-reveal data-glare>
+        <a href={`/news/${first.slug}`} class="nw-card group grid overflow-hidden rounded-[32px] p-1.5 text-white lg:grid-cols-2" data-reveal data-glare>
           <div class="overflow-hidden rounded-[26px]">
             <Image src={img(first)} alt="" widths={[640, 960, 1280]} sizes="(min-width: 1024px) 45vw, 100vw" class="aspect-[16/10] h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
           </div>
           <div class="flex flex-col justify-center p-7 md:p-12">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sage"><time datetime={first.date}>{fmt(first.date)}</time>{first.source && ` · ${first.source}`}</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/75"><time datetime={first.date}>{fmt(first.date)}</time>{first.source && ` · ${first.source}`}</p>
             <h2 class="cond mt-4 text-[clamp(2rem,1.4rem+2vw,3.25rem)] font-medium uppercase leading-[0.98]">{first.title}</h2>
-            <p class="mt-4 leading-relaxed text-ivory/80">{first.excerpt}</p>
-            <span class="mt-8 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-sage">Read more <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+            <p class="mt-4 leading-relaxed text-white/85">{first.excerpt}</p>
+            <span class="mt-8 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#74c365]">Read more <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
           </div>
         </a>
       )
     }
-    <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="nw-rail mt-12 flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1.5" role="group" aria-label="Filter by year" data-nw-filter>
+      {['All', ...years].map((y, i) => <button type="button" class:list={['nw-chip shrink-0 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white', i === 0 && 'is-on']} aria-pressed={i === 0 ? 'true' : 'false'} data-y={y}>{y}</button>)}
+    </div>
+    <ul class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-nw-list>
       {
         rest.map((p) => (
-          <li data-reveal>
-            <a href={`/news/${p.slug}`} class="glass group flex h-full flex-col overflow-hidden rounded-[26px] p-1.5" data-glare data-tilt>
+          <li data-reveal data-year={p.date.slice(0, 4)}>
+            <a href={`/news/${p.slug}`} class="nw-card group flex h-full flex-col overflow-hidden rounded-[26px] p-1.5" data-glare data-tilt>
               <div class="overflow-hidden rounded-[20px]">
                 <Image src={img(p)} alt="" widths={[480, 720]} sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" class="aspect-[16/10] w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
               </div>
               <div class="flex flex-1 flex-col p-5">
-                <p class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-sage"><time datetime={p.date}>{fmt(p.date)}</time>{p.source && ` · ${p.source}`}{p.lang === 'af' && ' · Afrikaans'}</p>
+                <p class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/70"><time datetime={p.date}>{fmt(p.date)}</time>{p.source && ` · ${p.source}`}{p.lang === 'af' && ' · Afrikaans'}</p>
                 <h2 class="cond mt-3 text-2xl font-medium uppercase leading-tight" lang={p.lang === 'af' ? 'af' : undefined}>{p.title}</h2>
-                <span class="mt-auto inline-flex items-center gap-2 pt-5 text-xs font-semibold uppercase tracking-[0.16em] text-ivory/70">Read <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+                <span class="mt-auto inline-flex items-center gap-2 pt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#74c365]">Read <Icon name="arrow" class="size-4 transition-transform group-hover:translate-x-1" /></span>
               </div>
             </a>
           </li>
@@ -59,5 +65,47 @@ const jsonLd = [
       }
     </ul>
     <div class="mt-24"><CtaBand /></div>
+   </div>
   </section>
 </Base>
+
+<style>
+  .nw-card,
+  .nw-rail {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.2), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.34);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.32), 0 40px 80px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+  .nw-chip {
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  .nw-chip:hover {
+    background: rgb(255 255 255 / 0.12);
+  }
+  .nw-chip.is-on {
+    background: rgb(116 195 101 / 0.35);
+    box-shadow: inset 0 0 0 1px #74c365;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { Flip } from 'gsap/Flip';
+  gsap.registerPlugin(Flip);
+  const rail = document.querySelector<HTMLElement>('[data-nw-filter]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-nw-list] > li')];
+  rail?.querySelectorAll<HTMLButtonElement>('button').forEach((b) =>
+    b.addEventListener('click', () => {
+      rail.querySelectorAll('button').forEach((x) => {
+        x.classList.toggle('is-on', x === b);
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      const y = b.dataset.y!;
+      const state = Flip.getState(items);
+      items.forEach((li) => (li.style.display = y === 'All' || li.dataset.year === y ? '' : 'none'));
+      Flip.from(state, { duration: 0.6, ease: 'power3.inOut', absolute: true, onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5 }), onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.9, duration: 0.4 }) });
+    }),
+  );
+</script>
