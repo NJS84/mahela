@@ -1,0 +1,299 @@
+---
+/**
+ * Mahela Cares: Our environment as a pinned, sideways walk across the farm. Scrolling carries you
+ * through five stops (approved copy) while the day moves on: the sun arcs over layered Lowveld
+ * ridges, the sky takes each stop's colour, and a trail along the bottom fills in. Each stop's photo
+ * comes alive when it arrives: the footprint shrinks into a sprout, ladybirds (natural predators)
+ * fly in and land, drippers water the orchard drop by drop, indigenous trees grow along the
+ * horizon, and wild dog tracks walk across to the sable.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { IconName } from '../../lib/icons';
+import { media } from '../../lib/media';
+
+type Stop = { key: string; short: string; title: string; text: string; icon: IconName; tone: [string, string]; photo: string; alt: string; pos?: string };
+const stops: Stop[] = [
+  { key: 'footprint', short: 'Footprint', title: 'Caretaker of the earth', text: 'As caretaker of the earth, we strive towards minimising our environmental footprint. Environmentally sustainable practices, as encompassed in the various standards Mahela Group is accredited to, are followed diligently.', icon: 'leaf', tone: ['#2e7d5b', '#0b2219'], photo: 'farms/farm-dam-105275.jpg', alt: 'A dam on a Mahela farm, fringed with reeds and indigenous bush' },
+  { key: 'ipm', short: 'Pest control', title: 'Integrated pest management', text: 'We have an integrated pest management system in place whereby the spraying of chemicals is kept to a minimum and natural predators are released to help control pests.', icon: 'shield', tone: ['#5f8a2a', '#16260a'], photo: 'produce/farm/citrus-orchard-103584.jpg', alt: 'Rows of citrus trees in a Mahela orchard' },
+  { key: 'water', short: 'Water', title: 'Every drop counts', text: 'Water management is optimised with the latest technology, such as an irrigation system using continuous drippers.', icon: 'drop', tone: ['#2a8fb0', '#06222c'], photo: 'generated/drip-irrigation.jpg', alt: 'A drip irrigation line watering the base of a young tree' },
+  { key: 'trees', short: 'Trees', title: 'Indigenous trees', text: 'A love for nature sees that large indigenous trees are left in place as far as possible when land is cleared for new orchards. We also regularly plant large numbers of indigenous trees on our farms.', icon: 'sprout', tone: ['#3f7a3a', '#0e1f0c'], photo: 'farms/indigenous-tree-103452.jpg', alt: 'An indigenous tree left standing in a field on a Mahela farm, with the mountains behind' },
+  { key: 'wildlife', short: 'Wildlife', title: 'Wildlife conservation', text: 'Mahela plays an active role in the conservation of wildlife. Game species such as the African wild dog and sable are some of the species we have helped to protect.', icon: 'globe', tone: ['#a8641c', '#2a1606'], photo: 'conservation/wild-dogs-pack.jpg', alt: 'A pack of African wild dogs in tall grass', pos: '50% 45%' },
+];
+const n = stops.length;
+const sable = media('conservation/sable-grazing.jpg');
+const bugs = [
+  [18, 30, -30], [70, 22, 25], [44, 58, -10], [82, 62, 40], [30, 76, 15],
+] as const;
+const trees = [
+  [8, 0.8], [22, 1], [40, 0.7], [61, 0.95], [78, 0.75], [92, 0.9],
+] as const;
+const paws = [
+  [6, 70], [14, 62], [22, 71], [30, 63], [38, 72], [46, 64], [54, 73], [62, 65],
+] as const;
+---
+
+<section id="environment" class="et relative isolate scroll-mt-0 bg-[#0b1a12]" aria-labelledby="environment-title" data-et>
+  <div class="et-pin relative h-[100svh] overflow-hidden">
+    <!-- Sky: each stop's colour cross-fades, the sun arcs across, the ridges drift at different speeds. -->
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      {stops.map((s, i) => <div class="absolute inset-0" style={`opacity:${i === 0 ? 1 : 0};background:radial-gradient(80% 70% at 60% 30%, ${s.tone[0]}, ${s.tone[1]} 75%)`} data-et-bg={i}></div>)}
+      <div class="et-sun absolute hidden size-[9vmin] rounded-full md:block" data-et-sun></div>
+      <svg class="absolute bottom-0 left-0 h-[44%] w-[220%]" viewBox="0 0 2200 400" preserveAspectRatio="none" data-et-far>
+        <path d="M0 250 C120 180 220 210 330 160 S560 120 700 190 S940 230 1060 150 S1300 90 1440 170 S1700 230 1820 160 S2060 120 2200 190 V400 H0Z" fill="#ffffff" opacity="0.05" />
+      </svg>
+      <svg class="absolute bottom-0 left-0 h-[30%] w-[320%]" viewBox="0 0 3200 300" preserveAspectRatio="none" data-et-near>
+        <path d="M0 210 C160 170 300 200 460 160 S760 150 900 200 S1200 230 1380 170 S1700 140 1860 200 S2200 220 2380 170 S2760 150 2900 200 S3100 210 3200 190 V300 H0Z" fill="#000000" opacity="0.22" />
+      </svg>
+    </div>
+
+    <div class="relative mx-auto flex h-full max-w-[84rem] flex-col px-4 pb-4 pt-20 md:px-6 md:pt-24">
+      <div class="flex items-end justify-between gap-6">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Custodians of nature</span>
+          <h2 id="environment-title" class="cond mt-2 text-[clamp(2.2rem,1.5rem+2.4vw,4rem)] font-medium uppercase leading-[0.95] text-white">Our environment</h2>
+        </div>
+        <p class="cond hidden text-white/70 sm:block" aria-hidden="true"><span class="text-3xl text-white" data-et-count>01</span> / 0{n}</p>
+      </div>
+
+      <!-- The sideways track: one stop per screen width. -->
+      <div class="relative mt-4 min-h-0 flex-1 [overflow-x:clip] md:mt-6">
+        <ol class="et-track absolute inset-y-0 left-0 flex" style={`width:${n * 100}%`} data-et-track>
+          {stops.map((s, i) => (
+            <li class:list={['et-stop flex h-full items-start md:items-center', `et-${s.key}`, i === 0 && 'is-on']} style={`width:${100 / n}%`} data-et-stop={i}>
+              <div class="grid w-full items-center gap-4 md:grid-cols-12 md:gap-8 md:pr-8">
+                <figure class="et-photo relative overflow-hidden rounded-[28px] md:col-span-7">
+                  <Image src={media(s.photo)} alt={s.alt} widths={[640, 960, 1400]} sizes="(min-width: 768px) 56vw, 92vw" class="et-img block w-full object-cover" style={s.pos ? `object-position:${s.pos}` : undefined} loading={i === 0 ? 'eager' : 'lazy'} />
+                  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+                    {s.key === 'footprint' && (
+                      <svg class="et-foot absolute left-1/2 top-1/2 h-[62%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 100 160">
+                        <g class="et-foot-print" fill="none" stroke="#fff" stroke-width="2.5">
+                          <path d="M50 150c-16 0-22-14-22-32 0-22 6-46 22-58 16 12 22 36 22 58 0 18-6 32-22 32Z" />
+                          <circle cx="30" cy="40" r="7" /><circle cx="43" cy="30" r="7.5" /><circle cx="57" cy="29" r="7" /><circle cx="69" cy="35" r="6" /><circle cx="78" cy="45" r="5" />
+                        </g>
+                        <g class="et-foot-sprout" fill="#9ee07f" stroke="#fff" stroke-width="2">
+                          <path d="M50 150V100" fill="none" />
+                          <path d="M50 112c-2-14-14-22-28-20 2 14 14 22 28 20Z" />
+                          <path d="M50 104c2-16 14-26 30-24-2 16-14 26-30 24Z" />
+                        </g>
+                      </svg>
+                    )}
+                    {s.key === 'ipm' && bugs.map(([x, y, r], k) => (
+                      <svg class="et-bug absolute w-[5.5%] min-w-[22px]" viewBox="0 0 40 40" style={`left:${x}%;top:${y}%;--r:${r}deg;--d:${k * 0.18}s;--fx:${(k % 2 ? 1 : -1) * (180 + k * 40)}px;--fy:${-160 - k * 30}px`}>
+                        <ellipse cx="20" cy="9" rx="7" ry="6" fill="#111" />
+                        <ellipse cx="20" cy="23" rx="14" ry="15" fill="#d8322a" stroke="#111" stroke-width="2" />
+                        <path d="M20 8v30" stroke="#111" stroke-width="2" />
+                        <circle cx="13" cy="19" r="3" fill="#111" /><circle cx="27" cy="19" r="3" fill="#111" /><circle cx="14" cy="30" r="2.6" fill="#111" /><circle cx="26" cy="30" r="2.6" fill="#111" />
+                        <ellipse cx="14" cy="15" rx="3" ry="2" fill="#fff" opacity="0.5" />
+                      </svg>
+                    ))}
+                    {s.key === 'water' && (
+                      <span class="absolute left-[49.2%] top-[50%] h-[30%] w-[3%]">
+                        {[0, 0.6, 1.2].map((d) => (
+                          <>
+                            <span class="et-drip" style={`--d:${d}s`}></span>
+                            <span class="et-ripple" style={`--d:${d}s`}></span>
+                          </>
+                        ))}
+                      </span>
+                    )}
+                    {s.key === 'trees' && (
+                      <svg class="absolute inset-x-0 bottom-[3%] h-[30%] w-full" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax meet">
+                        {trees.map(([x, sc], k) => (
+                          <g class="et-tree" style={`--d:${k * 0.14}s;transform-origin:${x * 4}px 120px`}>
+                            <g transform={`translate(${x * 4} 120) scale(${sc})`}>
+                              <path d="M0 0 V-46 M0 -30 L-14 -52 M0 -36 L12 -58" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                              <path d="M-38 -56 C-36 -76 -10 -82 0 -78 C12 -86 40 -78 40 -58 C30 -50 -28 -48 -38 -56Z" fill="#fff" fill-opacity="0.16" stroke="#fff" stroke-width="2" />
+                            </g>
+                          </g>
+                        ))}
+                      </svg>
+                    )}
+                    {s.key === 'wildlife' && (
+                      <>
+                        {paws.map(([x, y], k) => (
+                          <svg class="et-paw absolute w-[4%] min-w-[16px]" viewBox="0 0 30 30" style={`left:${x}%;top:${y}%;--d:${k * 0.16}s`}>
+                            <ellipse cx="15" cy="20" rx="7" ry="6" fill="#fff" />
+                            <ellipse cx="7" cy="10" rx="3" ry="3.6" fill="#fff" /><ellipse cx="12.5" cy="5.5" rx="3" ry="3.6" fill="#fff" /><ellipse cx="18" cy="5.5" rx="3" ry="3.6" fill="#fff" /><ellipse cx="23.5" cy="10" rx="3" ry="3.6" fill="#fff" />
+                          </svg>
+                        ))}
+                        <span class="et-sable absolute bottom-[8%] right-[5%] block aspect-square w-[30%] overflow-hidden rounded-full">
+                          <Image src={sable} alt="" widths={[320, 480]} sizes="16vw" class="h-full w-full object-cover" />
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </figure>
+                <div class="et-card rounded-[24px] p-4 text-white md:col-span-5 md:rounded-[28px] md:p-7">
+                  <div class="flex items-center justify-between">
+                    <span class="hidden size-11 items-center justify-center rounded-full border border-white/40 bg-white/10 md:flex"><Icon name={s.icon} class="size-5" /></span>
+                    <span class="cond text-sm tracking-[0.12em] text-white/70 max-md:order-first">0{i + 1} / 0{n}</span>
+                  </div>
+                  <h3 class="cond mt-1 text-[clamp(1.5rem,1.1rem+1.4vw,2.4rem)] font-medium uppercase leading-[0.98]">{s.title}</h3>
+                  <p class="mt-2 text-[0.84rem] leading-snug md:mt-3 md:leading-relaxed text-white/90 md:text-base">{s.text}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <!-- The trail: fills as you walk; each marker jumps to its stop. -->
+      <div class="relative mt-3 shrink-0 md:mt-5" data-et-trail>
+        <div class="absolute left-[10%] right-[10%] top-[1.35rem] h-px bg-white/25"></div>
+        <div class="absolute left-[10%] top-[1.35rem] h-px w-[80%] origin-left scale-x-0 bg-[#b9e08f]" data-et-fill></div>
+        <ul class="relative grid" style={`grid-template-columns:repeat(${n},1fr)`}>
+          {stops.map((s, i) => (
+            <li class="flex justify-center">
+              <button type="button" class:list={['et-node group flex flex-col items-center gap-1.5 text-white/70', i === 0 && 'is-on']} data-et-node={i} aria-label={`Go to ${s.title}`}>
+                <span class="et-dot flex size-11 items-center justify-center rounded-full"><Icon name={s.icon} class="size-4" /></span>
+                <span class="hidden text-[0.62rem] font-semibold uppercase tracking-[0.16em] sm:block">{s.short}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .et-sun {
+    left: 0;
+    top: 0;
+    background: radial-gradient(circle at 40% 38%, #fffbea, #ffd56b 70%);
+    box-shadow: 0 0 40px 10px rgb(255 214 107 / 0.35), 0 0 140px 50px rgb(255 214 107 / 0.18);
+  }
+  .et-img {
+    aspect-ratio: 16 / 10;
+    max-height: 30svh;
+  }
+  @media (min-width: 768px) {
+    .et-img { max-height: calc(100svh - 17rem); }
+  }
+  .et-photo {
+    box-shadow: 0 34px 70px -34px rgb(0 0 0 / 0.7);
+    outline: 1px solid rgb(225 238 255 / 0.28);
+    outline-offset: -1px;
+  }
+  .et-card {
+    background: linear-gradient(160deg, rgb(214 230 250 / 0.22), rgb(150 182 222 / 0.08));
+    border: 1px solid rgb(225 238 255 / 0.36);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 30px 60px -30px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+  }
+  .et-dot {
+    border: 1px solid rgb(255 255 255 / 0.35);
+    background: rgb(14 30 22 / 0.65);
+    transition: background-color 0.4s, border-color 0.4s, box-shadow 0.4s, color 0.4s, transform 0.4s;
+  }
+  .et-node:global(.is-on) { color: #fff; }
+  .et-node:global(.is-on) .et-dot,
+  .et-node:global(.is-past) .et-dot {
+    background: #b9e08f;
+    border-color: #fff;
+    color: #10201a;
+    box-shadow: 0 0 0 5px rgb(185 224 143 / 0.22);
+  }
+  .et-node:global(.is-on) .et-dot { transform: scale(1.12); }
+
+  /* 1. The footprint shrinks away and a sprout grows in its place. */
+  .et-foot-print { transform-origin: 50px 95px; transition: transform 1.4s cubic-bezier(.6,0,.2,1) 0.2s, opacity 1.2s 0.4s; }
+  .et-foot-sprout path { transform-origin: 50px 150px; transform: scale(0); transition: transform 0.9s cubic-bezier(.3,1.6,.5,1) 1.1s; }
+  .et-stop:global(.is-on) .et-foot-print { transform: scale(0.35); opacity: 0; }
+  .et-stop:global(.is-on) .et-foot-sprout path { transform: scale(1); }
+
+  /* 2. Ladybirds, the natural predators, fly in and land on the orchard. */
+  .et-bug { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(calc(var(--r) + 120deg)) scale(0.6); transition: transform 1.3s cubic-bezier(.2,.8,.2,1) var(--d), opacity 0.4s var(--d); filter: drop-shadow(0 6px 6px rgb(0 0 0 / 0.45)); }
+  .et-stop:global(.is-on) .et-bug { opacity: 1; transform: translate(0, 0) rotate(var(--r)) scale(1); animation: et-crawl 3.2s ease-in-out calc(var(--d) + 1.4s) infinite; }
+  @keyframes et-crawl { 50% { transform: translate(6px, -4px) rotate(calc(var(--r) + 14deg)) scale(1); } }
+
+  /* 3. Continuous drippers: a drop forms, falls and soaks in. */
+  .et-drip { position: absolute; left: 50%; top: 0; width: 12px; height: 16px; margin-left: -6px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: linear-gradient(180deg, #e6f7ff, #6cc6ea); box-shadow: 0 2px 8px rgb(108 198 234 / 0.6); opacity: 0; }
+  .et-ripple { position: absolute; left: 50%; bottom: -2px; width: 46px; height: 12px; margin-left: -23px; border-radius: 50%; border: 2px solid rgb(200 236 255 / 0.85); opacity: 0; }
+  .et-stop:global(.is-on) .et-drip { animation: et-drop 1.8s cubic-bezier(.5,0,.9,.6) var(--d) infinite; }
+  .et-stop:global(.is-on) .et-ripple { animation: et-ripple 1.8s ease-out var(--d) infinite; }
+  @keyframes et-drop { 0% { top: 0; transform: scale(0.2); opacity: 0; } 25% { top: 0; transform: scale(1); opacity: 1; } 70% { top: calc(100% - 14px); transform: scale(1, 1.15); opacity: 1; } 72%, 100% { top: calc(100% - 14px); opacity: 0; } }
+  @keyframes et-ripple { 0%, 70% { transform: scale(0.2); opacity: 0; } 74% { opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
+
+  /* 4. Indigenous trees grow up along the horizon. */
+  .et-tree { transform: scaleY(0) scaleX(0.6); opacity: 0; transition: transform 1s cubic-bezier(.3,1.4,.5,1) calc(0.3s + var(--d)), opacity 0.4s calc(0.3s + var(--d)); }
+  .et-stop:global(.is-on) .et-tree { transform: none; opacity: 1; }
+
+  /* 5. Wild dog tracks walk across to the sable. */
+  .et-paw { opacity: 0; transform: rotate(80deg) scale(0.4); transition: opacity 0.3s calc(0.3s + var(--d)), transform 0.4s calc(0.3s + var(--d)); filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.5)); }
+  .et-stop:global(.is-on) .et-paw { opacity: 0.9; transform: rotate(80deg) scale(1); }
+  .et-sable { border: 3px solid rgb(255 255 255 / 0.85); box-shadow: 0 20px 40px -16px rgb(0 0 0 / 0.7); transform: scale(0); transition: transform 0.8s cubic-bezier(.3,1.5,.5,1) 1.7s; }
+  .et-stop:global(.is-on) .et-sable { transform: scale(1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .et-bug, .et-drip, .et-ripple { animation: none !important; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('[data-et]').forEach((root) => {
+    const pin = root.querySelector<HTMLElement>('.et-pin')!;
+    const track = root.querySelector<HTMLElement>('[data-et-track]')!;
+    const stops = [...root.querySelectorAll<HTMLElement>('[data-et-stop]')];
+    const nodes = [...root.querySelectorAll<HTMLButtonElement>('[data-et-node]')];
+    const bgs = [...root.querySelectorAll<HTMLElement>('[data-et-bg]')];
+    const fill = root.querySelector<HTMLElement>('[data-et-fill]')!;
+    const count = root.querySelector<HTMLElement>('[data-et-count]');
+    const sun = root.querySelector<HTMLElement>('[data-et-sun]')!;
+    const far = root.querySelector<HTMLElement>('[data-et-far]')!;
+    const near = root.querySelector<HTMLElement>('[data-et-near]')!;
+    const n = stops.length;
+    let at = 0;
+
+    const show = (i: number) => {
+      if (i === at) return;
+      at = i;
+      stops.forEach((s, k) => s.classList.toggle('is-on', k === i));
+      nodes.forEach((d, k) => {
+        d.classList.toggle('is-on', k === i);
+        d.classList.toggle('is-past', k < i);
+      });
+      if (count) count.textContent = String(i + 1).padStart(2, '0');
+    };
+
+    const render = (p: number) => {
+      const pos = p * (n - 1);
+      const w = track.parentElement!.clientWidth;
+      gsap.set(track, { x: -pos * w });
+      gsap.set(far, { xPercent: -p * 50 });
+      gsap.set(near, { xPercent: -p * 65 });
+      gsap.set(fill, { scaleX: p });
+      bgs.forEach((b, k) => gsap.set(b, { opacity: Math.max(0, 1 - Math.abs(pos - k)) }));
+      // The sun rises on the left, peaks over the middle stop and sets on the right.
+      const W = pin.clientWidth;
+      const H = pin.clientHeight;
+      gsap.set(sun, { x: W * (0.3 + 0.45 * p), y: H * (0.3 - Math.sin(p * Math.PI) * 0.2), opacity: 0.6 + Math.sin(p * Math.PI) * 0.4 });
+      show(Math.round(pos));
+    };
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const st = ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: () => `+=${(n - 1) * window.innerHeight * 0.9}`,
+      pin,
+      scrub: reduce ? true : 0.6,
+      snap: reduce ? undefined : { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.6 }, delay: 0.08, ease: 'power2.inOut' },
+      invalidateOnRefresh: true,
+      onUpdate: (s) => render(s.progress),
+      onRefresh: (s) => render(s.progress),
+    });
+    render(0);
+
+    nodes.forEach((d, i) => d.addEventListener('click', () => {
+      const y = st.start + (st.end - st.start) * (i / (n - 1));
+      window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+    }));
+  });
+</script>
