@@ -38,8 +38,11 @@ interface Props {
   /** Default left name when a card has none. */
   name?: string;
   sub?: string;
+  /** 'top' (Export page): photo sits right under the heading, tighter spacing, so the whole section fits one screen. */
+  align?: 'bottom' | 'top';
 }
-const { id, eyebrow, title, tag, cards, name, sub } = Astro.props;
+const { id, eyebrow, title, tag, cards, name, sub, align = 'bottom' } = Astro.props;
+const top = align === 'top';
 const cs = cards.map((c, i) => ({ ...c, i, img: c.icon.img ? media(c.icon.img) : undefined, artImg: c.art ? media(c.art) : undefined, photoImg: c.photo ? media(c.photo) : undefined }));
 const hidden = (i: number) => (i === 0 ? '' : 'opacity:0;visibility:hidden');
 const n = cs.length;
@@ -55,14 +58,14 @@ const oneName = new Set(names).size === 1 && new Set(subs).size === 1;
     <div class="absolute inset-0 bg-[radial-gradient(40%_50%_at_70%_50%,rgb(255_255_255/0.12),transparent_70%)]"></div>
   </div>
 
-  <div class="mx-auto max-w-[84rem] px-4 py-24 md:px-6 md:py-28">
+  <div class:list={['mx-auto max-w-[84rem] px-4 md:px-6', top ? 'py-20 lg:pb-14 lg:pt-24' : 'py-24 md:py-28']}>
     <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">{eyebrow}</span>
     <h2 id={`${id}-title`} class="cond mt-3 max-w-3xl text-[clamp(2.4rem,1.6rem+2.6vw,4rem)] font-medium uppercase leading-[0.95] tracking-[0.01em] text-white">{title}</h2>
 
-    <div class="mt-8 grid items-end gap-12 lg:mt-6 lg:grid-cols-12 lg:gap-8">
+    <div class:list={['mt-8 grid gap-12 lg:mt-6 lg:grid-cols-12 lg:gap-8', top ? 'items-start' : 'items-end']}>
       <div class="lg:col-span-5">
         <div class="min-w-0 text-center lg:text-left">
-          <div class="relative mx-auto mb-4 aspect-square w-[min(72vw,24rem)] lg:-ml-6" style="perspective:1000px" data-gc-stage-art aria-hidden="true">
+          <div class:list={['relative mx-auto mb-4 aspect-square w-[min(72vw,24rem)] lg:-ml-6', top && 'lg:w-[min(22rem,42vh)]']} style="perspective:1000px" data-gc-stage-art aria-hidden="true">
             <div class="absolute inset-[8%] rounded-full border border-white/25 bg-white/[0.06] shadow-[inset_0_1px_0_rgb(255_255_255/0.3)] [backdrop-filter:blur(6px)]"></div>
             <div class="absolute inset-0 rounded-full border border-dashed border-white/15" data-gc-orbit></div>
             {cs.map((c) => (
@@ -100,7 +103,7 @@ const oneName = new Set(names).size === 1 && new Set(subs).size === 1;
         </div>
       </div>
 
-      <div class="lg:col-span-7">
+      <div class:list={['lg:col-span-7', top && 'lg:-mt-36']}>
         <div class="relative mx-auto w-full touch-pan-y select-none" data-gc-stage>
           <ul>
             {cs.map((c) => (
