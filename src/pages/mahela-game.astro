@@ -6,7 +6,6 @@ import GlassCards from '../components/site/GlassCards.astro';
 import SableHorns from '../components/site/SableHorns.astro';
 import PhotoMosaic from '../components/site/PhotoMosaic.astro';
 import CtaBand from '../components/site/CtaBand.astro';
-import Leaves from '../components/site/Leaves.astro';
 import { media } from '../lib/media';
 import { game } from '../data/pages';
 
@@ -47,7 +46,6 @@ const tiles = [
 
   <section class="relative overflow-hidden py-24 md:py-32" aria-labelledby="wild-title">
     <div class="absolute inset-0 -z-10" style="background: radial-gradient(60% 50% at 80% 20%, rgb(168 100 28 / 0.25), transparent 70%), #10201a"></div>
-    <Leaves />
     <div class="relative mx-auto max-w-[84rem] px-4 md:px-6">
       <SectionTitle eyebrow="Wildlife on Mahela farms" title="Custodians of nature" lead="Mahela plays an active role in the conservation of wildlife. Game species such as the African wild dog and sable are some of the species we have helped to protect." id="wild-title" />
       <div class="mt-12 pb-10"><PhotoMosaic tiles={tiles} /></div>

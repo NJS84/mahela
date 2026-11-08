@@ -14,7 +14,79 @@ const steps = [
   { year: '2018', title: 'Bulls over 50 inches', text: 'At the start of 2018, BJ Vorster owned three sable bulls with horns measuring more than 50 inches.' },
 ];
 const bg = media('conservation/game-and-conservation-photo1.jpg');
-const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
+
+/* ---------------------------------------------------------------------------------------------
+ * Horn geometry (build time). Each horn is a filled, tapering scimitar shape grown around a cubic
+ * centreline: wide ringed base, smooth polished upper third and a needle-sharp tip. Sable horn
+ * length is measured along the front (outside) curve, so the tape measure follows that curve.
+ * ------------------------------------------------------------------------------------------- */
+type P = [number, number];
+const f = (n: number) => n.toFixed(1);
+const bez = (a: P, b: P, c: P, d: P, t: number): P => {
+  const u = 1 - t;
+  return [u * u * u * a[0] + 3 * u * u * t * b[0] + 3 * u * t * t * c[0] + t * t * t * d[0], u * u * u * a[1] + 3 * u * u * t * b[1] + 3 * u * t * t * c[1] + t * t * t * d[1]];
+};
+const RING_END = 0.7; // rings cover the lower ~70% of the horn, the tip is smooth
+const RINGS = 23;
+function horn(pts: [P, P, P, P], w0: number, N = 240) {
+  const c: P[] = [];
+  for (let i = 0; i <= N; i++) c.push(bez(...pts, i / N));
+  const nrm: P[] = c.map((_, i) => {
+    const a = c[Math.max(0, i - 1)], b = c[Math.min(N, i + 1)];
+    const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+    return [dy / l, -dx / l]; // points to the front (left / outside) of the curve
+  });
+  // Ring phase: rings bunch up near the base and spread out as the horn rises.
+  const phase = (t: number) => { const u = Math.min(t, RING_END) / RING_END; return RINGS * Math.pow(u, 0.82) + 0.35 * Math.sin(u * 23) * u; };
+  const taperW = (t: number) => w0 * Math.pow(1 - t, 0.78) * (1 - 0.08 * Math.sin(Math.PI * t));
+  const width = (t: number) => {
+    const taper = w0 * Math.pow(1 - t, 0.78) * (1 - 0.08 * Math.sin(Math.PI * t));
+    const ridge = t < RING_END ? 1.5 * Math.pow(Math.max(0, Math.cos(2 * Math.PI * phase(t))), 6) * (1 - t / RING_END * 0.5) : 0;
+    return Math.max(0, taper + ridge);
+  };
+  const front: P[] = [], back: P[] = [];
+  c.forEach((p, i) => {
+    const t = i / N, w = width(t) / 2;
+    // The front edge carries a touch more of the width so the horn reads as curved, not tubular.
+    front.push([p[0] + nrm[i][0] * w * 1.08, p[1] + nrm[i][1] * w * 1.08]);
+    back.push([p[0] - nrm[i][0] * w * 0.92, p[1] - nrm[i][1] * w * 0.92]);
+  });
+  const outline = 'M' + front.map((p) => `${f(p[0])} ${f(p[1])}`).join('L') + 'L' + back.reverse().map((p) => `${f(p[0])} ${f(p[1])}`).join('L') + 'Z';
+  back.reverse();
+  const centre = 'M' + c.map((p) => `${f(p[0])} ${f(p[1])}`).join('L');
+  // Rings: a line across the horn at each whole phase, bowed slightly down toward the base.
+  const rings: string[] = [];
+  const hi: string[] = [];
+  let k = 1;
+  for (let i = 1; i <= N && k <= RINGS; i++) {
+    const t = i / N;
+    if (phase(t) >= k) {
+      const a = front[i], b = back[i], m = c[i];
+      const tx = -nrm[i][1], ty = nrm[i][0]; // tangent toward the base is -(dx,dy)
+      const bow = width(t) * (0.18 + 0.1 * Math.sin(k * 2.3));
+      rings.push(`M${f(a[0])} ${f(a[1])}Q${f(m[0] + tx * bow)} ${f(m[1] + ty * bow)} ${f(b[0])} ${f(b[1])}`);
+      hi.push(`M${f(a[0] - tx * 1.4)} ${f(a[1] - ty * 1.4)}Q${f(m[0] + tx * bow - tx * 1.4)} ${f(m[1] + ty * bow - ty * 1.4)} ${f(b[0] - tx * 1.4)} ${f(b[1] - ty * 1.4)}`);
+      k++;
+    }
+  }
+  // Front-edge sheen and the tape line, offset just outside the front edge.
+  const sheen = 'M' + c.map((p, i) => { const w = width(i / N) / 2 * 0.62; return `${f(p[0] + nrm[i][0] * w)} ${f(p[1] + nrm[i][1] * w)}`; }).join('L');
+  const tapePts: P[] = c.map((p, i) => { const w = taperW(i / N) / 2 * 1.08 + 8.5; return [p[0] + nrm[i][0] * w, p[1] + nrm[i][1] * w]; });
+  return { outline, centre, rings: rings.join(''), hi: hi.join(''), sheen, tapePts, nrm, c };
+}
+
+const near = horn([[66, 318], [44, 192], [70, 60], [232, 34]], 30);
+const far = horn([[98, 312], [80, 204], [104, 82], [252, 62]], 26);
+
+// Tape: inch ticks at equal arc length along the front curve of the near horn (0 to 50 inches).
+const tp = near.tapePts;
+const cum = [0];
+for (let i = 1; i < tp.length; i++) cum.push(cum[i - 1] + Math.hypot(tp[i][0] - tp[i - 1][0], tp[i][1] - tp[i - 1][1]));
+const L = cum[cum.length - 1];
+const tape = 'M' + tp.map((p) => `${f(p[0])} ${f(p[1])}`).join('L');
+const ticks = Array.from({ length: 51 }, (_, inch) => ({ inch, len: inch % 10 === 0 ? 9 : inch % 5 === 0 ? 6 : 3, label: inch % 10 === 0 }));
+const GROW_O: P = [82, 318];
+void L;
 ---
 
 <section class="sh relative isolate bg-[#120d08]" style="height:360svh" aria-labelledby="sh-title" data-sh>
@@ -23,50 +95,79 @@ const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
       <Image src={bg} alt="" widths={[960, 1440]} sizes="100vw" class="absolute inset-0 h-full w-full object-cover opacity-30" style="object-position:30% 40%" data-sh-bg />
       <div class="absolute inset-0 bg-[radial-gradient(70%_80%_at_30%_50%,rgb(120_70_20/0.55),#120d08_80%)]"></div>
     </div>
-    <div class="mx-auto grid w-full max-w-[84rem] items-center gap-6 px-4 md:grid-cols-12 md:gap-10 md:px-6">
+    <div class="mx-auto grid w-full max-w-[84rem] items-center gap-3 px-4 pt-20 md:grid-cols-12 md:gap-10 md:px-6 md:pt-0">
       <div class="md:col-span-5">
         <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">Sable breeding</span>
-        <h2 id="sh-title" class="cond mt-3 text-[clamp(2.2rem,1.5rem+2.4vw,3.8rem)] font-medium uppercase leading-[0.95] text-white">Measured in inches of horn</h2>
-        <!-- Horns and ruler. -->
-        <div class="relative mx-auto mt-4 flex h-[min(46svh,24rem)] items-end gap-4 md:mt-8 md:h-[min(56svh,30rem)]" aria-hidden="true">
-          <div class="relative h-full w-12 shrink-0">
-            <div class="absolute inset-y-0 right-0 w-px bg-white/40"></div>
-            {ticks.map((t) => (
-              <div class="absolute right-0 flex translate-y-1/2 items-center gap-1.5" style={`bottom:${(t / 50) * 100}%`}>
-                <span class="text-[0.6rem] font-semibold text-white/60">{t}″</span>
-                <span class:list={['h-px bg-white/60', t % 10 === 0 ? 'w-3' : 'w-2']}></span>
-              </div>
-            ))}
-            <div class="sh-mark absolute right-0 h-px w-[calc(100%+12rem)] translate-x-full bg-[#f2cf3c]/70" style="bottom:0%" data-sh-mark></div>
-          </div>
-          <svg viewBox="0 0 200 300" class="h-full w-auto overflow-visible" fill="none">
+        <h2 id="sh-title" class="cond mt-2 text-[clamp(1.9rem,1.4rem+2.4vw,3.8rem)] md:mt-3 font-medium uppercase leading-[0.95] text-white">Measured in inches of horn</h2>
+        <!-- A pair of sable horns with a tape measure running along the front curve. -->
+        <div class="relative mx-auto mt-2 h-[min(30svh,15rem)] md:mt-6 md:h-[min(60svh,32rem)]" aria-hidden="true">
+          <svg viewBox="-20 -14 280 344" class="h-full w-auto overflow-visible" fill="none">
             <defs>
-              <linearGradient id="sh-horn" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0" stop-color="#8a6a44" />
-                <stop offset="0.45" stop-color="#4a3420" />
-                <stop offset="1" stop-color="#1a120a" />
+              <linearGradient id="sh-fill" x1="0" y1="1" x2="0.35" y2="0">
+                <stop offset="0" stop-color="#2b211a" />
+                <stop offset="0.55" stop-color="#1b1511" />
+                <stop offset="0.86" stop-color="#3a3029" />
+                <stop offset="1" stop-color="#6b5e52" />
               </linearGradient>
+              <linearGradient id="sh-fill-far" x1="0" y1="1" x2="0.35" y2="0">
+                <stop offset="0" stop-color="#17110d" />
+                <stop offset="0.85" stop-color="#1e1915" />
+                <stop offset="1" stop-color="#4a4038" />
+              </linearGradient>
+              <linearGradient id="sh-sheen" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#f6dfb6" stop-opacity="0.08" />
+                <stop offset="0.6" stop-color="#f6dfb6" stop-opacity="0.32" />
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0.75" />
+              </linearGradient>
+              <radialGradient id="sh-boss" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" stop-color="#000" stop-opacity="0.7" />
+                <stop offset="1" stop-color="#000" stop-opacity="0" />
+              </radialGradient>
+              <filter id="sh-blur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.1" /></filter>
             </defs>
-            <!-- Two backward-curving scimitar horns rising from the head. -->
-            <path d="M78 296 C 70 220, 60 150, 84 92 C 100 56, 128 26, 166 8" stroke="url(#sh-horn)" stroke-width="16" stroke-linecap="round" pathLength="1" class="sh-horn" data-sh-horn />
-            <path d="M108 296 C 104 224, 100 160, 120 104 C 134 70, 158 44, 192 28" stroke="url(#sh-horn)" stroke-width="14" stroke-linecap="round" pathLength="1" class="sh-horn" data-sh-horn />
-            <!-- Rim light. -->
-            <path d="M74 296 C 66 220, 56 150, 80 92 C 96 56, 124 26, 162 8" stroke="#f2d9a6" stroke-width="2" stroke-linecap="round" pathLength="1" class="sh-horn sh-rim" data-sh-horn />
-            <!-- Rings on the horn base. -->
-            <path d="M78 296 C 70 220, 60 150, 84 92 C 100 56, 128 26, 166 8" stroke="#c9a26a" stroke-width="16" stroke-dasharray="0.012 0.03" pathLength="1" class="sh-ring" data-sh-ring />
+            <ellipse cx="86" cy="320" rx="70" ry="16" fill="url(#sh-boss)" />
+            <!-- Horns and tape grow together from the base, so the tips stay sharp at every size. -->
+            <g data-sh-grow data-o={GROW_O.join(' ')} transform={`translate(${GROW_O[0]} ${GROW_O[1]}) scale(0.02) translate(${-GROW_O[0]} ${-GROW_O[1]})`}>
+              <!-- Far horn, darker and set back. -->
+              <g>
+                <path d={far.outline} fill="url(#sh-fill-far)" />
+                <path d={far.rings} stroke="#050302" stroke-width="1.5" opacity="0.9" />
+                <path d={far.hi} stroke="#c8ab84" stroke-width="0.8" opacity="0.18" />
+                <path d={far.sheen} stroke="url(#sh-sheen)" stroke-width="1.6" opacity="0.5" filter="url(#sh-blur)" />
+              </g>
+              <!-- Near horn. -->
+              <g class="sh-near">
+                <path d={near.outline} fill="url(#sh-fill)" />
+                <path d={near.rings} stroke="#070403" stroke-width="1.7" />
+                <path d={near.hi} stroke="#e2c79c" stroke-width="0.8" opacity="0.2" />
+                <path d={near.sheen} stroke="url(#sh-sheen)" stroke-width="2.4" filter="url(#sh-blur)" />
+                <path d={near.outline} stroke="#000" stroke-opacity="0.55" stroke-width="0.6" />
+              </g>
+              <path d={tape} stroke="#f2cf3c" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke" class="sh-tapeline" data-sh-tape />
+            </g>
+            <!-- Inch ticks, placed each frame along the grown tape (they keep their size). -->
+            <g class="sh-ticks">
+              {ticks.map((t) => (
+                <g class="sh-tick" data-sh-tick={t.inch} data-len={t.len}>
+                  <path d="M0 0L1 0" stroke="#f2cf3c" stroke-width={t.label ? 1.4 : 0.9} />
+                  {t.label && <text text-anchor="middle" dominant-baseline="middle" class="sh-lbl">{t.inch}″</text>}
+                </g>
+              ))}
+              <circle r="4.2" fill="#f2cf3c" class="sh-head" data-sh-head cx={GROW_O[0]} cy={GROW_O[1]} />
+            </g>
           </svg>
-          <p class="absolute bottom-0 right-0 text-right" >
-            <span class="cond block text-[clamp(3.6rem,2.6rem+4vw,6.5rem)] font-medium leading-[0.8] text-white"><span data-sh-count>0</span>″</span>
-            <span class="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-white/70">sable horn length</span>
+          <p class="absolute bottom-0 right-0 text-right">
+            <span class="cond block text-[clamp(3rem,2.4rem+4vw,6.5rem)] font-medium leading-[0.8] text-white"><span data-sh-count>0</span>″</span>
+            <span class="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-white/70">measured along the curve</span>
           </p>
         </div>
       </div>
-      <ol class="space-y-3 md:col-span-7">
+      <ol class="space-y-2 md:col-span-7 md:space-y-3">
         {steps.map((s, i) => (
-          <li class="sh-step flex gap-5 rounded-[24px] p-5 md:p-6" data-sh-step={i}>
-            <span class="cond w-24 shrink-0 text-3xl font-medium uppercase leading-none text-white md:w-36 md:text-[2.6rem]">{s.year}</span>
+          <li class="sh-step flex gap-4 rounded-[20px] px-4 py-3 md:gap-5 md:rounded-[24px] md:p-6" data-sh-step={i}>
+            <span class="cond w-20 shrink-0 text-2xl font-medium uppercase leading-none text-white md:w-36 md:text-[2.6rem]">{s.year}</span>
             <span>
-              <span class="cond block text-lg font-medium uppercase leading-tight text-white md:text-2xl">{s.title}</span>
+              <span class="cond block text-base font-medium uppercase leading-tight text-white md:text-2xl">{s.title}</span>
               <span class="sh-text block text-[0.85rem] leading-snug text-white/85 md:text-[0.95rem]">{s.text}</span>
             </span>
           </li>
@@ -77,26 +178,32 @@ const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
 </section>
 
 <style>
-  .sh-horn {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.5));
+  .sh-near {
+    filter: drop-shadow(0 12px 16px rgb(0 0 0 / 0.55));
   }
-  .sh-rim {
-    opacity: 0.55;
-    filter: none;
+  .sh-tapeline {
+    filter: drop-shadow(0 0 4px rgb(242 207 60 / 0.6));
   }
-  .sh-ring {
-    opacity: 0.6;
-    clip-path: inset(70% 0 0 0);
+  .sh-tick {
+    opacity: 0;
+  }
+  .sh-tick.is-on {
+    opacity: 1;
+  }
+  .sh-lbl {
+    fill: rgb(255 255 255 / 0.85);
+    font: 600 8.5px/1 Inter, system-ui, sans-serif;
+  }
+  .sh-head {
+    filter: drop-shadow(0 0 6px rgb(242 207 60 / 0.9));
   }
   .sh-step {
-    background: linear-gradient(160deg, rgb(214 230 250 / 0.18), rgb(150 182 222 / 0.06));
-    border: 1px solid rgb(225 238 255 / 0.26);
+    background: linear-gradient(160deg, rgb(110 160 235 / 0.34), rgb(30 72 143 / 0.26));
+    border: 1px solid rgb(200 222 255 / 0.3);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
     backdrop-filter: blur(18px) saturate(150%);
-    opacity: 0.45;
+    opacity: 0.62;
     transition: opacity 0.5s, transform 0.5s, border-color 0.5s;
   }
   .sh-text {
@@ -116,9 +223,6 @@ const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
   .sh-step.is-past {
     opacity: 0.78;
   }
-  .sh-mark {
-    box-shadow: 0 0 10px rgb(242 207 60 / 0.6);
-  }
 </style>
 
 <script>
@@ -128,11 +232,28 @@ const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
 
   document.querySelectorAll<HTMLElement>('[data-sh]').forEach((root) => {
     const steps = [...root.querySelectorAll<HTMLElement>('[data-sh-step]')];
-    const horns = [...root.querySelectorAll<SVGPathElement>('[data-sh-horn]')];
-    const ring = root.querySelector<SVGPathElement>('[data-sh-ring]')!;
+    const grow = root.querySelector<SVGGElement>('[data-sh-grow]')!;
+    const tape = root.querySelector<SVGPathElement>('[data-sh-tape]')!;
+    const head = root.querySelector<SVGCircleElement>('[data-sh-head]')!;
+    const tickEls = [...root.querySelectorAll<SVGGElement>('[data-sh-tick]')].map((el) => ({
+      el,
+      inch: Number(el.dataset.shTick),
+      len: Number(el.dataset.len),
+      line: el.querySelector('path')!,
+      text: el.querySelector('text'),
+    }));
     const count = root.querySelector<HTMLElement>('[data-sh-count]')!;
-    const mark = root.querySelector<HTMLElement>('[data-sh-mark]')!;
     const bg = root.querySelector<HTMLElement>('[data-sh-bg]')!;
+    const tapeLen = tape.getTotalLength();
+    const [ox, oy] = (grow.dataset.o || '82 318').split(' ').map(Number);
+    // A point on the tape (scaled by s about the base) plus the outward normal at that point.
+    const onTape = (len: number, s: number) => {
+      const a = tape.getPointAtLength(Math.max(0, len - 0.6));
+      const b = tape.getPointAtLength(Math.min(tapeLen, len + 0.6));
+      const p = tape.getPointAtLength(len);
+      const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1;
+      return { x: ox + (p.x - ox) * s, y: oy + (p.y - oy) * s, nx: dy / l, ny: -dx / l };
+    };
     const n = steps.length;
     let at = -1;
     const show = (i: number) => {
@@ -154,11 +275,26 @@ const ticks = Array.from({ length: 11 }, (_, i) => i * 5);
         const p = st.progress;
         show(Math.min(n - 1, Math.floor(p * n * 0.999)));
         const g = Math.min(1, p / 0.85);
-        horns.forEach((h, k) => h.style.setProperty('stroke-dashoffset', String(1 - Math.max(0, Math.min(1, g * 1.04 - k * 0.04)))));
-        ring.style.opacity = String(0.6 * g);
+        // The pair of horns grows from the base; tips stay sharp at every size. The tape on the
+        // front curve grows with them and its inch ticks are re-laid each frame at true scale.
+        const sc = Math.max(0.02, g);
+        grow.setAttribute('transform', `translate(${ox} ${oy}) scale(${sc}) translate(${-ox} ${-oy})`);
         const inches = Math.round(g * 50);
+        tickEls.forEach((t) => {
+          const on = t.inch <= g * 50 + 0.001 && g > 0.01;
+          t.el.style.opacity = on ? '1' : '0';
+          if (!on) return;
+          const q = onTape(((t.inch / 50) * tapeLen) / sc, sc);
+          t.line.setAttribute('d', `M${q.x} ${q.y}L${q.x + q.nx * t.len} ${q.y + q.ny * t.len}`);
+          if (t.text) {
+            t.text.setAttribute('x', String(q.x + q.nx * 19));
+            t.text.setAttribute('y', String(q.y + q.ny * 19));
+          }
+        });
+        const tip = onTape(tapeLen, sc);
+        head.setAttribute('cx', String(tip.x));
+        head.setAttribute('cy', String(tip.y));
         count.textContent = String(inches);
-        mark.style.bottom = `${g * 100}%`;
         gsap.set(bg, { scale: 1.12 - p * 0.12 });
       },
     });
