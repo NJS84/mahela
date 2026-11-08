@@ -33,3 +33,6 @@ Phase 2: home page look and feel. Photography, logo and certification marks come
 2. `cp .env.example .env` and set `SANITY_PROJECT_ID` / `SANITY_DATASET`. `cp studio/.env.example studio/.env` and set the same two values.
 3. Studio: `cd studio && npm install && npx sanity login && npm run seed && npm run dev` (opens at localhost:3333). `npm run seed` loads the current approved Cares copy.
 4. Site: `npm run dev`. Anything empty in Sanity falls back to the built-in copy; with no `.env` the site is unchanged.
+
+## Preview hosting
+The client preview is built by Cloudflare from branch claude/project-thread-rnglkk (see wrangler.jsonc). It is hidden from search engines until launch.
