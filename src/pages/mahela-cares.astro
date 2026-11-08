@@ -12,8 +12,28 @@ import Icon from '../components/site/Icon.astro';
 import Leaves from '../components/site/Leaves.astro';
 import { media } from '../lib/media';
 import { cares } from '../data/pages';
+import { sanityFetch, sanityImage, pick, type SanityImage } from '../lib/sanity';
 
-const description = 'How Mahela Group cares for its employees, community and environment: SIZA accreditation, training, an on-farm crèche and school, the Khomanani Mahela farmer project, integrated pest management and wildlife conservation.';
+/* Editable in Sanity Studio (studio/ folder, document "Mahela Cares page"). Any field left empty uses the approved copy below. */
+type CaresCms = {
+  seoDescription?: string;
+  heroEyebrow?: string;
+  heroTitle?: string;
+  heroLead?: string;
+  heroImage?: SanityImage;
+  employeeCards?: { title?: string; text?: string }[];
+  programmes?: string[];
+  communityTitle?: string;
+  communityText?: string[];
+  schoolCardTitle?: string;
+  schoolCardText?: string;
+  ctaTitle?: string;
+  ctaText?: string;
+};
+const cms = (await sanityFetch<CaresCms>(`*[_type == "caresPage" && _id == "caresPage"][0]`)) ?? {};
+const heroRemote = sanityImage(cms.heroImage);
+
+const description = pick(cms.seoDescription, 'How Mahela Group cares for its employees, community and environment: SIZA accreditation, training, an on-farm crèche and school, the Khomanani Mahela farmer project, integrated pest management and wildlife conservation.');
 const hero = media('people/team-2025-103319.jpg');
 const pillars = [
   { id: 'employees', icon: 'people', title: 'Our employees' },
@@ -29,7 +49,10 @@ const people = [
   { short: 'Crèche', title: 'Crèche and school', text: 'Working moms can focus on their careers, knowing that toddlers are well looked after by trained personnel in a Mahela Group crèche. With an on-farm primary school, their children need not walk long distances.', icon: { line: 'heart' as const }, tone: ['#c0446a', '#2a0c18'] as [string, string], photo: 'community/mahelacares-community-photo1.jpg', name: 'Crèche and school', sub: 'On the farm' },
   { short: 'Sport', title: 'A healthy, balanced life', text: 'Mahela Group promotes a healthy and well-balanced life by organising and sponsoring events such as soccer tournaments, fishing and cycling competitions.', icon: { line: 'sun' as const }, tone: ['#c98a12', '#3a2604'] as [string, string], photo: 'community/mahelacares-people-photo4.jpg', name: 'Sport and events', sub: 'Soccer, fishing, cycling' },
   { short: 'Vegetables', title: 'Vegetable tunnels', text: 'Vegetable tunnels were erected on farms. Workers are supplied with everything they need to produce vegetables for themselves and their families.', icon: { line: 'sprout' as const }, tone: ['#5f8a2a', '#16260a'] as [string, string], photo: 'generated/soil-hands.jpg', name: 'Vegetable project', sub: 'For workers and families' },
-];
+].map((c, i) => ({ ...c, title: pick(cms.employeeCards?.[i]?.title, c.title), text: pick(cms.employeeCards?.[i]?.text, c.text) }));
+const programmes = pick(cms.programmes, cares.programmes);
+const community = { title: pick(cms.communityTitle, 'Our community'), text: pick(cms.communityText, cares.community), school: pick(cms.schoolCardTitle, 'Junction primary school'), schoolText: pick(cms.schoolCardText, 'Funded almost entirely by Mahela, on land Mahela provided') };
+const cta = { title: pick(cms.ctaTitle, 'Partner with a grower that cares.'), text: pick(cms.ctaText, 'Ethically grown, SIZA-accredited fruit from a company invested in its people, its community and the land.') };
 const tiles = [
   { src: 'people/team-2025-103338.jpg', alt: 'Mahela colleagues together at the entrance with the Mahela elephant emblem', cls: 'sm:col-span-2 lg:col-span-4 lg:row-span-2', pos: '50% 30%' },
   { src: 'people/team-2022-105310.jpg', alt: 'A Mahela colleague in traditional dress in the office reception', cls: 'lg:col-span-2 lg:row-span-2', pos: '50% 12%' },
@@ -41,7 +64,7 @@ const tiles = [
 ---
 
 <Base title="Mahela Cares" description={description} breadcrumbs={[{ name: 'Mahela Cares', href: '/mahela-cares' }]} ogImage={hero}>
-  <PageHero image={hero} eyebrow="Mahela Cares" title="People, community and the land we farm" lead={cares.lead} crumbs={[{ name: "Mahela Cares", href: "/mahela-cares" }]} position="50% 62%">
+  <PageHero image={hero} remote={heroRemote} eyebrow={pick(cms.heroEyebrow, 'Mahela Cares')} title={pick(cms.heroTitle, 'People, community and the land we farm')} lead={pick(cms.heroLead, cares.lead)} crumbs={[{ name: "Mahela Cares", href: "/mahela-cares" }]} position="50% 62%">
     <ul class="mt-8 flex flex-wrap gap-2">
       {pillars.map((p) => <li><a href={`#${p.id}`} class="mc-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white"><Icon name={p.icon} class="size-4" />{p.title}</a></li>)}
     </ul>
@@ -51,7 +74,7 @@ const tiles = [
     <div slot="panel">
       <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white">Programmes on our farms</p>
       <ul class="grid gap-x-4 gap-y-2 sm:grid-cols-2">
-        {cares.programmes.map((x) => <li class="flex items-center gap-2 text-[0.8rem] text-white/90"><Icon name="check" class="size-3.5 shrink-0 text-[#74c365]" />{x}</li>)}
+        {programmes.map((x) => <li class="flex items-center gap-2 text-[0.8rem] text-white/90"><Icon name="check" class="size-3.5 shrink-0 text-[#74c365]" />{x}</li>)}
       </ul>
     </div>
   </GlassCards>
@@ -65,8 +88,8 @@ const tiles = [
     <Leaves />
     <div class="relative mx-auto grid max-w-[84rem] items-center gap-12 px-4 md:px-6 lg:grid-cols-12">
       <div class="lg:col-span-6">
-        <SectionTitle eyebrow="Uplifting our community" title="Our community" id="community-title" />
-        {cares.community.map((t, i) => <p class:list={['mt-5 leading-relaxed', i === 0 ? 'text-xl text-ivory/90' : 'text-ivory/80']} data-reveal>{t}</p>)}
+        <SectionTitle eyebrow="Uplifting our community" title={community.title} id="community-title" />
+        {community.text.map((t, i) => <p class:list={['mt-5 leading-relaxed', i === 0 ? 'text-xl text-ivory/90' : 'text-ivory/80']} data-reveal>{t}</p>)}
       </div>
       <div class="grid grid-cols-2 gap-4 lg:col-span-6">
         <figure class="mc-photo col-span-2 overflow-hidden rounded-[28px]" data-reveal>
@@ -74,7 +97,7 @@ const tiles = [
         </figure>
         <div class="mc-glass flex min-h-full flex-col justify-between gap-4 rounded-[28px] p-5 text-white md:p-6" data-reveal>
           <Icon name="heart" class="size-7" />
-          <p><span class="cond block text-[clamp(1.3rem,1rem+1vw,2rem)] font-medium uppercase leading-none">Junction primary school</span><span class="mt-2 block text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">Funded almost entirely by Mahela, on land Mahela provided</span></p>
+          <p><span class="cond block text-[clamp(1.3rem,1rem+1vw,2rem)] font-medium uppercase leading-none">{community.school}</span><span class="mt-2 block text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white/75">{community.schoolText}</span></p>
         </div>
         <figure class="mc-photo aspect-square overflow-hidden rounded-[28px]" data-reveal>
           <Image src={media('community/mahelacares-community-photo1.jpg')} alt="Learners in green uniforms at a school supported by Mahela Group" widths={[480, 720]} sizes="(min-width: 1024px) 20vw, 46vw" class="h-full w-full object-cover" />
@@ -86,7 +109,7 @@ const tiles = [
   <section class="mx-auto max-w-[84rem] px-4 pb-24 md:px-6 md:pb-32" aria-labelledby="life-title">
     <SectionTitle eyebrow="Life at Mahela" title="The people behind the fruit" id="life-title" />
     <div class="mt-12 pb-10"><PhotoMosaic tiles={tiles} /></div>
-    <div class="mt-16"><CtaBand title="Partner with a grower that cares." text="Ethically grown, SIZA-accredited fruit from a company invested in its people, its community and the land." /></div>
+    <div class="mt-16"><CtaBand title={cta.title} text={cta.text} /></div>
   </section>
 </Base>
 
